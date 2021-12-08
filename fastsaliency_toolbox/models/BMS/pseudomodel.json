@@ -1,0 +1,8 @@
+{
+    "name": "BMS",
+    "original_model_name": "BMS",
+    "notes" : "Knowledge distilled version with a very leightweight neural network",
+    "student_path": "BMS/exported/bms.pth",
+    "version": "1.0.0",
+    "model_type": "matlab"
+}

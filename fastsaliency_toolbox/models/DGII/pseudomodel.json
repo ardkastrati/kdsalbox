@@ -1,0 +1,8 @@
+{
+    "name": "DGII",
+    "original_model_name": "Deep Gaze II",
+    "notes" : "Knowledge distilled version with a very leightweight neural network",
+    "student_path": "DGII/exported/dgii.pth",
+    "version": "1.0.0",
+    "model_type": "deep learning"
+}

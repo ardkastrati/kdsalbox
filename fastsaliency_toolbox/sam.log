@@ -1,0 +1,2073 @@
+Got name AIM
+Got original model name Attention by Information Maximization
+Got notes Knowledge distilled version with a very leightweight neural network
+Got student path AIM/exported/aim.pth
+Got root path models/
+Got model type matlab
+Got version 1.0.0
+Got pretrained False
+Got name SAM
+Got original model name SAM
+Got notes Knowledge distilled version with a very leightweight neural network
+Got student path SAM/exported/sam.pth
+Got root path models/
+Got model type matlab
+Got version 1.0.0
+Got pretrained False
+Got name BMS
+Got original model name BMS
+Got notes Knowledge distilled version with a very leightweight neural network
+Got student path BMS/exported/bms.pth
+Got root path models/
+Got model type matlab
+Got version 1.0.0
+Got pretrained False
+Got name SUN
+Got original model name SUN
+Got notes Knowledge distilled version with a very leightweight neural network
+Got student path SUN/exported/sun.pth
+Got root path models/
+Got model type matlab
+Got version 1.0.0
+Got pretrained False
+Got name GBVS
+Got original model name Attention by Information Maximization
+Got notes Knowledge distilled version with a very leightweight neural network
+Got student path GBVS/exported/gbvs.pth
+Got root path models/
+Got model type matlab
+Got version 1.0.0
+Got pretrained False
+Got name RARE2012
+Got original model name Attention by Information Maximization
+Got notes Knowledge distilled version with a very leightweight neural network
+Got student path RARE2012/exported/rare2012.pth
+Got root path models/
+Got model type matlab
+Got version 1.0.0
+Got pretrained False
+Got name UniSal
+Got original model name Unisal
+Got notes Knowledge distilled version with a very leightweight neural network
+Got student path UniSal/exported/unisal.pth
+Got root path models/
+Got model type deep learning
+Got version 1.0.0
+Got pretrained False
+Got name IKN
+Got original model name The initial model
+Got notes Knowledge distilled version with a very leightweight neural network
+Got student path IKN/exported/ikn.pth
+Got root path models/
+Got model type matlab
+Got version 1.0.0
+Got pretrained False
+Got name IMSIG
+Got original model name Image Signature
+Got notes Knowledge distilled version with a very leightweight neural network
+Got student path IMSIG/exported/imsig.pth
+Got root path models/
+Got model type matlab
+Got version 1.0.0
+Got pretrained False
+Got name DGII
+Got original model name Deep Gaze II
+Got notes Knowledge distilled version with a very leightweight neural network
+Got student path DGII/exported/dgii.pth
+Got root path models/
+Got model type deep learning
+Got version 1.0.0
+Got pretrained False
+{'aim': <backend.pseudomodels.PseudoModel object at 0x7f2b7e067550>, 'sam': <backend.pseudomodels.PseudoModel object at 0x7f2b7aefd700>, 'bms': <backend.pseudomodels.PseudoModel object at 0x7f2b7af0f5b0>, 'sun': <backend.pseudomodels.PseudoModel object at 0x7f2b7b2e37c0>, 'gbvs': <backend.pseudomodels.PseudoModel object at 0x7f2b7b21a5b0>, 'rare2012': <backend.pseudomodels.PseudoModel object at 0x7f2b7b143760>, 'unisal': <backend.pseudomodels.PseudoModel object at 0x7f2b7b07b760>, 'ikn': <backend.pseudomodels.PseudoModel object at 0x7f2b7aff7130>, 'imsig': <backend.pseudomodels.PseudoModel object at 0x7f2b7aecd3d0>, 'dgii': <backend.pseudomodels.PseudoModel object at 0x7f2b7ae14670>}
+{'aim': <backend.pseudomodels.PseudoModel object at 0x7f2b7e067550>, 'sam': <backend.pseudomodels.PseudoModel object at 0x7f2b7aefd700>, 'bms': <backend.pseudomodels.PseudoModel object at 0x7f2b7af0f5b0>, 'sun': <backend.pseudomodels.PseudoModel object at 0x7f2b7b2e37c0>, 'gbvs': <backend.pseudomodels.PseudoModel object at 0x7f2b7b21a5b0>, 'rare2012': <backend.pseudomodels.PseudoModel object at 0x7f2b7b143760>, 'unisal': <backend.pseudomodels.PseudoModel object at 0x7f2b7b07b760>, 'ikn': <backend.pseudomodels.PseudoModel object at 0x7f2b7aff7130>, 'imsig': <backend.pseudomodels.PseudoModel object at 0x7f2b7aecd3d0>, 'dgii': <backend.pseudomodels.PseudoModel object at 0x7f2b7ae14670>}
+Parameter: experiment_name: REMAININGDEFAULTRERUN1
+Parameter: experiment_description: NA
+Parameter: models: SAM
+Parameter: logging_dir: logs/experiment_logs/
+Parameter: input_images: ./dataset/DATASET/Images/
+Parameter: input_saliencies: ./dataset/DATASET/
+Parameter: recursive: False
+Parameter: overwrite: False
+Parameter: verbose: True
+['experiment_name', 'experiment_description', 'models', 'logging_dir', 'input_images', 'input_saliencies', 'recursive', 'overwrite', 'verbose']
+Moving pseudomodel SAM in cuda:0
+Position 1
+54525952
+42424320
+
+0
+0
+
+0
+0
+
+0
+0
+
+0
+0
+
+0
+0
+
+0
+0
+
+0
+0
+
+Train setup:
+Init dataset
+	 total of 10000 images.
+Validation setup:
+Init dataset
+	 total of 5000 images.
+************************************************************
+*********************** TRAINING SAM ***********************
+************************************************************
+Trainer started...
+Encoder frozen...
+FOUND SOMETHING WEIRD
+Batch 0: current accumulated loss 0.6909804940223694
+Batch 100: current accumulated loss 0.16711608497518124
+Batch 200: current accumulated loss 0.15760280058455112
+Batch 300: current accumulated loss 0.15153613184080567
+Batch 400: current accumulated loss 0.1477270256774384
+Batch 500: current accumulated loss 0.14679769761191158
+Batch 600: current accumulated loss 0.14578023742568275
+Batch 700: current accumulated loss 0.14520783248369432
+Batch 800: current accumulated loss 0.14527118417170462
+Batch 900: current accumulated loss 0.14448933276067696
+Batch 1000: current accumulated loss 0.1439056106202014
+Batch 1100: current accumulated loss 0.14308587370354084
+Batch 1200: current accumulated loss 0.14328811098073146
+Batch 1300: current accumulated loss 0.1427240156948704
+Batch 1400: current accumulated loss 0.1420153352956445
+Batch 1500: current accumulated loss 0.14168953013015062
+Batch 1600: current accumulated loss 0.14154536375714272
+Batch 1700: current accumulated loss 0.14110665755682592
+Batch 1800: current accumulated loss 0.1409771970283449
+Batch 1900: current accumulated loss 0.14104681329577298
+Batch 2000: current accumulated loss 0.1410356130281548
+Batch 2100: current accumulated loss 0.1406429402852898
+Batch 2200: current accumulated loss 0.14042397392833303
+Batch 2300: current accumulated loss 0.14016010220130595
+Batch 2400: current accumulated loss 0.13974201493973734
+--------------------------------------------->>>>>>
+Epoch 0: loss train 0.13956710448861123, lr 0.01
+--------------------------------------------->>>>>>
+Batch 0: current accumulated loss 0.12437552213668823
+Batch 100: current accumulated loss 0.1637274956349099
+Batch 200: current accumulated loss 0.1629612536276158
+Batch 300: current accumulated loss 0.16378245317064646
+Batch 400: current accumulated loss 0.1640981461044559
+Batch 500: current accumulated loss 0.1675690637674636
+Batch 600: current accumulated loss 0.168066766726693
+Batch 700: current accumulated loss 0.16643621222502664
+Batch 800: current accumulated loss 0.16545668422487494
+Batch 900: current accumulated loss 0.1656590251832969
+Batch 1000: current accumulated loss 0.16463743670137373
+Batch 1100: current accumulated loss 0.1647992595543004
+Batch 1200: current accumulated loss 0.1645399804206117
+--------------------------------------------->>>>>>
+Epoch 0: loss val 0.16420178794264795, lr 0.01
+--------------------------------------------->>>>>>
+FOUND SOMETHING WEIRD
+Batch 0: current accumulated loss 0.19047117233276367
+Batch 100: current accumulated loss 0.12937127157013015
+Batch 200: current accumulated loss 0.1327203302018678
+Batch 300: current accumulated loss 0.13152916259147795
+Batch 400: current accumulated loss 0.13077534980458808
+Batch 500: current accumulated loss 0.13180952638149737
+Batch 600: current accumulated loss 0.1320696805732421
+Batch 700: current accumulated loss 0.1326294599071719
+Batch 800: current accumulated loss 0.1333421366045091
+Batch 900: current accumulated loss 0.13325182835547694
+Batch 1000: current accumulated loss 0.13320462054365523
+Batch 1100: current accumulated loss 0.13296339325911344
+Batch 1200: current accumulated loss 0.13356470647923258
+Batch 1300: current accumulated loss 0.1333810230981928
+Batch 1400: current accumulated loss 0.13299854794818958
+Batch 1500: current accumulated loss 0.13305030039931678
+Batch 1600: current accumulated loss 0.13317753267076
+Batch 1700: current accumulated loss 0.13304039162705744
+Batch 1800: current accumulated loss 0.1331390832643387
+Batch 1900: current accumulated loss 0.13341585690178162
+Batch 2000: current accumulated loss 0.13358301623561036
+Batch 2100: current accumulated loss 0.13338347209146736
+Batch 2200: current accumulated loss 0.1333415051757179
+Batch 2300: current accumulated loss 0.13325127925576463
+Batch 2400: current accumulated loss 0.13297625124200044
+--------------------------------------------->>>>>>
+Epoch 1: loss train 0.13291830650120973, lr 0.01
+--------------------------------------------->>>>>>
+Batch 0: current accumulated loss 0.11028380692005157
+Batch 100: current accumulated loss 0.15032403716946593
+Batch 200: current accumulated loss 0.14891124335094472
+Batch 300: current accumulated loss 0.14978407714454042
+Batch 400: current accumulated loss 0.1500433015444332
+Batch 500: current accumulated loss 0.15289982327979482
+Batch 600: current accumulated loss 0.15317294020174743
+Batch 700: current accumulated loss 0.15172548434257338
+Batch 800: current accumulated loss 0.15090235232023264
+Batch 900: current accumulated loss 0.15102396812393318
+Batch 1000: current accumulated loss 0.15013080557341224
+Batch 1100: current accumulated loss 0.15035859895675535
+Batch 1200: current accumulated loss 0.15005313682305524
+--------------------------------------------->>>>>>
+Epoch 1: loss val 0.1497799279540777, lr 0.01
+--------------------------------------------->>>>>>
+FOUND SOMETHING WEIRD
+Batch 0: current accumulated loss 0.18303842842578888
+Batch 100: current accumulated loss 0.12591690540608794
+Batch 200: current accumulated loss 0.12950528220305987
+Batch 300: current accumulated loss 0.12844824063223462
+Batch 400: current accumulated loss 0.1277483982078155
+Batch 500: current accumulated loss 0.12880608211912795
+Batch 600: current accumulated loss 0.1291455829922054
+Batch 700: current accumulated loss 0.12962386528622577
+Batch 800: current accumulated loss 0.13026855673906063
+Batch 900: current accumulated loss 0.13022919196002888
+Batch 1000: current accumulated loss 0.130194392513026
+Batch 1100: current accumulated loss 0.1299892626871963
+Batch 1200: current accumulated loss 0.13060956966321136
+Batch 1300: current accumulated loss 0.13048877035032136
+Batch 1400: current accumulated loss 0.13014614793719945
+Batch 1500: current accumulated loss 0.13022262476469024
+Batch 1600: current accumulated loss 0.13036865799185784
+Batch 1700: current accumulated loss 0.13025880711200236
+Batch 1800: current accumulated loss 0.1303796774704115
+Batch 1900: current accumulated loss 0.13065512883802705
+Batch 2000: current accumulated loss 0.13083594149608782
+Batch 2100: current accumulated loss 0.13063924598628598
+Batch 2200: current accumulated loss 0.1306494841659302
+Batch 2300: current accumulated loss 0.13058121720315166
+Batch 2400: current accumulated loss 0.1303408400344506
+--------------------------------------------->>>>>>
+Epoch 2: loss train 0.13030616361647845, lr 0.01
+--------------------------------------------->>>>>>
+Batch 0: current accumulated loss 0.10754034668207169
+Batch 100: current accumulated loss 0.13967995898853433
+Batch 200: current accumulated loss 0.13857671188477852
+Batch 300: current accumulated loss 0.13921385949038192
+Batch 400: current accumulated loss 0.13932412154879653
+Batch 500: current accumulated loss 0.14179764544505796
+Batch 600: current accumulated loss 0.14216958104745916
+Batch 700: current accumulated loss 0.1409870958627971
+Batch 800: current accumulated loss 0.14026191066043653
+Batch 900: current accumulated loss 0.14040662920501468
+Batch 1000: current accumulated loss 0.13969087154864074
+Batch 1100: current accumulated loss 0.13981951885162214
+Batch 1200: current accumulated loss 0.13954257963536978
+--------------------------------------------->>>>>>
+Epoch 2: loss val 0.13930077439248562, lr 0.01
+--------------------------------------------->>>>>>
+Encoder unfrozen
+FOUND SOMETHING WEIRD
+Batch 0: current accumulated loss 0.17345036566257477
+Batch 100: current accumulated loss 0.1236560780665662
+Batch 200: current accumulated loss 0.12727736018190336
+Batch 300: current accumulated loss 0.12630678955898728
+Batch 400: current accumulated loss 0.12573300300170656
+Batch 500: current accumulated loss 0.12683550467688642
+Batch 600: current accumulated loss 0.12721731167863093
+Batch 700: current accumulated loss 0.1277169730307032
+Batch 800: current accumulated loss 0.12837651404511466
+Batch 900: current accumulated loss 0.12831220072957705
+Batch 1000: current accumulated loss 0.1283147451016572
+Batch 1100: current accumulated loss 0.12807305471178188
+Batch 1200: current accumulated loss 0.12870739115019028
+Batch 1300: current accumulated loss 0.12857783892171187
+Batch 1400: current accumulated loss 0.1283109450418978
+Batch 1500: current accumulated loss 0.12838994756311198
+Batch 1600: current accumulated loss 0.1285331268224174
+Batch 1700: current accumulated loss 0.12845700077804517
+Batch 1800: current accumulated loss 0.12859093950133665
+Batch 1900: current accumulated loss 0.1288725889549012
+Batch 2000: current accumulated loss 0.12905359070474418
+Batch 2100: current accumulated loss 0.12886473466631118
+Batch 2200: current accumulated loss 0.1288775789726192
+Batch 2300: current accumulated loss 0.12879554181967234
+Batch 2400: current accumulated loss 0.1285555720816474
+--------------------------------------------->>>>>>
+Epoch 3: loss train 0.12851817985028027, lr 0.01
+--------------------------------------------->>>>>>
+Batch 0: current accumulated loss 0.10496889799833298
+Batch 100: current accumulated loss 0.13976541921348856
+Batch 200: current accumulated loss 0.13861874453908768
+Batch 300: current accumulated loss 0.13954292767467688
+Batch 400: current accumulated loss 0.13963461994307297
+Batch 500: current accumulated loss 0.14215944850159262
+Batch 600: current accumulated loss 0.14255496466566442
+Batch 700: current accumulated loss 0.14136106225950232
+Batch 800: current accumulated loss 0.14062384697381924
+Batch 900: current accumulated loss 0.14076830583989422
+Batch 1000: current accumulated loss 0.14004976637326516
+Batch 1100: current accumulated loss 0.14025183200335417
+Batch 1200: current accumulated loss 0.1400007893867189
+--------------------------------------------->>>>>>
+Epoch 3: loss val 0.13975548706948757, lr 0.01
+--------------------------------------------->>>>>>
+FOUND SOMETHING WEIRD
+Batch 0: current accumulated loss 0.17314960062503815
+Batch 100: current accumulated loss 0.1222224235534668
+Batch 200: current accumulated loss 0.12571252878773864
+Batch 300: current accumulated loss 0.12479221499045426
+Batch 400: current accumulated loss 0.12430844847995444
+Batch 500: current accumulated loss 0.12553816971307744
+Batch 600: current accumulated loss 0.12583017838923585
+Batch 700: current accumulated loss 0.12633786216569526
+Batch 800: current accumulated loss 0.12702528348241407
+Batch 900: current accumulated loss 0.12700638876241796
+Batch 1000: current accumulated loss 0.12697648239153606
+Batch 1100: current accumulated loss 0.12675351909041188
+Batch 1200: current accumulated loss 0.1273321759957606
+Batch 1300: current accumulated loss 0.12722047812074172
+Batch 1400: current accumulated loss 0.1269173142044864
+Batch 1500: current accumulated loss 0.1269805104577843
+Batch 1600: current accumulated loss 0.12713291456714634
+Batch 1700: current accumulated loss 0.1270342160898892
+Batch 1800: current accumulated loss 0.12714265509488382
+Batch 1900: current accumulated loss 0.12741627239635403
+Batch 2000: current accumulated loss 0.1275956310901506
+Batch 2100: current accumulated loss 0.12741236806249176
+Batch 2200: current accumulated loss 0.127446857392314
+Batch 2300: current accumulated loss 0.12738206630644722
+Batch 2400: current accumulated loss 0.12715619995954233
+--------------------------------------------->>>>>>
+Epoch 4: loss train 0.1271399773016572, lr 0.01
+--------------------------------------------->>>>>>
+Batch 0: current accumulated loss 0.10785149037837982
+Batch 100: current accumulated loss 0.1375817102518412
+Batch 200: current accumulated loss 0.13645586890367725
+Batch 300: current accumulated loss 0.1374325448046887
+Batch 400: current accumulated loss 0.13746554493681154
+Batch 500: current accumulated loss 0.1399020709900442
+Batch 600: current accumulated loss 0.1402782374270843
+Batch 700: current accumulated loss 0.13906489374825515
+Batch 800: current accumulated loss 0.1383054450656591
+Batch 900: current accumulated loss 0.13843607031776425
+Batch 1000: current accumulated loss 0.13777745937878316
+Batch 1100: current accumulated loss 0.13792108584002513
+Batch 1200: current accumulated loss 0.13760595124751504
+--------------------------------------------->>>>>>
+Epoch 4: loss val 0.13736239570379258, lr 0.01
+--------------------------------------------->>>>>>
+FOUND SOMETHING WEIRD
+Batch 0: current accumulated loss 0.1768266260623932
+Batch 100: current accumulated loss 0.12083023801298425
+Batch 200: current accumulated loss 0.1242288161643702
+Batch 300: current accumulated loss 0.12338848439264931
+Batch 400: current accumulated loss 0.12282002210022505
+Batch 500: current accumulated loss 0.12401111743704764
+Batch 600: current accumulated loss 0.12439377403844415
+Batch 700: current accumulated loss 0.12488922718035511
+Batch 800: current accumulated loss 0.12562485779641422
+Batch 900: current accumulated loss 0.125652997213913
+Batch 1000: current accumulated loss 0.12563597853039646
+Batch 1100: current accumulated loss 0.12543381124626604
+Batch 1200: current accumulated loss 0.1260193538705475
+Batch 1300: current accumulated loss 0.12589759653366867
+Batch 1400: current accumulated loss 0.1256184099902858
+Batch 1500: current accumulated loss 0.12567680836379092
+Batch 1600: current accumulated loss 0.1258152181109289
+Batch 1700: current accumulated loss 0.12573063568699927
+Batch 1800: current accumulated loss 0.12585273843624736
+Batch 1900: current accumulated loss 0.12612716008814492
+Batch 2000: current accumulated loss 0.12631157877436583
+Batch 2100: current accumulated loss 0.12611856574333605
+Batch 2200: current accumulated loss 0.1261508183647751
+Batch 2300: current accumulated loss 0.12608884225580444
+Batch 2400: current accumulated loss 0.12586350308755248
+--------------------------------------------->>>>>>
+Epoch 5: loss train 0.12583940042108296, lr 0.01
+--------------------------------------------->>>>>>
+Batch 0: current accumulated loss 0.10371700674295425
+Batch 100: current accumulated loss 0.13647905338813762
+Batch 200: current accumulated loss 0.13508436387747674
+Batch 300: current accumulated loss 0.13607505991114335
+Batch 400: current accumulated loss 0.13615460089986164
+Batch 500: current accumulated loss 0.13852201438622322
+Batch 600: current accumulated loss 0.13893768910362003
+Batch 700: current accumulated loss 0.13768258416618667
+Batch 800: current accumulated loss 0.13694803125588934
+Batch 900: current accumulated loss 0.13707911514250207
+Batch 1000: current accumulated loss 0.1364276544465409
+Batch 1100: current accumulated loss 0.13658000825549882
+Batch 1200: current accumulated loss 0.13629719027807374
+--------------------------------------------->>>>>>
+Epoch 5: loss val 0.1360724124222994, lr 0.01
+--------------------------------------------->>>>>>
+FOUND SOMETHING WEIRD
+Batch 0: current accumulated loss 0.17045651376247406
+Batch 100: current accumulated loss 0.11993449033782033
+Batch 200: current accumulated loss 0.12306778162569548
+Batch 300: current accumulated loss 0.12231457164121229
+Batch 400: current accumulated loss 0.12179857914212933
+Batch 500: current accumulated loss 0.1229973247873331
+Batch 600: current accumulated loss 0.12331016659240754
+Batch 700: current accumulated loss 0.12376261377088013
+Batch 800: current accumulated loss 0.12446771048651206
+Batch 900: current accumulated loss 0.12444712879026637
+Batch 1000: current accumulated loss 0.12444204287780272
+Batch 1100: current accumulated loss 0.1242532372190452
+Batch 1200: current accumulated loss 0.124819214558919
+Batch 1300: current accumulated loss 0.12469415187973137
+Batch 1400: current accumulated loss 0.12444671441260446
+Batch 1500: current accumulated loss 0.12449611573517919
+Batch 1600: current accumulated loss 0.12464626299113798
+Batch 1700: current accumulated loss 0.1245405369978628
+Batch 1800: current accumulated loss 0.12464632168163994
+Batch 1900: current accumulated loss 0.12491932597750115
+Batch 2000: current accumulated loss 0.1250837881328433
+Batch 2100: current accumulated loss 0.12489296011502603
+Batch 2200: current accumulated loss 0.12492606751129931
+Batch 2300: current accumulated loss 0.12487318264445964
+Batch 2400: current accumulated loss 0.12464423329631073
+--------------------------------------------->>>>>>
+Epoch 6: loss train 0.12462769835591317, lr 0.01
+--------------------------------------------->>>>>>
+Batch 0: current accumulated loss 0.10020732879638672
+Batch 100: current accumulated loss 0.13475067810256883
+Batch 200: current accumulated loss 0.13368280524786433
+Batch 300: current accumulated loss 0.1345812491701291
+Batch 400: current accumulated loss 0.13461500027233228
+Batch 500: current accumulated loss 0.13693728652632164
+Batch 600: current accumulated loss 0.1373731198715985
+Batch 700: current accumulated loss 0.1361279440100455
+Batch 800: current accumulated loss 0.1354137593310573
+Batch 900: current accumulated loss 0.13555933044733404
+Batch 1000: current accumulated loss 0.1349287614762247
+Batch 1100: current accumulated loss 0.13510594694629027
+Batch 1200: current accumulated loss 0.13482340201611423
+--------------------------------------------->>>>>>
+Epoch 6: loss val 0.13457515732944011, lr 0.01
+--------------------------------------------->>>>>>
+FOUND SOMETHING WEIRD
+Batch 0: current accumulated loss 0.16445912420749664
+Batch 100: current accumulated loss 0.11901984157243578
+Batch 200: current accumulated loss 0.12193633560369264
+Batch 300: current accumulated loss 0.1210856873331672
+Batch 400: current accumulated loss 0.12060175933631281
+Batch 500: current accumulated loss 0.12173150270850121
+Batch 600: current accumulated loss 0.12207476918069575
+Batch 700: current accumulated loss 0.12254294815251389
+Batch 800: current accumulated loss 0.12331155102965091
+Batch 900: current accumulated loss 0.12329269893938773
+Batch 1000: current accumulated loss 0.12328534356349118
+Batch 1100: current accumulated loss 0.12310465009752779
+Batch 1200: current accumulated loss 0.12365254934111007
+Batch 1300: current accumulated loss 0.1235042511586452
+Batch 1400: current accumulated loss 0.12324348420468421
+Batch 1500: current accumulated loss 0.12330417135242698
+Batch 1600: current accumulated loss 0.12345526607789746
+Batch 1700: current accumulated loss 0.12338829412837368
+Batch 1800: current accumulated loss 0.12350213319179021
+Batch 1900: current accumulated loss 0.12377197061053456
+Batch 2000: current accumulated loss 0.1239521167073948
+Batch 2100: current accumulated loss 0.1237787135328383
+Batch 2200: current accumulated loss 0.1238008868296219
+Batch 2300: current accumulated loss 0.12374694181726788
+Batch 2400: current accumulated loss 0.12353538349736289
+--------------------------------------------->>>>>>
+Epoch 7: loss train 0.12351470010876656, lr 0.01
+--------------------------------------------->>>>>>
+Batch 0: current accumulated loss 0.10009732097387314
+Batch 100: current accumulated loss 0.13384182153656932
+Batch 200: current accumulated loss 0.1327121577304394
+Batch 300: current accumulated loss 0.13364184595817744
+Batch 400: current accumulated loss 0.13366971739992833
+Batch 500: current accumulated loss 0.13596863541268778
+Batch 600: current accumulated loss 0.1363351110201608
+Batch 700: current accumulated loss 0.13509269908984617
+Batch 800: current accumulated loss 0.1343595560188969
+Batch 900: current accumulated loss 0.13452233268686062
+Batch 1000: current accumulated loss 0.13389580099509432
+Batch 1100: current accumulated loss 0.13405722464949948
+Batch 1200: current accumulated loss 0.1337685180358049
+--------------------------------------------->>>>>>
+Epoch 7: loss val 0.1335177311360836, lr 0.01
+--------------------------------------------->>>>>>
+FOUND SOMETHING WEIRD
+Batch 0: current accumulated loss 0.16145747900009155
+Batch 100: current accumulated loss 0.117937105569509
+Batch 200: current accumulated loss 0.12080503607270729
+Batch 300: current accumulated loss 0.12013538154553734
+Batch 400: current accumulated loss 0.11964930388658421
+Batch 500: current accumulated loss 0.12075383566364557
+Batch 600: current accumulated loss 0.12111345882498087
+Batch 700: current accumulated loss 0.12157562750786245
+Batch 800: current accumulated loss 0.12232436908039261
+Batch 900: current accumulated loss 0.12227984110552913
+Batch 1000: current accumulated loss 0.12228053123815791
+Batch 1100: current accumulated loss 0.12210967208679215
+Batch 1200: current accumulated loss 0.12265889008810975
+Batch 1300: current accumulated loss 0.12253371124470078
+Batch 1400: current accumulated loss 0.12228191331784101
+Batch 1500: current accumulated loss 0.12233819929680612
+Batch 1600: current accumulated loss 0.1224921127033189
+Batch 1700: current accumulated loss 0.12239801703674663
+Batch 1800: current accumulated loss 0.1225275758784192
+Batch 1900: current accumulated loss 0.12279274788876698
+Batch 2000: current accumulated loss 0.12296293600313905
+Batch 2100: current accumulated loss 0.12279936691470399
+Batch 2200: current accumulated loss 0.12282887227775724
+Batch 2300: current accumulated loss 0.12276972117293455
+Batch 2400: current accumulated loss 0.1225339067694124
+--------------------------------------------->>>>>>
+Epoch 8: loss train 0.1225256563052535, lr 0.01
+--------------------------------------------->>>>>>
+Batch 0: current accumulated loss 0.09815093129873276
+Batch 100: current accumulated loss 0.13313495308750928
+Batch 200: current accumulated loss 0.13205597186414755
+Batch 300: current accumulated loss 0.13300045686108725
+Batch 400: current accumulated loss 0.13297332239864473
+Batch 500: current accumulated loss 0.13524845896842713
+Batch 600: current accumulated loss 0.13556377294654656
+Batch 700: current accumulated loss 0.1343267648115478
+Batch 800: current accumulated loss 0.1336095289149311
+Batch 900: current accumulated loss 0.13375861294046623
+Batch 1000: current accumulated loss 0.133140500597693
+Batch 1100: current accumulated loss 0.1332634142062861
+Batch 1200: current accumulated loss 0.13298152188005097
+--------------------------------------------->>>>>>
+Epoch 8: loss val 0.1327305151462555, lr 0.01
+--------------------------------------------->>>>>>
+FOUND SOMETHING WEIRD
+Batch 0: current accumulated loss 0.1632692962884903
+Batch 100: current accumulated loss 0.11719474631665956
+Batch 200: current accumulated loss 0.11987070212909831
+Batch 300: current accumulated loss 0.11897147167164622
+Batch 400: current accumulated loss 0.11852549215281694
+Batch 500: current accumulated loss 0.11965172154133667
+Batch 600: current accumulated loss 0.1200521416813383
+Batch 700: current accumulated loss 0.12052418622646624
+Batch 800: current accumulated loss 0.12131714238116655
+Batch 900: current accumulated loss 0.12133369452168093
+Batch 1000: current accumulated loss 0.12137123917440673
+Batch 1100: current accumulated loss 0.12121782640670235
+Batch 1200: current accumulated loss 0.12179339897945263
+Batch 1300: current accumulated loss 0.12167109281889849
+Batch 1400: current accumulated loss 0.12142005436478727
+Batch 1500: current accumulated loss 0.12146633295348531
+Batch 1600: current accumulated loss 0.1216534619556413
+Batch 1700: current accumulated loss 0.12157748430213951
+Batch 1800: current accumulated loss 0.12171666576904035
+Batch 1900: current accumulated loss 0.12198871959281056
+Batch 2000: current accumulated loss 0.12214855438676374
+Batch 2100: current accumulated loss 0.12197742612942919
+Batch 2200: current accumulated loss 0.12197282731614292
+Batch 2300: current accumulated loss 0.12193351735671361
+Batch 2400: current accumulated loss 0.1217178381244027
+--------------------------------------------->>>>>>
+Epoch 9: loss train 0.12171707763373851, lr 0.01
+--------------------------------------------->>>>>>
+Batch 0: current accumulated loss 0.09866400808095932
+Batch 100: current accumulated loss 0.1323983401502713
+Batch 200: current accumulated loss 0.13141464760795754
+Batch 300: current accumulated loss 0.1322770937287134
+Batch 400: current accumulated loss 0.13227378779515958
+Batch 500: current accumulated loss 0.13451926029489902
+Batch 600: current accumulated loss 0.13480005583132365
+Batch 700: current accumulated loss 0.13362802025701281
+Batch 800: current accumulated loss 0.13291150790066011
+Batch 900: current accumulated loss 0.13305096475450895
+Batch 1000: current accumulated loss 0.13247466388788376
+Batch 1100: current accumulated loss 0.13260746963125916
+Batch 1200: current accumulated loss 0.13231552228468046
+--------------------------------------------->>>>>>
+Epoch 9: loss val 0.13205440744161606, lr 0.01
+--------------------------------------------->>>>>>
+FOUND SOMETHING WEIRD
+Batch 0: current accumulated loss 0.16082479059696198
+Batch 100: current accumulated loss 0.11643140408957359
+Batch 200: current accumulated loss 0.119200726053608
+Batch 300: current accumulated loss 0.118460454430394
+Batch 400: current accumulated loss 0.1179867685955956
+Batch 500: current accumulated loss 0.11909971878438176
+Batch 600: current accumulated loss 0.11946105239246531
+Batch 700: current accumulated loss 0.11992279005458793
+Batch 800: current accumulated loss 0.12070793248294445
+Batch 900: current accumulated loss 0.1206918744066447
+Batch 1000: current accumulated loss 0.120738851581956
+Batch 1100: current accumulated loss 0.12058089275275112
+Batch 1200: current accumulated loss 0.12115324671681874
+Batch 1300: current accumulated loss 0.12104589373537616
+Batch 1400: current accumulated loss 0.12078034504450363
+Batch 1500: current accumulated loss 0.12080850762170525
+Batch 1600: current accumulated loss 0.12095617123418194
+Batch 1700: current accumulated loss 0.12088041458232904
+Batch 1800: current accumulated loss 0.1210289126027299
+Batch 1900: current accumulated loss 0.12130019224705914
+Batch 2000: current accumulated loss 0.12147289552148255
+Batch 2100: current accumulated loss 0.12130712605534083
+Batch 2200: current accumulated loss 0.12132166309628309
+Batch 2300: current accumulated loss 0.12127834972947746
+Batch 2400: current accumulated loss 0.12105542686036705
+--------------------------------------------->>>>>>
+Epoch 10: loss train 0.12105706470906734, lr 0.01
+--------------------------------------------->>>>>>
+Batch 0: current accumulated loss 0.09701929986476898
+Batch 100: current accumulated loss 0.1313234627394393
+Batch 200: current accumulated loss 0.13032855797762893
+Batch 300: current accumulated loss 0.1311086468720357
+Batch 400: current accumulated loss 0.13098361103463352
+Batch 500: current accumulated loss 0.13317452496040366
+Batch 600: current accumulated loss 0.13343526096317215
+Batch 700: current accumulated loss 0.1322523860550471
+Batch 800: current accumulated loss 0.1315375655405828
+Batch 900: current accumulated loss 0.13169898489670007
+Batch 1000: current accumulated loss 0.13112680816447939
+Batch 1100: current accumulated loss 0.1312456625758194
+Batch 1200: current accumulated loss 0.13099399739124198
+--------------------------------------------->>>>>>
+Epoch 10: loss val 0.1307382437556982, lr 0.01
+--------------------------------------------->>>>>>
+FOUND SOMETHING WEIRD
+Batch 0: current accumulated loss 0.15772224962711334
+Batch 100: current accumulated loss 0.11606260979234582
+Batch 200: current accumulated loss 0.1187881422205944
+Batch 300: current accumulated loss 0.11784736364089769
+Batch 400: current accumulated loss 0.11735812214172986
+Batch 500: current accumulated loss 0.11847321927815141
+Batch 600: current accumulated loss 0.11887989206217886
+Batch 700: current accumulated loss 0.11936086584706279
+Batch 800: current accumulated loss 0.12012826023941928
+Batch 900: current accumulated loss 0.12007615466361306
+Batch 1000: current accumulated loss 0.12009824429090683
+Batch 1100: current accumulated loss 0.11993191341491422
+Batch 1200: current accumulated loss 0.12048645080885323
+Batch 1300: current accumulated loss 0.12039768397464466
+Batch 1400: current accumulated loss 0.12012706172627946
+Batch 1500: current accumulated loss 0.12016294061700794
+Batch 1600: current accumulated loss 0.12029759125606035
+Batch 1700: current accumulated loss 0.12023410835751781
+Batch 1800: current accumulated loss 0.1203706393050426
+Batch 1900: current accumulated loss 0.1206590176874998
+Batch 2000: current accumulated loss 0.12083990680522051
+Batch 2100: current accumulated loss 0.12067866139025248
+Batch 2200: current accumulated loss 0.12071192436857908
+Batch 2300: current accumulated loss 0.12067959893791119
+Batch 2400: current accumulated loss 0.12046414859490512
+--------------------------------------------->>>>>>
+Epoch 11: loss train 0.1204731165498495, lr 0.01
+--------------------------------------------->>>>>>
+Batch 0: current accumulated loss 0.09686405211687088
+Batch 100: current accumulated loss 0.13122152087121908
+Batch 200: current accumulated loss 0.13024650884801475
+Batch 300: current accumulated loss 0.13115373602836236
+Batch 400: current accumulated loss 0.13107329478807878
+Batch 500: current accumulated loss 0.13329152330875157
+Batch 600: current accumulated loss 0.13352937059796194
+Batch 700: current accumulated loss 0.13230326884398277
+Batch 800: current accumulated loss 0.13158709240540137
+Batch 900: current accumulated loss 0.1317501608344347
+Batch 1000: current accumulated loss 0.13119223037293623
+Batch 1100: current accumulated loss 0.1313113120945338
+Batch 1200: current accumulated loss 0.1310543522648172
+--------------------------------------------->>>>>>
+Epoch 11: loss val 0.13077994236946106, lr 0.01
+--------------------------------------------->>>>>>
+FOUND SOMETHING WEIRD
+Batch 0: current accumulated loss 0.15646199882030487
+Batch 100: current accumulated loss 0.11548927942715069
+Batch 200: current accumulated loss 0.11820029945515875
+Batch 300: current accumulated loss 0.11734647603328045
+Batch 400: current accumulated loss 0.11685311919696016
+Batch 500: current accumulated loss 0.11801323241846053
+Batch 600: current accumulated loss 0.1183866098485949
+Batch 700: current accumulated loss 0.1188270116328513
+Batch 800: current accumulated loss 0.1196118781852365
+Batch 900: current accumulated loss 0.11961278032829838
+Batch 1000: current accumulated loss 0.11965479725203314
+Batch 1100: current accumulated loss 0.11949588641943876
+Batch 1200: current accumulated loss 0.12004627293591495
+Batch 1300: current accumulated loss 0.11993965417788086
+Batch 1400: current accumulated loss 0.11966650938877117
+Batch 1500: current accumulated loss 0.11967503564366494
+Batch 1600: current accumulated loss 0.11982572599454346
+Batch 1700: current accumulated loss 0.11974938813025358
+Batch 1800: current accumulated loss 0.11989738727231479
+Batch 1900: current accumulated loss 0.12021974010343052
+Batch 2000: current accumulated loss 0.12039300016518953
+Batch 2100: current accumulated loss 0.12022538794854436
+Batch 2200: current accumulated loss 0.12024928077459607
+Batch 2300: current accumulated loss 0.12020078405368748
+Batch 2400: current accumulated loss 0.11999017850452043
+--------------------------------------------->>>>>>
+Epoch 12: loss train 0.11999010029733181, lr 0.01
+--------------------------------------------->>>>>>
+Batch 0: current accumulated loss 0.093688003718853
+Batch 100: current accumulated loss 0.13078030191435672
+Batch 200: current accumulated loss 0.12989020688616815
+Batch 300: current accumulated loss 0.13057225464883437
+Batch 400: current accumulated loss 0.13059626893138054
+Batch 500: current accumulated loss 0.1327931881322713
+Batch 600: current accumulated loss 0.1330016047047597
+Batch 700: current accumulated loss 0.13180710972630857
+Batch 800: current accumulated loss 0.13114661973588326
+Batch 900: current accumulated loss 0.13134599426610355
+Batch 1000: current accumulated loss 0.13075874436211277
+Batch 1100: current accumulated loss 0.1308649431281367
+Batch 1200: current accumulated loss 0.1305980353207513
+--------------------------------------------->>>>>>
+Epoch 12: loss val 0.1303476552903652, lr 0.01
+--------------------------------------------->>>>>>
+FOUND SOMETHING WEIRD
+Batch 0: current accumulated loss 0.1555900126695633
+Batch 100: current accumulated loss 0.11484200426257483
+Batch 200: current accumulated loss 0.11757206542426674
+Batch 300: current accumulated loss 0.11673336685248388
+Batch 400: current accumulated loss 0.1162733719254521
+Batch 500: current accumulated loss 0.11742209005141686
+Batch 600: current accumulated loss 0.11782411164828822
+Batch 700: current accumulated loss 0.11829471001972826
+Batch 800: current accumulated loss 0.11910149822018566
+Batch 900: current accumulated loss 0.11909315498188121
+Batch 1000: current accumulated loss 0.11914921017153399
+Batch 1100: current accumulated loss 0.11899129435636584
+Batch 1200: current accumulated loss 0.11954742558703732
+Batch 1300: current accumulated loss 0.11944992123293381
+Batch 1400: current accumulated loss 0.11918072281225846
+Batch 1500: current accumulated loss 0.11921374996420465
+Batch 1600: current accumulated loss 0.11935157999210176
+Batch 1700: current accumulated loss 0.11928216864446343
+Batch 1800: current accumulated loss 0.11942042421129662
+Batch 1900: current accumulated loss 0.11972238661340197
+Batch 2000: current accumulated loss 0.11986518035578109
+Batch 2100: current accumulated loss 0.11970230574404439
+Batch 2200: current accumulated loss 0.11972273994695865
+Batch 2300: current accumulated loss 0.11969201854943763
+Batch 2400: current accumulated loss 0.11948334118013876
+--------------------------------------------->>>>>>
+Epoch 13: loss train 0.11950356240421534, lr 0.01
+--------------------------------------------->>>>>>
+Batch 0: current accumulated loss 0.09284195303916931
+Batch 100: current accumulated loss 0.1306908098187777
+Batch 200: current accumulated loss 0.12965214593493524
+Batch 300: current accumulated loss 0.13045446616767647
+Batch 400: current accumulated loss 0.13038390074064607
+Batch 500: current accumulated loss 0.13263516537770778
+Batch 600: current accumulated loss 0.13288298961450773
+Batch 700: current accumulated loss 0.13172460235814734
+Batch 800: current accumulated loss 0.13105133254913504
+Batch 900: current accumulated loss 0.13120612972617546
+Batch 1000: current accumulated loss 0.13062214814163708
+Batch 1100: current accumulated loss 0.13076663524128976
+Batch 1200: current accumulated loss 0.1305083309445254
+--------------------------------------------->>>>>>
+Epoch 13: loss val 0.13024527841806413, lr 0.01
+--------------------------------------------->>>>>>
+FOUND SOMETHING WEIRD
+Batch 0: current accumulated loss 0.15514659881591797
+Batch 100: current accumulated loss 0.11412006384222814
+Batch 200: current accumulated loss 0.11698185924941035
+Batch 300: current accumulated loss 0.1162168171467179
+Batch 400: current accumulated loss 0.1157357032849753
+Batch 500: current accumulated loss 0.11690521116058032
+Batch 600: current accumulated loss 0.11726885872231348
+Batch 700: current accumulated loss 0.11771668606941268
+Batch 800: current accumulated loss 0.11852658982301473
+Batch 900: current accumulated loss 0.11852619070952529
+Batch 1000: current accumulated loss 0.11859125931273688
+Batch 1100: current accumulated loss 0.11845212840525049
+Batch 1200: current accumulated loss 0.1189843637498094
+Batch 1300: current accumulated loss 0.11890003793256546
+Batch 1400: current accumulated loss 0.11865505269016648
+Batch 1500: current accumulated loss 0.11868471747573259
+Batch 1600: current accumulated loss 0.11883621055081366
+Batch 1700: current accumulated loss 0.11877844483974329
+Batch 1800: current accumulated loss 0.1189042629900573
+Batch 1900: current accumulated loss 0.11920113175880087
+Batch 2000: current accumulated loss 0.11935755066286916
+Batch 2100: current accumulated loss 0.11920748106152997
+Batch 2200: current accumulated loss 0.11922544269555539
+Batch 2300: current accumulated loss 0.11918043596317902
+Batch 2400: current accumulated loss 0.11896349793483892
+--------------------------------------------->>>>>>
+Epoch 14: loss train 0.11896810888797045, lr 0.01
+--------------------------------------------->>>>>>
+Batch 0: current accumulated loss 0.0928928479552269
+Batch 100: current accumulated loss 0.13062889328097352
+Batch 200: current accumulated loss 0.12935710068217557
+Batch 300: current accumulated loss 0.13016792332314178
+Batch 400: current accumulated loss 0.13020314159164406
+Batch 500: current accumulated loss 0.13232001000476218
+Batch 600: current accumulated loss 0.13251865568404983
+Batch 700: current accumulated loss 0.13138178530841343
+Batch 800: current accumulated loss 0.1306789635160889
+Batch 900: current accumulated loss 0.1308331218249393
+Batch 1000: current accumulated loss 0.13026611873141297
+Batch 1100: current accumulated loss 0.13041672533163148
+Batch 1200: current accumulated loss 0.1301457839773706
+--------------------------------------------->>>>>>
+Epoch 14: loss val 0.12987478782236575, lr 0.01
+--------------------------------------------->>>>>>
+FOUND SOMETHING WEIRD
+Batch 0: current accumulated loss 0.1560375690460205
+Batch 100: current accumulated loss 0.11398109546539807
+Batch 200: current accumulated loss 0.1167164637489402
+Batch 300: current accumulated loss 0.11586951099311395
+Batch 400: current accumulated loss 0.11545569032542129
+Batch 500: current accumulated loss 0.11666395707788343
+Batch 600: current accumulated loss 0.11702809281362075
+Batch 700: current accumulated loss 0.11745686020792466
+Batch 800: current accumulated loss 0.11820666625463264
+Batch 900: current accumulated loss 0.11817623856379242
+Batch 1000: current accumulated loss 0.11824030806119744
+Batch 1100: current accumulated loss 0.11806986344255825
+Batch 1200: current accumulated loss 0.11863268361575002
+Batch 1300: current accumulated loss 0.11854978786247405
+Batch 1400: current accumulated loss 0.11828690875244514
+Batch 1500: current accumulated loss 0.11830562821215268
+Batch 1600: current accumulated loss 0.11843705829523787
+Batch 1700: current accumulated loss 0.11837276895648237
+Batch 1800: current accumulated loss 0.1185032094785864
+Batch 1900: current accumulated loss 0.11880348560874052
+Batch 2000: current accumulated loss 0.11897017566607274
+Batch 2100: current accumulated loss 0.11880773259437634
+Batch 2200: current accumulated loss 0.1188439001269581
+Batch 2300: current accumulated loss 0.11879714062418797
+Batch 2400: current accumulated loss 0.11858514658191312
+--------------------------------------------->>>>>>
+Epoch 15: loss train 0.1186177088201046, lr 0.01
+--------------------------------------------->>>>>>
+Batch 0: current accumulated loss 0.09354248642921448
+Batch 100: current accumulated loss 0.13066274060471222
+Batch 200: current accumulated loss 0.1294873435402391
+Batch 300: current accumulated loss 0.1302855963821823
+Batch 400: current accumulated loss 0.13022501957126686
+Batch 500: current accumulated loss 0.13231888059489502
+Batch 600: current accumulated loss 0.13260183311044277
+Batch 700: current accumulated loss 0.1314154861710126
+Batch 800: current accumulated loss 0.13070117437586504
+Batch 900: current accumulated loss 0.13091199332383047
+Batch 1000: current accumulated loss 0.13033003768661283
+Batch 1100: current accumulated loss 0.13046993458005757
+Batch 1200: current accumulated loss 0.13022118347769077
+--------------------------------------------->>>>>>
+Epoch 15: loss val 0.12994951203465463, lr 0.01
+--------------------------------------------->>>>>>
+FOUND SOMETHING WEIRD
+Batch 0: current accumulated loss 0.1538790464401245
+Batch 100: current accumulated loss 0.11345457547519466
+Batch 200: current accumulated loss 0.11612988020576055
+Batch 300: current accumulated loss 0.11524301799527831
+Batch 400: current accumulated loss 0.11467445826627072
+Batch 500: current accumulated loss 0.1157197881185128
+Batch 600: current accumulated loss 0.11608179442944026
+Batch 700: current accumulated loss 0.11645580669825155
+Batch 800: current accumulated loss 0.11717554982681846
+Batch 900: current accumulated loss 0.11713324240372659
+Batch 1000: current accumulated loss 0.1170781289713902
+Batch 1100: current accumulated loss 0.11682007662769235
+Batch 1200: current accumulated loss 0.11726654377718651
+Batch 1300: current accumulated loss 0.11712279305331622
+Batch 1400: current accumulated loss 0.11681578919653124
+Batch 1500: current accumulated loss 0.1167763200682215
+Batch 1600: current accumulated loss 0.11686030246880486
+Batch 1700: current accumulated loss 0.11672958272395942
+Batch 1800: current accumulated loss 0.11676647481216383
+Batch 1900: current accumulated loss 0.11698031976137081
+Batch 2000: current accumulated loss 0.11705967040545401
+Batch 2100: current accumulated loss 0.11683981255519565
+Batch 2200: current accumulated loss 0.11678885720646527
+Batch 2300: current accumulated loss 0.11665162287882389
+Batch 2400: current accumulated loss 0.11635584591956548
+--------------------------------------------->>>>>>
+Epoch 16: loss train 0.11628005109727382, lr 0.001
+--------------------------------------------->>>>>>
+Batch 0: current accumulated loss 0.0908588245511055
+Batch 100: current accumulated loss 0.13006086551611967
+Batch 200: current accumulated loss 0.12870826446150072
+Batch 300: current accumulated loss 0.1296134393328052
+Batch 400: current accumulated loss 0.12953387191542365
+Batch 500: current accumulated loss 0.13172693755068704
+Batch 600: current accumulated loss 0.1319690414529275
+Batch 700: current accumulated loss 0.1308027516503137
+Batch 800: current accumulated loss 0.1300628911680571
+Batch 900: current accumulated loss 0.13021794757438818
+Batch 1000: current accumulated loss 0.12963696760120808
+Batch 1100: current accumulated loss 0.12980361365045773
+Batch 1200: current accumulated loss 0.1295233832255043
+--------------------------------------------->>>>>>
+Epoch 16: loss val 0.12925931948125363, lr 0.001
+--------------------------------------------->>>>>>
+FOUND SOMETHING WEIRD
+Batch 0: current accumulated loss 0.15080811083316803
+Batch 100: current accumulated loss 0.11105010603176485
+Batch 200: current accumulated loss 0.11392932776269035
+Batch 300: current accumulated loss 0.11324110754651089
+Batch 400: current accumulated loss 0.11276911679385904
+Batch 500: current accumulated loss 0.11387601254615717
+Batch 600: current accumulated loss 0.11430413922459234
+Batch 700: current accumulated loss 0.11470972765741946
+Batch 800: current accumulated loss 0.1155019426595108
+Batch 900: current accumulated loss 0.11549505741892592
+Batch 1000: current accumulated loss 0.11548333931397962
+Batch 1100: current accumulated loss 0.11527410532930675
+Batch 1200: current accumulated loss 0.11574621987121984
+Batch 1300: current accumulated loss 0.11564206959340409
+Batch 1400: current accumulated loss 0.11537502215727154
+Batch 1500: current accumulated loss 0.11535355347710638
+Batch 1600: current accumulated loss 0.11546137859389828
+Batch 1700: current accumulated loss 0.11536039509698266
+Batch 1800: current accumulated loss 0.11542342604240863
+Batch 1900: current accumulated loss 0.11566625207051172
+Batch 2000: current accumulated loss 0.11577474024297595
+Batch 2100: current accumulated loss 0.1155817929011677
+Batch 2200: current accumulated loss 0.11555506472477096
+Batch 2300: current accumulated loss 0.11544942312502747
+Batch 2400: current accumulated loss 0.11518846302200536
+--------------------------------------------->>>>>>
+Epoch 17: loss train 0.11514937382787466, lr 0.001
+--------------------------------------------->>>>>>
+Batch 0: current accumulated loss 0.09040819108486176
+Batch 100: current accumulated loss 0.1300635293568715
+Batch 200: current accumulated loss 0.12873984005913805
+Batch 300: current accumulated loss 0.1297130891155959
+Batch 400: current accumulated loss 0.12964347132163453
+Batch 500: current accumulated loss 0.13183492832555027
+Batch 600: current accumulated loss 0.13206740323076033
+Batch 700: current accumulated loss 0.13089718978942375
+Batch 800: current accumulated loss 0.13015543412272998
+Batch 900: current accumulated loss 0.1303082096465883
+Batch 1000: current accumulated loss 0.12972860576047168
+Batch 1100: current accumulated loss 0.12989379682803998
+Batch 1200: current accumulated loss 0.12960931892001956
+--------------------------------------------->>>>>>
+Epoch 17: loss val 0.12934539833664893, lr 0.001
+--------------------------------------------->>>>>>
+FOUND SOMETHING WEIRD
+Batch 0: current accumulated loss 0.15037892758846283
+Batch 100: current accumulated loss 0.11031587554676699
+Batch 200: current accumulated loss 0.11312606434027354
+Batch 300: current accumulated loss 0.11247038867237956
+Batch 400: current accumulated loss 0.11200367719715373
+Batch 500: current accumulated loss 0.11313382211975946
+Batch 600: current accumulated loss 0.11357325838627712
+Batch 700: current accumulated loss 0.11397596567167705
+Batch 800: current accumulated loss 0.11477764975395839
+Batch 900: current accumulated loss 0.11477747388787725
+Batch 1000: current accumulated loss 0.11476533474785822
+Batch 1100: current accumulated loss 0.11456301584366124
+Batch 1200: current accumulated loss 0.11503533736107054
+Batch 1300: current accumulated loss 0.11494097215832884
+Batch 1400: current accumulated loss 0.11469007802224432
+Batch 1500: current accumulated loss 0.11466829275723539
+Batch 1600: current accumulated loss 0.11478060955818112
+Batch 1700: current accumulated loss 0.11469188510609472
+Batch 1800: current accumulated loss 0.11476410287683173
+Batch 1900: current accumulated loss 0.11501234797452199
+Batch 2000: current accumulated loss 0.11513204563191269
+Batch 2100: current accumulated loss 0.11494825167075218
+Batch 2200: current accumulated loss 0.11492822671149168
+Batch 2300: current accumulated loss 0.11483294276382186
+Batch 2400: current accumulated loss 0.11458258591018236
+--------------------------------------------->>>>>>
+Epoch 18: loss train 0.11455622409582138, lr 0.001
+--------------------------------------------->>>>>>
+Batch 0: current accumulated loss 0.09003214538097382
+Batch 100: current accumulated loss 0.1302053626663614
+Batch 200: current accumulated loss 0.12889337183824226
+Batch 300: current accumulated loss 0.12992585700413714
+Batch 400: current accumulated loss 0.12985752277689386
+Batch 500: current accumulated loss 0.13205499973096058
+Batch 600: current accumulated loss 0.13229625372715084
+Batch 700: current accumulated loss 0.13110478823411992
+Batch 800: current accumulated loss 0.1303568117962348
+Batch 900: current accumulated loss 0.130507711391404
+Batch 1000: current accumulated loss 0.12992787806988954
+Batch 1100: current accumulated loss 0.13009637825657952
+Batch 1200: current accumulated loss 0.12981059192544117
+--------------------------------------------->>>>>>
+Epoch 18: loss val 0.12955029418468475, lr 0.001
+--------------------------------------------->>>>>>
+FOUND SOMETHING WEIRD
+Batch 0: current accumulated loss 0.14983826875686646
+Batch 100: current accumulated loss 0.1097372169836913
+Batch 200: current accumulated loss 0.11250495736426976
+Batch 300: current accumulated loss 0.11188898804872931
+Batch 400: current accumulated loss 0.11143519500841821
+Batch 500: current accumulated loss 0.11258308384976463
+Batch 600: current accumulated loss 0.113037233152574
+Batch 700: current accumulated loss 0.11342898742980012
+Batch 800: current accumulated loss 0.11422361289796311
+Batch 900: current accumulated loss 0.11422957919050136
+Batch 1000: current accumulated loss 0.11422322022837478
+Batch 1100: current accumulated loss 0.11402883941305972
+Batch 1200: current accumulated loss 0.11449668262709091
+Batch 1300: current accumulated loss 0.11439901674531405
+Batch 1400: current accumulated loss 0.11415836059998223
+Batch 1500: current accumulated loss 0.11413487925539804
+Batch 1600: current accumulated loss 0.11425156203063111
+Batch 1700: current accumulated loss 0.1141727832723617
+Batch 1800: current accumulated loss 0.11425134502992505
+Batch 1900: current accumulated loss 0.11450335945050256
+Batch 2000: current accumulated loss 0.11462872551343609
+Batch 2100: current accumulated loss 0.11445391334518826
+Batch 2200: current accumulated loss 0.11443724682633306
+Batch 2300: current accumulated loss 0.11434866150097192
+Batch 2400: current accumulated loss 0.11410501598536049
+--------------------------------------------->>>>>>
+Epoch 19: loss train 0.11408647387325764, lr 0.001
+--------------------------------------------->>>>>>
+Batch 0: current accumulated loss 0.09015637636184692
+Batch 100: current accumulated loss 0.13035117871690505
+Batch 200: current accumulated loss 0.12907886568141813
+Batch 300: current accumulated loss 0.13013561800171766
+Batch 400: current accumulated loss 0.13006680973450144
+Batch 500: current accumulated loss 0.13227427662340943
+Batch 600: current accumulated loss 0.13252363357686758
+Batch 700: current accumulated loss 0.13133102156933976
+Batch 800: current accumulated loss 0.13057694565062963
+Batch 900: current accumulated loss 0.13072772398094887
+Batch 1000: current accumulated loss 0.13014770126887612
+Batch 1100: current accumulated loss 0.13032341690617297
+Batch 1200: current accumulated loss 0.13004159000853416
+--------------------------------------------->>>>>>
+Epoch 19: loss val 0.12978227138221263, lr 0.001
+--------------------------------------------->>>>>>
+FOUND SOMETHING WEIRD
+Batch 0: current accumulated loss 0.14967499673366547
+Batch 100: current accumulated loss 0.10923625510370377
+Batch 200: current accumulated loss 0.11200548280308496
+Batch 300: current accumulated loss 0.11140577545841271
+Batch 400: current accumulated loss 0.1109594289687209
+Batch 500: current accumulated loss 0.11211398717558789
+Batch 600: current accumulated loss 0.1125762032874908
+Batch 700: current accumulated loss 0.11296394275509342
+Batch 800: current accumulated loss 0.1137484788438875
+Batch 900: current accumulated loss 0.1137577236757162
+Batch 1000: current accumulated loss 0.11375579978902262
+Batch 1100: current accumulated loss 0.11357274258697066
+Batch 1200: current accumulated loss 0.11404012731097322
+Batch 1300: current accumulated loss 0.11394760729336995
+Batch 1400: current accumulated loss 0.11371438469283075
+Batch 1500: current accumulated loss 0.11368950306723945
+Batch 1600: current accumulated loss 0.11380796947474035
+Batch 1700: current accumulated loss 0.11373661872194417
+Batch 1800: current accumulated loss 0.11382147693579427
+Batch 1900: current accumulated loss 0.11407407551713833
+Batch 2000: current accumulated loss 0.11420216956834445
+Batch 2100: current accumulated loss 0.11403044669408846
+Batch 2200: current accumulated loss 0.11401579486394893
+Batch 2300: current accumulated loss 0.11393266998843388
+Batch 2400: current accumulated loss 0.11369353880340087
+--------------------------------------------->>>>>>
+Epoch 20: loss train 0.113679747107625, lr 0.001
+--------------------------------------------->>>>>>
+Batch 0: current accumulated loss 0.09039232134819031
+Batch 100: current accumulated loss 0.13052951717878333
+Batch 200: current accumulated loss 0.12925519755304749
+Batch 300: current accumulated loss 0.13031484519573938
+Batch 400: current accumulated loss 0.13024590350223003
+Batch 500: current accumulated loss 0.13246902647965444
+Batch 600: current accumulated loss 0.13272124098709934
+Batch 700: current accumulated loss 0.13153443614634738
+Batch 800: current accumulated loss 0.13077589513713053
+Batch 900: current accumulated loss 0.13092904816175935
+Batch 1000: current accumulated loss 0.1303480022608281
+Batch 1100: current accumulated loss 0.13052408903038687
+Batch 1200: current accumulated loss 0.13024663177321197
+--------------------------------------------->>>>>>
+Epoch 20: loss val 0.129985716894269, lr 0.001
+--------------------------------------------->>>>>>
+FOUND SOMETHING WEIRD
+Batch 0: current accumulated loss 0.14946310222148895
+Batch 100: current accumulated loss 0.10879605300355666
+Batch 200: current accumulated loss 0.11154447836958947
+Batch 300: current accumulated loss 0.11096054860127724
+Batch 400: current accumulated loss 0.11053493676563153
+Batch 500: current accumulated loss 0.11169307728013593
+Batch 600: current accumulated loss 0.11216043906531199
+Batch 700: current accumulated loss 0.11254780531227164
+Batch 800: current accumulated loss 0.11332458202795738
+Batch 900: current accumulated loss 0.1133360310140315
+Batch 1000: current accumulated loss 0.1133368957702156
+Batch 1100: current accumulated loss 0.11316200609671648
+Batch 1200: current accumulated loss 0.11363175877685551
+Batch 1300: current accumulated loss 0.11353889865361205
+Batch 1400: current accumulated loss 0.11330956357832384
+Batch 1500: current accumulated loss 0.11328652436081209
+Batch 1600: current accumulated loss 0.11340907945540232
+Batch 1700: current accumulated loss 0.11334521513539578
+Batch 1800: current accumulated loss 0.1134336026781536
+Batch 1900: current accumulated loss 0.11368853952941425
+Batch 2000: current accumulated loss 0.1138207265517969
+Batch 2100: current accumulated loss 0.11365066730603043
+Batch 2200: current accumulated loss 0.1136368649441754
+Batch 2300: current accumulated loss 0.11355792079889894
+Batch 2400: current accumulated loss 0.1133239097111253
+--------------------------------------------->>>>>>
+Epoch 21: loss train 0.1133132869720459, lr 0.001
+--------------------------------------------->>>>>>
+Batch 0: current accumulated loss 0.09048882871866226
+Batch 100: current accumulated loss 0.1306648188003219
+Batch 200: current accumulated loss 0.12938689755563118
+Batch 300: current accumulated loss 0.13045372395618413
+Batch 400: current accumulated loss 0.1303882835864872
+Batch 500: current accumulated loss 0.13262277655675264
+Batch 600: current accumulated loss 0.13288816745189977
+Batch 700: current accumulated loss 0.13169192288405715
+Batch 800: current accumulated loss 0.13093336809719547
+Batch 900: current accumulated loss 0.131087212154557
+Batch 1000: current accumulated loss 0.13050656770537425
+Batch 1100: current accumulated loss 0.13067963577258815
+Batch 1200: current accumulated loss 0.1304043632351191
+--------------------------------------------->>>>>>
+Epoch 21: loss val 0.13014377970695495, lr 0.001
+--------------------------------------------->>>>>>
+FOUND SOMETHING WEIRD
+Batch 0: current accumulated loss 0.1491227000951767
+Batch 100: current accumulated loss 0.10837720323464659
+Batch 200: current accumulated loss 0.11114554490838478
+Batch 300: current accumulated loss 0.11056630773797779
+Batch 400: current accumulated loss 0.11015557524680794
+Batch 500: current accumulated loss 0.11131241737666006
+Batch 600: current accumulated loss 0.11179028668389741
+Batch 700: current accumulated loss 0.11216793521792334
+Batch 800: current accumulated loss 0.11293579262219713
+Batch 900: current accumulated loss 0.11294729786446436
+Batch 1000: current accumulated loss 0.11295053902845997
+Batch 1100: current accumulated loss 0.11278130442283026
+Batch 1200: current accumulated loss 0.11325408138030772
+Batch 1300: current accumulated loss 0.11316252998624006
+Batch 1400: current accumulated loss 0.11294024916024058
+Batch 1500: current accumulated loss 0.11291867884485265
+Batch 1600: current accumulated loss 0.11304348379810998
+Batch 1700: current accumulated loss 0.11298587710663965
+Batch 1800: current accumulated loss 0.11307942534878081
+Batch 1900: current accumulated loss 0.11333265441270454
+Batch 2000: current accumulated loss 0.11346990618666727
+Batch 2100: current accumulated loss 0.1133012318613982
+Batch 2200: current accumulated loss 0.11328879762093948
+Batch 2300: current accumulated loss 0.11321385779370696
+Batch 2400: current accumulated loss 0.11298353508462364
+--------------------------------------------->>>>>>
+Epoch 22: loss train 0.1129748723745346, lr 0.001
+--------------------------------------------->>>>>>
+Batch 0: current accumulated loss 0.09041771292686462
+Batch 100: current accumulated loss 0.13074416740991102
+Batch 200: current accumulated loss 0.12950357257281964
+Batch 300: current accumulated loss 0.13056373952631142
+Batch 400: current accumulated loss 0.1304897540097968
+Batch 500: current accumulated loss 0.13272651736280638
+Batch 600: current accumulated loss 0.13299623569365152
+Batch 700: current accumulated loss 0.1318000286615609
+Batch 800: current accumulated loss 0.1310393562942706
+Batch 900: current accumulated loss 0.13119195548034004
+Batch 1000: current accumulated loss 0.1306124007725692
+Batch 1100: current accumulated loss 0.1307837839333931
+Batch 1200: current accumulated loss 0.13051092272297132
+--------------------------------------------->>>>>>
+Epoch 22: loss val 0.130251420545578, lr 0.001
+--------------------------------------------->>>>>>
+FOUND SOMETHING WEIRD
+Batch 0: current accumulated loss 0.14855165779590607
+Batch 100: current accumulated loss 0.1079928615674524
+Batch 200: current accumulated loss 0.11077144132250577
+Batch 300: current accumulated loss 0.11020747228120252
+Batch 400: current accumulated loss 0.10980105848792485
+Batch 500: current accumulated loss 0.11096166157555913
+Batch 600: current accumulated loss 0.11144508795809627
+Batch 700: current accumulated loss 0.11181663411447564
+Batch 800: current accumulated loss 0.1125823584165466
+Batch 900: current accumulated loss 0.11259623239443252
+Batch 1000: current accumulated loss 0.11260230682574428
+Batch 1100: current accumulated loss 0.11244045686548564
+Batch 1200: current accumulated loss 0.1129159173252779
+Batch 1300: current accumulated loss 0.11282431600840159
+Batch 1400: current accumulated loss 0.1126053508512043
+Batch 1500: current accumulated loss 0.11258758597825465
+Batch 1600: current accumulated loss 0.1127124512422688
+Batch 1700: current accumulated loss 0.11265960567439745
+Batch 1800: current accumulated loss 0.11275784904214821
+Batch 1900: current accumulated loss 0.11301280663342365
+Batch 2000: current accumulated loss 0.11315344156383694
+Batch 2100: current accumulated loss 0.11298820807260312
+Batch 2200: current accumulated loss 0.11297521108371299
+Batch 2300: current accumulated loss 0.11290323269634027
+Batch 2400: current accumulated loss 0.11267542676602191
+--------------------------------------------->>>>>>
+Epoch 23: loss train 0.11266864722818136, lr 0.001
+--------------------------------------------->>>>>>
+Batch 0: current accumulated loss 0.09037414193153381
+Batch 100: current accumulated loss 0.1309396041796939
+Batch 200: current accumulated loss 0.12971364517710102
+Batch 300: current accumulated loss 0.13078126697445233
+Batch 400: current accumulated loss 0.1307087080678589
+Batch 500: current accumulated loss 0.13295610925692047
+Batch 600: current accumulated loss 0.1332208437538286
+Batch 700: current accumulated loss 0.13202044701525217
+Batch 800: current accumulated loss 0.13126506909411795
+Batch 900: current accumulated loss 0.13141540697590756
+Batch 1000: current accumulated loss 0.13083166847904246
+Batch 1100: current accumulated loss 0.13100318941241174
+Batch 1200: current accumulated loss 0.13073328226420108
+--------------------------------------------->>>>>>
+Epoch 23: loss val 0.1304748661965132, lr 0.001
+--------------------------------------------->>>>>>
+FOUND SOMETHING WEIRD
+Batch 0: current accumulated loss 0.148008331656456
+Batch 100: current accumulated loss 0.10762377610743636
+Batch 200: current accumulated loss 0.11041062586565516
+Batch 300: current accumulated loss 0.10986171202406139
+Batch 400: current accumulated loss 0.10945922862784821
+Batch 500: current accumulated loss 0.110623228127609
+Batch 600: current accumulated loss 0.11110915496523883
+Batch 700: current accumulated loss 0.11147925011101531
+Batch 800: current accumulated loss 0.11223636903380335
+Batch 900: current accumulated loss 0.11224904546429394
+Batch 1000: current accumulated loss 0.11225709441554296
+Batch 1100: current accumulated loss 0.11210348543378573
+Batch 1200: current accumulated loss 0.11257888937212347
+Batch 1300: current accumulated loss 0.11248986278127286
+Batch 1400: current accumulated loss 0.11227631371077429
+Batch 1500: current accumulated loss 0.11225849903032908
+Batch 1600: current accumulated loss 0.11238755914688035
+Batch 1700: current accumulated loss 0.11234000144523078
+Batch 1800: current accumulated loss 0.11244085660697618
+Batch 1900: current accumulated loss 0.11269487219341863
+Batch 2000: current accumulated loss 0.11283821533101311
+Batch 2100: current accumulated loss 0.11267534997677701
+Batch 2200: current accumulated loss 0.11266340280983297
+Batch 2300: current accumulated loss 0.11259426751126678
+Batch 2400: current accumulated loss 0.11236915061687093
+--------------------------------------------->>>>>>
+Epoch 24: loss train 0.11236552637815475, lr 0.001
+--------------------------------------------->>>>>>
+Batch 0: current accumulated loss 0.090396448969841
+Batch 100: current accumulated loss 0.1311421938756905
+Batch 200: current accumulated loss 0.12989040690274975
+Batch 300: current accumulated loss 0.1309583298490689
+Batch 400: current accumulated loss 0.13087144913035736
+Batch 500: current accumulated loss 0.13313535069247442
+Batch 600: current accumulated loss 0.13339337762972084
+Batch 700: current accumulated loss 0.13218738934219137
+Batch 800: current accumulated loss 0.13143110337124186
+Batch 900: current accumulated loss 0.1315797504066561
+Batch 1000: current accumulated loss 0.13099743978499057
+Batch 1100: current accumulated loss 0.13117375090163366
+Batch 1200: current accumulated loss 0.1309022553804812
+--------------------------------------------->>>>>>
+Epoch 24: loss val 0.13064777812361716, lr 0.001
+--------------------------------------------->>>>>>
+FOUND SOMETHING WEIRD
+Batch 0: current accumulated loss 0.14762252569198608
+Batch 100: current accumulated loss 0.10731727792189853
+Batch 200: current accumulated loss 0.1100802573917517
+Batch 300: current accumulated loss 0.1095313918575694
+Batch 400: current accumulated loss 0.10914057292545823
+Batch 500: current accumulated loss 0.11030416247135627
+Batch 600: current accumulated loss 0.11079091350617702
+Batch 700: current accumulated loss 0.11115959481722788
+Batch 800: current accumulated loss 0.11191298588924342
+Batch 900: current accumulated loss 0.11192762271628263
+Batch 1000: current accumulated loss 0.11193917631418197
+Batch 1100: current accumulated loss 0.11178954119551301
+Batch 1200: current accumulated loss 0.11226436073622735
+Batch 1300: current accumulated loss 0.11217812626271134
+Batch 1400: current accumulated loss 0.11197083970953277
+Batch 1500: current accumulated loss 0.11195394204436819
+Batch 1600: current accumulated loss 0.11208273419909072
+Batch 1700: current accumulated loss 0.11203997296394494
+Batch 1800: current accumulated loss 0.11214570059280207
+Batch 1900: current accumulated loss 0.11239796842417549
+Batch 2000: current accumulated loss 0.11254204781739965
+Batch 2100: current accumulated loss 0.1123803744056235
+Batch 2200: current accumulated loss 0.11236853418750743
+Batch 2300: current accumulated loss 0.11230388638773518
+Batch 2400: current accumulated loss 0.11208152077604909
+--------------------------------------------->>>>>>
+Epoch 25: loss train 0.11207862264215947, lr 0.001
+--------------------------------------------->>>>>>
+Batch 0: current accumulated loss 0.09057967364788055
+Batch 100: current accumulated loss 0.13132342788400037
+Batch 200: current accumulated loss 0.13009586183363525
+Batch 300: current accumulated loss 0.131167789741707
+Batch 400: current accumulated loss 0.13107911717527526
+Batch 500: current accumulated loss 0.13334648317830292
+Batch 600: current accumulated loss 0.13360074534392397
+Batch 700: current accumulated loss 0.13238309680905389
+Batch 800: current accumulated loss 0.13163063817479637
+Batch 900: current accumulated loss 0.13177478411023016
+Batch 1000: current accumulated loss 0.13119124027934823
+Batch 1100: current accumulated loss 0.1313712867272918
+Batch 1200: current accumulated loss 0.13109845048022906
+--------------------------------------------->>>>>>
+Epoch 25: loss val 0.13084595117866993, lr 0.001
+--------------------------------------------->>>>>>
+FOUND SOMETHING WEIRD
+Batch 0: current accumulated loss 0.14726588129997253
+Batch 100: current accumulated loss 0.1069987733839172
+Batch 200: current accumulated loss 0.10977864269148652
+Batch 300: current accumulated loss 0.10924579557093275
+Batch 400: current accumulated loss 0.10884515830592027
+Batch 500: current accumulated loss 0.11000227902136639
+Batch 600: current accumulated loss 0.1104924463653029
+Batch 700: current accumulated loss 0.11086153939430111
+Batch 800: current accumulated loss 0.11160764495345686
+Batch 900: current accumulated loss 0.11162335035307426
+Batch 1000: current accumulated loss 0.11163570967081424
+Batch 1100: current accumulated loss 0.11149433101582376
+Batch 1200: current accumulated loss 0.11197186648523083
+Batch 1300: current accumulated loss 0.1118875307150523
+Batch 1400: current accumulated loss 0.11168166532378636
+Batch 1500: current accumulated loss 0.1116665805789886
+Batch 1600: current accumulated loss 0.11179884921975765
+Batch 1700: current accumulated loss 0.11175896927302617
+Batch 1800: current accumulated loss 0.11186906052489601
+Batch 1900: current accumulated loss 0.1121200297707824
+Batch 2000: current accumulated loss 0.11226354639740779
+Batch 2100: current accumulated loss 0.11210441522509469
+Batch 2200: current accumulated loss 0.11209322165008948
+Batch 2300: current accumulated loss 0.11203238084711546
+Batch 2400: current accumulated loss 0.11181222182581793
+--------------------------------------------->>>>>>
+Epoch 26: loss train 0.11180919403135776, lr 0.001
+--------------------------------------------->>>>>>
+Batch 0: current accumulated loss 0.09065373241901398
+Batch 100: current accumulated loss 0.13157729188551998
+Batch 200: current accumulated loss 0.1303222299326415
+Batch 300: current accumulated loss 0.1314123184404698
+Batch 400: current accumulated loss 0.13130678881210578
+Batch 500: current accumulated loss 0.13356995030107374
+Batch 600: current accumulated loss 0.13382496649458286
+Batch 700: current accumulated loss 0.13260518501216437
+Batch 800: current accumulated loss 0.13185722869675556
+Batch 900: current accumulated loss 0.13200107419017815
+Batch 1000: current accumulated loss 0.13141829462779628
+Batch 1100: current accumulated loss 0.13159920881882134
+Batch 1200: current accumulated loss 0.13132975781824963
+--------------------------------------------->>>>>>
+Epoch 26: loss val 0.13108239406645297, lr 0.001
+--------------------------------------------->>>>>>
+FOUND SOMETHING WEIRD
+Batch 0: current accumulated loss 0.14684641361236572
+Batch 100: current accumulated loss 0.10673188071439763
+Batch 200: current accumulated loss 0.10951048070889208
+Batch 300: current accumulated loss 0.1089846737113506
+Batch 400: current accumulated loss 0.10858083849870356
+Batch 500: current accumulated loss 0.10973956991366283
+Batch 600: current accumulated loss 0.11022321657338079
+Batch 700: current accumulated loss 0.11058192086883006
+Batch 800: current accumulated loss 0.11132297955090634
+Batch 900: current accumulated loss 0.11133405674955954
+Batch 1000: current accumulated loss 0.11134595951655289
+Batch 1100: current accumulated loss 0.11120790415033224
+Batch 1200: current accumulated loss 0.11168523920043918
+Batch 1300: current accumulated loss 0.11160174507553261
+Batch 1400: current accumulated loss 0.11140092874981522
+Batch 1500: current accumulated loss 0.11138372712437905
+Batch 1600: current accumulated loss 0.11151681089777264
+Batch 1700: current accumulated loss 0.11148101472455148
+Batch 1800: current accumulated loss 0.11159541993621719
+Batch 1900: current accumulated loss 0.11184634758783667
+Batch 2000: current accumulated loss 0.11199010564745039
+Batch 2100: current accumulated loss 0.11183279806633667
+Batch 2200: current accumulated loss 0.11182276843989887
+Batch 2300: current accumulated loss 0.11176267505721754
+Batch 2400: current accumulated loss 0.11154443922699714
+--------------------------------------------->>>>>>
+Epoch 27: loss train 0.11154170162975788, lr 0.001
+--------------------------------------------->>>>>>
+Batch 0: current accumulated loss 0.0905655175447464
+Batch 100: current accumulated loss 0.13181058291604023
+Batch 200: current accumulated loss 0.13052075202414645
+Batch 300: current accumulated loss 0.13161345391822019
+Batch 400: current accumulated loss 0.13150194813114152
+Batch 500: current accumulated loss 0.1337548562003943
+Batch 600: current accumulated loss 0.13400180433286407
+Batch 700: current accumulated loss 0.13278650545040824
+Batch 800: current accumulated loss 0.1320393437917313
+Batch 900: current accumulated loss 0.13218107662441728
+Batch 1000: current accumulated loss 0.13159837618425532
+Batch 1100: current accumulated loss 0.13178257518985073
+Batch 1200: current accumulated loss 0.13150747952909891
+--------------------------------------------->>>>>>
+Epoch 27: loss val 0.13126278797388077, lr 0.001
+--------------------------------------------->>>>>>
+FOUND SOMETHING WEIRD
+Batch 0: current accumulated loss 0.14657904207706451
+Batch 100: current accumulated loss 0.10650110207866914
+Batch 200: current accumulated loss 0.10928023145047587
+Batch 300: current accumulated loss 0.10874616291584367
+Batch 400: current accumulated loss 0.10833721443490495
+Batch 500: current accumulated loss 0.10948150666679689
+Batch 600: current accumulated loss 0.10996633411668699
+Batch 700: current accumulated loss 0.1103176406867664
+Batch 800: current accumulated loss 0.11106123875701025
+Batch 900: current accumulated loss 0.11107221071284831
+Batch 1000: current accumulated loss 0.1110800780452691
+Batch 1100: current accumulated loss 0.1109460698953279
+Batch 1200: current accumulated loss 0.11142296081937719
+Batch 1300: current accumulated loss 0.11133968004588894
+Batch 1400: current accumulated loss 0.11113871083854777
+Batch 1500: current accumulated loss 0.11112230506630677
+Batch 1600: current accumulated loss 0.1112557881041142
+Batch 1700: current accumulated loss 0.11122321524930519
+Batch 1800: current accumulated loss 0.11133814376801136
+Batch 1900: current accumulated loss 0.1115884442315454
+Batch 2000: current accumulated loss 0.11173208045779259
+Batch 2100: current accumulated loss 0.1115753411987831
+Batch 2200: current accumulated loss 0.1115660905661988
+Batch 2300: current accumulated loss 0.1115090002308639
+Batch 2400: current accumulated loss 0.11129303313155613
+--------------------------------------------->>>>>>
+Epoch 28: loss train 0.11129331193268299, lr 0.001
+--------------------------------------------->>>>>>
+Batch 0: current accumulated loss 0.090675950050354
+Batch 100: current accumulated loss 0.1321019914997096
+Batch 200: current accumulated loss 0.1308038143709821
+Batch 300: current accumulated loss 0.13192038481863233
+Batch 400: current accumulated loss 0.13180320008548715
+Batch 500: current accumulated loss 0.13406474729944132
+Batch 600: current accumulated loss 0.13432072041658513
+Batch 700: current accumulated loss 0.13310150464149073
+Batch 800: current accumulated loss 0.13235448352927423
+Batch 900: current accumulated loss 0.13249175251357168
+Batch 1000: current accumulated loss 0.13191298278538022
+Batch 1100: current accumulated loss 0.13210198264924317
+Batch 1200: current accumulated loss 0.1318285795770815
+--------------------------------------------->>>>>>
+Epoch 28: loss val 0.13158337217569352, lr 0.001
+--------------------------------------------->>>>>>
+FOUND SOMETHING WEIRD
+Batch 0: current accumulated loss 0.14643271267414093
+Batch 100: current accumulated loss 0.10627307735457278
+Batch 200: current accumulated loss 0.10905007912374254
+Batch 300: current accumulated loss 0.1085181151365125
+Batch 400: current accumulated loss 0.10810680207134482
+Batch 500: current accumulated loss 0.10923794962599606
+Batch 600: current accumulated loss 0.1097151056341145
+Batch 700: current accumulated loss 0.11006620090013734
+Batch 800: current accumulated loss 0.11080268316073215
+Batch 900: current accumulated loss 0.11081385031574045
+Batch 1000: current accumulated loss 0.11081962432939332
+Batch 1100: current accumulated loss 0.1106855553167988
+Batch 1200: current accumulated loss 0.11116500826650218
+Batch 1300: current accumulated loss 0.11108258045024362
+Batch 1400: current accumulated loss 0.11088367498650625
+Batch 1500: current accumulated loss 0.11086774757162958
+Batch 1600: current accumulated loss 0.11100399113265445
+Batch 1700: current accumulated loss 0.11097180877956203
+Batch 1800: current accumulated loss 0.11108927703620261
+Batch 1900: current accumulated loss 0.11134040045274175
+Batch 2000: current accumulated loss 0.11148243986893033
+Batch 2100: current accumulated loss 0.11132714938884801
+Batch 2200: current accumulated loss 0.11131752235497577
+Batch 2300: current accumulated loss 0.11126167652905894
+Batch 2400: current accumulated loss 0.1110459038959052
+--------------------------------------------->>>>>>
+Epoch 29: loss train 0.11104660770893097, lr 0.001
+--------------------------------------------->>>>>>
+Batch 0: current accumulated loss 0.09047504514455795
+Batch 100: current accumulated loss 0.13202913157125512
+Batch 200: current accumulated loss 0.13078466543362507
+Batch 300: current accumulated loss 0.13193625035971107
+Batch 400: current accumulated loss 0.13181972667166122
+Batch 500: current accumulated loss 0.13405239393194754
+Batch 600: current accumulated loss 0.13429844131485594
+Batch 700: current accumulated loss 0.1330857148736758
+Batch 800: current accumulated loss 0.13233146350016903
+Batch 900: current accumulated loss 0.1324620468047893
+Batch 1000: current accumulated loss 0.1318913921825476
+Batch 1100: current accumulated loss 0.13208582586897274
+Batch 1200: current accumulated loss 0.1318178211403181
+--------------------------------------------->>>>>>
+Epoch 29: loss val 0.13157451527416705, lr 0.001
+--------------------------------------------->>>>>>
+FOUND SOMETHING WEIRD
+Batch 0: current accumulated loss 0.14638951420783997
+Batch 100: current accumulated loss 0.10609530860392175
+Batch 200: current accumulated loss 0.10885889970915234
+Batch 300: current accumulated loss 0.10832238140395313
+Batch 400: current accumulated loss 0.10791189838525958
+Batch 500: current accumulated loss 0.10903632869858466
+Batch 600: current accumulated loss 0.1095042723090002
+Batch 700: current accumulated loss 0.10984224856388722
+Batch 800: current accumulated loss 0.11057590739278311
+Batch 900: current accumulated loss 0.11058262879903388
+Batch 1000: current accumulated loss 0.11058764022725684
+Batch 1100: current accumulated loss 0.11045205467579366
+Batch 1200: current accumulated loss 0.11092800924013199
+Batch 1300: current accumulated loss 0.11084247237324807
+Batch 1400: current accumulated loss 0.11064270531212236
+Batch 1500: current accumulated loss 0.11062687477326488
+Batch 1600: current accumulated loss 0.11076736016935441
+Batch 1700: current accumulated loss 0.11073681409265419
+Batch 1800: current accumulated loss 0.11085401589194646
+Batch 1900: current accumulated loss 0.11110623469326385
+Batch 2000: current accumulated loss 0.11124865914034522
+Batch 2100: current accumulated loss 0.1110952333278993
+Batch 2200: current accumulated loss 0.11108683032922613
+Batch 2300: current accumulated loss 0.11103259441626948
+Batch 2400: current accumulated loss 0.11081860748518015
+--------------------------------------------->>>>>>
+Epoch 30: loss train 0.11081975248456001, lr 0.001
+--------------------------------------------->>>>>>
+Batch 0: current accumulated loss 0.09033899009227753
+Batch 100: current accumulated loss 0.1322775191747316
+Batch 200: current accumulated loss 0.13105219087345682
+Batch 300: current accumulated loss 0.1322040266768877
+Batch 400: current accumulated loss 0.13210014412713764
+Batch 500: current accumulated loss 0.13434495254904924
+Batch 600: current accumulated loss 0.13458217404001763
+Batch 700: current accumulated loss 0.1333783482667723
+Batch 800: current accumulated loss 0.1326193492231744
+Batch 900: current accumulated loss 0.1327476913934278
+Batch 1000: current accumulated loss 0.13217278644368127
+Batch 1100: current accumulated loss 0.13236577103724814
+Batch 1200: current accumulated loss 0.1320944842599413
+--------------------------------------------->>>>>>
+Epoch 30: loss val 0.13185528792738915, lr 0.001
+--------------------------------------------->>>>>>
+FOUND SOMETHING WEIRD
+Batch 0: current accumulated loss 0.14619940519332886
+Batch 100: current accumulated loss 0.10602108064559426
+Batch 200: current accumulated loss 0.10889106288329879
+Batch 300: current accumulated loss 0.10840458122153218
+Batch 400: current accumulated loss 0.10802137422517054
+Batch 500: current accumulated loss 0.10919035710914882
+Batch 600: current accumulated loss 0.10967107216351837
+Batch 700: current accumulated loss 0.10999292499264875
+Batch 800: current accumulated loss 0.11074908397226745
+Batch 900: current accumulated loss 0.11074603465566625
+Batch 1000: current accumulated loss 0.11073591651675942
+Batch 1100: current accumulated loss 0.1105783976729516
+Batch 1200: current accumulated loss 0.11103761488638453
+Batch 1300: current accumulated loss 0.11094471740663098
+Batch 1400: current accumulated loss 0.11072233898683499
+Batch 1500: current accumulated loss 0.11067401252930201
+Batch 1600: current accumulated loss 0.11079942317752821
+Batch 1700: current accumulated loss 0.11074543550724425
+Batch 1800: current accumulated loss 0.11084044748903778
+Batch 1900: current accumulated loss 0.11107396972079078
+Batch 2000: current accumulated loss 0.11119004848530922
+Batch 2100: current accumulated loss 0.11101627490283307
+Batch 2200: current accumulated loss 0.11098054956571994
+Batch 2300: current accumulated loss 0.11089304905677816
+Batch 2400: current accumulated loss 0.11064944569578472
+--------------------------------------------->>>>>>
+Epoch 31: loss train 0.11062257083058358, lr 0.0001
+--------------------------------------------->>>>>>
+Batch 0: current accumulated loss 0.09017176181077957
+Batch 100: current accumulated loss 0.13042817419708366
+Batch 200: current accumulated loss 0.1293711499936545
+Batch 300: current accumulated loss 0.13045213126462957
+Batch 400: current accumulated loss 0.13034508902198655
+Batch 500: current accumulated loss 0.13251838889605033
+Batch 600: current accumulated loss 0.1327267771155981
+Batch 700: current accumulated loss 0.1315572560099239
+Batch 800: current accumulated loss 0.13084364042020916
+Batch 900: current accumulated loss 0.1309669566662211
+Batch 1000: current accumulated loss 0.13042357118500697
+Batch 1100: current accumulated loss 0.13058518898164978
+Batch 1200: current accumulated loss 0.1303370897933456
+--------------------------------------------->>>>>>
+Epoch 31: loss val 0.13010672377645968, lr 0.0001
+--------------------------------------------->>>>>>
+FOUND SOMETHING WEIRD
+Batch 0: current accumulated loss 0.1461469829082489
+Batch 100: current accumulated loss 0.10601220847946582
+Batch 200: current accumulated loss 0.10879513348883657
+Batch 300: current accumulated loss 0.10824336309567638
+Batch 400: current accumulated loss 0.10780604391769875
+Batch 500: current accumulated loss 0.10893493173959964
+Batch 600: current accumulated loss 0.10939826246059675
+Batch 700: current accumulated loss 0.10970693598694026
+Batch 800: current accumulated loss 0.11045220439855973
+Batch 900: current accumulated loss 0.1104481144953978
+Batch 1000: current accumulated loss 0.11043646165005096
+Batch 1100: current accumulated loss 0.11028156359151317
+Batch 1200: current accumulated loss 0.11074087888833685
+Batch 1300: current accumulated loss 0.11065042197566871
+Batch 1400: current accumulated loss 0.11043372858238594
+Batch 1500: current accumulated loss 0.1103905598241476
+Batch 1600: current accumulated loss 0.11052319967303702
+Batch 1700: current accumulated loss 0.11047571434966261
+Batch 1800: current accumulated loss 0.11057837085507764
+Batch 1900: current accumulated loss 0.11081837909761572
+Batch 2000: current accumulated loss 0.11094363974868089
+Batch 2100: current accumulated loss 0.1107787443205239
+Batch 2200: current accumulated loss 0.11075213763089356
+Batch 2300: current accumulated loss 0.11067516461455112
+Batch 2400: current accumulated loss 0.11044275866311722
+--------------------------------------------->>>>>>
+Epoch 32: loss train 0.11042684728056193, lr 0.0001
+--------------------------------------------->>>>>>
+Batch 0: current accumulated loss 0.09023009985685349
+Batch 100: current accumulated loss 0.13050927531601178
+Batch 200: current accumulated loss 0.12944429052706383
+Batch 300: current accumulated loss 0.13052660308506006
+Batch 400: current accumulated loss 0.130417125917358
+Batch 500: current accumulated loss 0.13259221824581274
+Batch 600: current accumulated loss 0.1327964004048591
+Batch 700: current accumulated loss 0.13162726757466028
+Batch 800: current accumulated loss 0.1309133025488529
+Batch 900: current accumulated loss 0.13103596366255582
+Batch 1000: current accumulated loss 0.13049226101268302
+Batch 1100: current accumulated loss 0.1306535296724072
+Batch 1200: current accumulated loss 0.13040856402568973
+--------------------------------------------->>>>>>
+Epoch 32: loss val 0.13017958221137524, lr 0.0001
+--------------------------------------------->>>>>>
+FOUND SOMETHING WEIRD
+Batch 0: current accumulated loss 0.14601601660251617
+Batch 100: current accumulated loss 0.1059094179827388
+Batch 200: current accumulated loss 0.10867461775295177
+Batch 300: current accumulated loss 0.10812208082440287
+Batch 400: current accumulated loss 0.10768222188265841
+Batch 500: current accumulated loss 0.10880356049258076
+Batch 600: current accumulated loss 0.1092652070728098
+Batch 700: current accumulated loss 0.10957094972764544
+Batch 800: current accumulated loss 0.11031312861487957
+Batch 900: current accumulated loss 0.11031033393909347
+Batch 1000: current accumulated loss 0.11029998336608832
+Batch 1100: current accumulated loss 0.11014679016090327
+Batch 1200: current accumulated loss 0.11060697853341885
+Batch 1300: current accumulated loss 0.11051781694880822
+Batch 1400: current accumulated loss 0.11030331476565602
+Batch 1500: current accumulated loss 0.11026260989167784
+Batch 1600: current accumulated loss 0.11039867739121591
+Batch 1700: current accumulated loss 0.11035411358580458
+Batch 1800: current accumulated loss 0.1104597275966012
+Batch 1900: current accumulated loss 0.11070132555576263
+Batch 2000: current accumulated loss 0.11083015152949026
+Batch 2100: current accumulated loss 0.11066825888600593
+Batch 2200: current accumulated loss 0.1106451314428431
+Batch 2300: current accumulated loss 0.11057255471506516
+Batch 2400: current accumulated loss 0.11034476379555545
+--------------------------------------------->>>>>>
+Epoch 33: loss train 0.11033287839144468, lr 0.0001
+--------------------------------------------->>>>>>
+Batch 0: current accumulated loss 0.09024590998888016
+Batch 100: current accumulated loss 0.13058261388894354
+Batch 200: current accumulated loss 0.1295117343317217
+Batch 300: current accumulated loss 0.13059431269913416
+Batch 400: current accumulated loss 0.1304856575746786
+Batch 500: current accumulated loss 0.1326620427003045
+Batch 600: current accumulated loss 0.1328643830601566
+Batch 700: current accumulated loss 0.13169445624088766
+Batch 800: current accumulated loss 0.1309791755084688
+Batch 900: current accumulated loss 0.1311020875116035
+Batch 1000: current accumulated loss 0.13055781873462202
+Batch 1100: current accumulated loss 0.1307200920631894
+Batch 1200: current accumulated loss 0.13047666240678937
+--------------------------------------------->>>>>>
+Epoch 33: loss val 0.1302487911015749, lr 0.0001
+--------------------------------------------->>>>>>
+FOUND SOMETHING WEIRD
+Batch 0: current accumulated loss 0.14589276909828186
+Batch 100: current accumulated loss 0.10581445413650853
+Batch 200: current accumulated loss 0.10857642853437964
+Batch 300: current accumulated loss 0.10802607905379562
+Batch 400: current accumulated loss 0.10758500551790966
+Batch 500: current accumulated loss 0.10870361153385834
+Batch 600: current accumulated loss 0.10916526350944292
+Batch 700: current accumulated loss 0.10946987343476434
+Batch 800: current accumulated loss 0.11021093554915709
+Batch 900: current accumulated loss 0.11020894896458178
+Batch 1000: current accumulated loss 0.11019965820572712
+Batch 1100: current accumulated loss 0.11004816870341293
+Batch 1200: current accumulated loss 0.11050944419253578
+Batch 1300: current accumulated loss 0.11042127486527378
+Batch 1400: current accumulated loss 0.11020862109039103
+Batch 1500: current accumulated loss 0.11016973333159023
+Batch 1600: current accumulated loss 0.11030818536868325
+Batch 1700: current accumulated loss 0.11026566228591156
+Batch 1800: current accumulated loss 0.1103732161294216
+Batch 1900: current accumulated loss 0.11061622349565936
+Batch 2000: current accumulated loss 0.11074735183289264
+Batch 2100: current accumulated loss 0.11058744510501864
+Batch 2200: current accumulated loss 0.11056623849738516
+Batch 2300: current accumulated loss 0.11049598478904396
+Batch 2400: current accumulated loss 0.11027092992272639
+--------------------------------------------->>>>>>
+Epoch 34: loss train 0.11026134020835161, lr 0.0001
+--------------------------------------------->>>>>>
+Batch 0: current accumulated loss 0.09024674445390701
+Batch 100: current accumulated loss 0.1306432415500726
+Batch 200: current accumulated loss 0.12956681358280467
+Batch 300: current accumulated loss 0.13065383561029784
+Batch 400: current accumulated loss 0.1305447992894269
+Batch 500: current accumulated loss 0.1327205451945226
+Batch 600: current accumulated loss 0.1329218394707225
+Batch 700: current accumulated loss 0.13175162170268329
+Batch 800: current accumulated loss 0.13103568519508646
+Batch 900: current accumulated loss 0.13115776027578624
+Batch 1000: current accumulated loss 0.13061307637871325
+Batch 1100: current accumulated loss 0.1307767744258141
+Batch 1200: current accumulated loss 0.13053389131824342
+--------------------------------------------->>>>>>
+Epoch 34: loss val 0.13030689069628715, lr 0.0001
+--------------------------------------------->>>>>>
+FOUND SOMETHING WEIRD
+Batch 0: current accumulated loss 0.14576740562915802
+Batch 100: current accumulated loss 0.10573282955896736
+Batch 200: current accumulated loss 0.10849074161245455
+Batch 300: current accumulated loss 0.10794439951446762
+Batch 400: current accumulated loss 0.10750325350206986
+Batch 500: current accumulated loss 0.10862024193127712
+Batch 600: current accumulated loss 0.10908109136235694
+Batch 700: current accumulated loss 0.10938521791329227
+Batch 800: current accumulated loss 0.11012561915072609
+Batch 900: current accumulated loss 0.1101238958694694
+Batch 1000: current accumulated loss 0.11011548121120189
+Batch 1100: current accumulated loss 0.1099649622670961
+Batch 1200: current accumulated loss 0.11042698362003159
+Batch 1300: current accumulated loss 0.11033978681727889
+Batch 1400: current accumulated loss 0.1101288620108668
+Batch 1500: current accumulated loss 0.1100912092130713
+Batch 1600: current accumulated loss 0.11023140037612644
+Batch 1700: current accumulated loss 0.11019084804517812
+Batch 1800: current accumulated loss 0.11029982344474414
+Batch 1900: current accumulated loss 0.11054387015105861
+Batch 2000: current accumulated loss 0.11067667971367481
+Batch 2100: current accumulated loss 0.11051815614345413
+Batch 2200: current accumulated loss 0.11049847933601271
+Batch 2300: current accumulated loss 0.1104303328259672
+Batch 2400: current accumulated loss 0.11020738965382133
+--------------------------------------------->>>>>>
+Epoch 35: loss train 0.11019935267567635, lr 0.0001
+--------------------------------------------->>>>>>
+Batch 0: current accumulated loss 0.09024661034345627
+Batch 100: current accumulated loss 0.13070078157257325
+Batch 200: current accumulated loss 0.12962260401219278
+Batch 300: current accumulated loss 0.130711736596898
+Batch 400: current accumulated loss 0.13060321341131692
+Batch 500: current accumulated loss 0.13278078559986844
+Batch 600: current accumulated loss 0.13298012539992315
+Batch 700: current accumulated loss 0.1318088953520109
+Batch 800: current accumulated loss 0.13109213324931082
+Batch 900: current accumulated loss 0.13121324209506716
+Batch 1000: current accumulated loss 0.13066859125763505
+Batch 1100: current accumulated loss 0.13083282771514396
+Batch 1200: current accumulated loss 0.13059080199809198
+--------------------------------------------->>>>>>
+Epoch 35: loss val 0.13036428934931754, lr 0.0001
+--------------------------------------------->>>>>>
+FOUND SOMETHING WEIRD
+Batch 0: current accumulated loss 0.14566650986671448
+Batch 100: current accumulated loss 0.10566593581202006
+Batch 200: current accumulated loss 0.108422538256319
+Batch 300: current accumulated loss 0.10787716360632764
+Batch 400: current accumulated loss 0.10743619929859763
+Batch 500: current accumulated loss 0.10855148777276456
+Batch 600: current accumulated loss 0.10901160637372345
+Batch 700: current accumulated loss 0.10931516541287664
+Batch 800: current accumulated loss 0.11005476086903898
+Batch 900: current accumulated loss 0.11005325948656201
+Batch 1000: current accumulated loss 0.11004557337734726
+Batch 1100: current accumulated loss 0.10989583167945331
+Batch 1200: current accumulated loss 0.11035825661092773
+Batch 1300: current accumulated loss 0.11027148213927605
+Batch 1400: current accumulated loss 0.11006151091873774
+Batch 1500: current accumulated loss 0.11002464448756412
+Batch 1600: current accumulated loss 0.11016624946284488
+Batch 1700: current accumulated loss 0.11012715968505415
+Batch 1800: current accumulated loss 0.11023715622040511
+Batch 1900: current accumulated loss 0.11048184916855222
+Batch 2000: current accumulated loss 0.11061595369508301
+Batch 2100: current accumulated loss 0.11045848551086163
+Batch 2200: current accumulated loss 0.1104399490913631
+Batch 2300: current accumulated loss 0.11037314751844
+Batch 2400: current accumulated loss 0.11015190936932212
+--------------------------------------------->>>>>>
+Epoch 36: loss train 0.11014499752819538, lr 0.0001
+--------------------------------------------->>>>>>
+Batch 0: current accumulated loss 0.09024628251791
+Batch 100: current accumulated loss 0.13074816608487969
+Batch 200: current accumulated loss 0.12966731750401692
+Batch 300: current accumulated loss 0.13075912008649884
+Batch 400: current accumulated loss 0.1306507207286031
+Batch 500: current accumulated loss 0.13283056022967407
+Batch 600: current accumulated loss 0.1330279386393143
+Batch 700: current accumulated loss 0.13185604533098225
+Batch 800: current accumulated loss 0.1311387586617812
+Batch 900: current accumulated loss 0.1312588674536225
+Batch 1000: current accumulated loss 0.13071416140153452
+Batch 1100: current accumulated loss 0.13087972255252794
+Batch 1200: current accumulated loss 0.1306381588406259
+--------------------------------------------->>>>>>
+Epoch 36: loss val 0.13041270840466024, lr 0.0001
+--------------------------------------------->>>>>>
+FOUND SOMETHING WEIRD
+Batch 0: current accumulated loss 0.1455698311328888
+Batch 100: current accumulated loss 0.10559978834030652
+Batch 200: current accumulated loss 0.10835574196642311
+Batch 300: current accumulated loss 0.10781219523659973
+Batch 400: current accumulated loss 0.10737313492748506
+Batch 500: current accumulated loss 0.10848712747146984
+Batch 600: current accumulated loss 0.10894672002352018
+Batch 700: current accumulated loss 0.10925030379360821
+Batch 800: current accumulated loss 0.10998891893955652
+Batch 900: current accumulated loss 0.10998817691610471
+Batch 1000: current accumulated loss 0.10998149884568824
+Batch 1100: current accumulated loss 0.10983256543973811
+Batch 1200: current accumulated loss 0.11029548800979229
+Batch 1300: current accumulated loss 0.11020939520844399
+Batch 1400: current accumulated loss 0.110000347366276
+Batch 1500: current accumulated loss 0.10996412121250898
+Batch 1600: current accumulated loss 0.11010669563652054
+Batch 1700: current accumulated loss 0.1100686168618969
+Batch 1800: current accumulated loss 0.11017915358283929
+Batch 1900: current accumulated loss 0.11042437984802608
+Batch 2000: current accumulated loss 0.11055955540450259
+Batch 2100: current accumulated loss 0.11040283961736662
+Batch 2200: current accumulated loss 0.11038531372488655
+Batch 2300: current accumulated loss 0.1103197245776446
+Batch 2400: current accumulated loss 0.110099861209825
+--------------------------------------------->>>>>>
+Epoch 37: loss train 0.11009385726749897, lr 0.0001
+--------------------------------------------->>>>>>
+Batch 0: current accumulated loss 0.09024760127067566
+Batch 100: current accumulated loss 0.13080255805265786
+Batch 200: current accumulated loss 0.12972023586432138
+Batch 300: current accumulated loss 0.13081478060182938
+Batch 400: current accumulated loss 0.13070674889031195
+Batch 500: current accumulated loss 0.13288888396944354
+Batch 600: current accumulated loss 0.1330846869347992
+Batch 700: current accumulated loss 0.1319125908321984
+Batch 800: current accumulated loss 0.13119425327422912
+Batch 900: current accumulated loss 0.13131356100809163
+Batch 1000: current accumulated loss 0.13076829869713222
+Batch 1100: current accumulated loss 0.13093484502681593
+Batch 1200: current accumulated loss 0.13069350960711754
+--------------------------------------------->>>>>>
+Epoch 37: loss val 0.13046832946240902, lr 0.0001
+--------------------------------------------->>>>>>
+FOUND SOMETHING WEIRD
+Batch 0: current accumulated loss 0.1455075740814209
+Batch 100: current accumulated loss 0.10554107898237682
+Batch 200: current accumulated loss 0.1082967689714918
+Batch 300: current accumulated loss 0.10775480540685875
+Batch 400: current accumulated loss 0.10731642210201135
+Batch 500: current accumulated loss 0.1084290544043282
+Batch 600: current accumulated loss 0.10888756988895515
+Batch 700: current accumulated loss 0.10919124407749543
+Batch 800: current accumulated loss 0.1099289564529757
+Batch 900: current accumulated loss 0.10992864498271132
+Batch 1000: current accumulated loss 0.10992231331281847
+Batch 1100: current accumulated loss 0.10977397742025642
+Batch 1200: current accumulated loss 0.11023734612615281
+Batch 1300: current accumulated loss 0.11015192727392953
+Batch 1400: current accumulated loss 0.10994383922746827
+Batch 1500: current accumulated loss 0.10990802171596045
+Batch 1600: current accumulated loss 0.11005156710138922
+Batch 1700: current accumulated loss 0.11001445841633313
+Batch 1800: current accumulated loss 0.11012576412262684
+Batch 1900: current accumulated loss 0.11037137961776429
+Batch 2000: current accumulated loss 0.1105074142587596
+Batch 2100: current accumulated loss 0.11035142597280928
+Batch 2200: current accumulated loss 0.11033483140546319
+Batch 2300: current accumulated loss 0.11027023891089845
+Batch 2400: current accumulated loss 0.11005157993633963
+--------------------------------------------->>>>>>
+Epoch 38: loss train 0.11004639262259007, lr 0.0001
+--------------------------------------------->>>>>>
+Batch 0: current accumulated loss 0.0902475118637085
+Batch 100: current accumulated loss 0.13085074597361065
+Batch 200: current accumulated loss 0.12976724947269877
+Batch 300: current accumulated loss 0.130863640172735
+Batch 400: current accumulated loss 0.1307556290374581
+Batch 500: current accumulated loss 0.13294033499475486
+Batch 600: current accumulated loss 0.13313413400841434
+Batch 700: current accumulated loss 0.13196129158946995
+Batch 800: current accumulated loss 0.13124236466825828
+Batch 900: current accumulated loss 0.13136140864495433
+Batch 1000: current accumulated loss 0.1308154552974008
+Batch 1100: current accumulated loss 0.13098257252917736
+Batch 1200: current accumulated loss 0.13074151496654943
+--------------------------------------------->>>>>>
+Epoch 38: loss val 0.1305168395936489, lr 0.0001
+--------------------------------------------->>>>>>
+FOUND SOMETHING WEIRD
+Batch 0: current accumulated loss 0.1454474925994873
+Batch 100: current accumulated loss 0.10548748153418598
+Batch 200: current accumulated loss 0.10824109756605542
+Batch 300: current accumulated loss 0.10770024147590133
+Batch 400: current accumulated loss 0.10726275948106202
+Batch 500: current accumulated loss 0.1083739666257076
+Batch 600: current accumulated loss 0.1088314227350738
+Batch 700: current accumulated loss 0.10913467802606874
+Batch 800: current accumulated loss 0.10987227057082376
+Batch 900: current accumulated loss 0.10987226902347029
+Batch 1000: current accumulated loss 0.10986653058887362
+Batch 1100: current accumulated loss 0.10971872914552039
+Batch 1200: current accumulated loss 0.1101825880034083
+Batch 1300: current accumulated loss 0.11009798925097955
+Batch 1400: current accumulated loss 0.10989067296389168
+Batch 1500: current accumulated loss 0.10985522760918424
+Batch 1600: current accumulated loss 0.1099996955100817
+Batch 1700: current accumulated loss 0.10996341386668686
+Batch 1800: current accumulated loss 0.11007525838667455
+Batch 1900: current accumulated loss 0.11032128641906065
+Batch 2000: current accumulated loss 0.11045790512462904
+Batch 2100: current accumulated loss 0.1103025131328284
+Batch 2200: current accumulated loss 0.11028677748786163
+Batch 2300: current accumulated loss 0.11022302839599035
+Batch 2400: current accumulated loss 0.11000525427114115
+--------------------------------------------->>>>>>
+Epoch 39: loss train 0.11000084992051125, lr 0.0001
+--------------------------------------------->>>>>>
+Batch 0: current accumulated loss 0.09025304019451141
+Batch 100: current accumulated loss 0.1308995809885535
+Batch 200: current accumulated loss 0.12981171275845807
+Batch 300: current accumulated loss 0.1309107203172687
+Batch 400: current accumulated loss 0.13080206875714875
+Batch 500: current accumulated loss 0.13298961768547693
+Batch 600: current accumulated loss 0.13318262527543376
+Batch 700: current accumulated loss 0.1320092404758114
+Batch 800: current accumulated loss 0.13129006194580956
+Batch 900: current accumulated loss 0.13140847822124102
+Batch 1000: current accumulated loss 0.1308619183907797
+Batch 1100: current accumulated loss 0.1310295650158602
+Batch 1200: current accumulated loss 0.1307888152008003
+--------------------------------------------->>>>>>
+Epoch 39: loss val 0.13056454311907292, lr 0.0001
+--------------------------------------------->>>>>>
+Done with SAM!
+Position 2
+2856321024
+1423675904
+
+0
+0
+
+0
+0
+
+0
+0
+
+0
+0
+
+0
+0
+
+0
+0
+
+0
+0
+
+Test setup:
+Init dataset
+	 total of 5000 images.
+************************************************************
+*********************** TESTING SAM ************************
+************************************************************
+Tester started...
+Batch 0: current accumulated loss 0.09025304019451141
+Batch 100: current accumulated loss 0.1308995809885535
+Batch 200: current accumulated loss 0.12981171275845807
+Batch 300: current accumulated loss 0.1309107203172687
+Batch 400: current accumulated loss 0.13080206875714875
+Batch 500: current accumulated loss 0.13298961768547693
+Batch 600: current accumulated loss 0.13318262527543376
+Batch 700: current accumulated loss 0.1320092404758114
+Batch 800: current accumulated loss 0.13129006194580956
+Batch 900: current accumulated loss 0.13140847822124102
+Batch 1000: current accumulated loss 0.1308619183907797
+Batch 1100: current accumulated loss 0.1310295650158602
+Batch 1200: current accumulated loss 0.1307888152008003
+Done with SAM!
+Position 3
+2904555520
+1412166144
+
+0
+0
+
+0
+0
+
+0
+0
+
+0
+0
+
+0
+0
+
+0
+0
+
+0
+0
+
+Run setup:
+Init dataset in mode run
+	 total of 6 images.
+************************************************************
+*********************** RUNNING SAM ************************
+************************************************************
+Running the model...
+Running image [1/6]: COCO_1.jpg
+(480, 640)
+Running image [2/6]: COCO_2.jpg
+(480, 640)
+Running image [3/6]: COCO_3.jpg
+(480, 640)
+Running image [4/6]: COCO_4.jpg
+(480, 640)
+Running image [5/6]: COCO_5.jpg
+(480, 640)
+Running image [6/6]: Pattern_001.jpg
+(1088, 1920)
+Done with SAM!
+Position 5
+3139436544
+2343041536
+
+0
+0
+
+0
+0
+
+0
+0
+
+0
+0
+
+0
+0
+
+0
+0
+
+0
+0
+
+Removing pseudomodel from cuda: SAM
+Position 6
+3139436544
+2343041536
+
+0
+0
+
+0
+0
+
+0
+0
+
+0
+0
+
+0
+0
+
+0
+0
+
+0
+0
+

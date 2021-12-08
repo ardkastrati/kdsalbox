@@ -1,0 +1,8 @@
+{
+    "name": "RARE2012",
+    "original_model_name": "Attention by Information Maximization",
+    "notes" : "Knowledge distilled version with a very leightweight neural network",
+    "student_path": "RARE2012/exported/rare2012.pth",
+    "version": "1.0.0",
+    "model_type": "matlab"
+}

@@ -1,0 +1,10 @@
+torch==1.9.0
+torchvision==0.10.0
+numpy==1.21.2
+pillow==8.3.2
+scipy==1.7.1
+click
+scikit-image==0.18.3
+streamlit==0.89.0
+scikit-learn
+# Python 3.8 (worked for me, maybe newer versions of Python will need newer versions of the librarier, but generally it should work)

@@ -1,0 +1,8 @@
+{
+    "name": "SAM",
+    "original_model_name": "SAM",
+    "notes" : "Knowledge distilled version with a very leightweight neural network",
+    "student_path": "SAM/exported/sam.pth",
+    "version": "1.0.0",
+    "model_type": "matlab"
+}

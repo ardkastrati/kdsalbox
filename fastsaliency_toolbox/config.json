@@ -1,0 +1,324 @@
+{
+    "postprocessing_parameters": {
+        "histogram_matching": {
+            "default": "none",
+            "description": "Specification for histogram matching. ",
+            "valid_values": ["equalization", "biased", "none"]
+        },
+        "histogram_matching_bias_path": {
+            "default": "./dataset/mean.jpg",
+            "description": "A saliency map to be used for histogram matching ",
+            "valid_values": "A directory to the image that represents the bias"
+        },
+        "do_smoothing": {
+            "default": "none",
+            "description": "Specification for preprocessing smoothing. 'default' uses whatever smoothing step is provided by the originally released model code. 'none' turns off post-processing smoothing (though it should be noted that some implicit smoothing (eg. through image resizing) will remain). 'custom' smooths the map with a specified kernel 'proportional' smooths the map with a kernel sized to the major dimension of the image.",
+            "valid_values": ["default", "none", "custom", "proportional"]
+        },
+        "smooth_size": {
+            "default": 9.0,
+            "description": "Custom smoothing kernel size, only used when do_smoothing is set to custom.",
+            "valid_values": "Integer greater than 0"
+        },
+        "smooth_std": {
+            "default": 3.0,
+            "description": "Custom smoothing kernel standard deviation, only used when do_smoothing is set to custom.",
+            "valid_values": "Number greater than 0"
+        },
+        "smooth_prop": {
+            "default": 0.05,
+            "description": "Proportional smoothing kernel parameter, only used when do_smoothing is set to proportional. smooth_prop*max(image_height,image_width) is the standard deviation of a Gaussian kernel; size is set to 3 times this value.",
+            "valid_values": "Number between 0 and 1"
+        },
+        "scale_output": {
+            "default": "none",
+            "description": "Specification for rescaling saliency map values into a specified range. 'log-density' transforms the map to a probability density in log-space, as expected by the Information Gain metric. 'min-max' linearly rescales the values between a specified minimum and maximum. 'none' leaves the output in whatever range is dictated by the original model code 'normalized' returns normally distributed values with mean 0 and standard deviation 1.",
+            "valid_values": ["log-density", "min-max", "none", "normalized"]
+        },
+        "scale_min": {
+            "default": 0.0,
+            "description": "Minimum saliency value in the map, only valid when scale_output is set to min-max or log-density.",
+            "valid_values": "Any number less than scale_max"
+        },
+        "scale_max": {
+            "default": 1.0,
+            "description": "Maximum saliency value in the map, only valid when scale_output is set to min-max or log-density.",
+            "valid_values": "Any number greater than scale_min"
+        },
+        "center_prior": {
+            "default": "none",
+            "description": "Specification for the addition of a priori bias toward the center, usually through the post-processing application of a centered Gaussian, but sometimes built into a model in other ways. Note that this option cannot guarantee to control all forms of spatial bias toward the center, but rather provides control over any parametric or explicit steps which contribute to such a spatial bias. 'default' uses whatever central bias term is automatically provided by a given model, if one is included. 'none' turns off or removes the sources of central biasing which are accessible to SMILER. 'proportional_add' adds a central Gaussian prior with sigma proportional to the image dimensions. 'proportional_mult' multiplies the map by a central Gaussian prior with sigma proportional to the image dimensions.",
+            "valid_values": ["default", "none", "proportional_add", "proportional_mult"]
+        },
+        "center_prior_prop": {
+            "default": 0.2,
+            "description": "When incorporating a central Gaussian prior, this parameter specifies the sigma of the Gaussian as a proportion of image dimensions. Only used when center_prior is set to proportional_add or proportional_mult.",
+            "valid_values": "Number between 0 and 1"
+        },
+        "center_prior_weight": {
+            "default": 0.5,
+            "description": "When incorporating a central Gaussian prior, this parameter specifies the weight given to the prior in the form of multiplicative gain. Higher numbers will mean more emphasis is placed on the central prior, whereas lower numbers will place more emphasis on the calculated saliency map. When center_prior is set to proportional_add, the resultant map will be equal to (1-center_prior_weight)*salmap + center_prior_weight*center_prior_map. When center_prior is set to proportional_mult, the resultant map will be equal to (1-center_prior_weight)*salmap + center_prior_weight*salmap*center_prior_map. This parameter is not used in other conditions.",
+            "valid_values": "Number greater than 0"
+        },
+        "center_prior_scale_first": {
+            "default": true,
+            "description": "When incorporating a central Gaussian prior, this flag tells SMILER to first scale the saliency map to be between 0 and 1 before adding the prior (NOT the scale_output step - this takes place after adding a center prior). After adding the prior SMILER will then do any scaling specified by the scale_output parameter. It is recommended to keep this 'true' to ensure that the magnitude of the center prior is equivalent across algorithms, but this step may be skipped by setting the flag to 'false'.",
+            "valid_values": [true, false]
+        }
+    },
+
+    "experiment_parameters": {
+        "experiment_name": {
+            "default": "NA",
+            "description": "The name of the experiment",
+            "valid_values": "A string with the name of the experiment"
+        },
+        "experiment_description": {
+            "default": "NA",
+            "description": "The description of the experiment.",
+            "valid_values": "A string with the description of the experiment."
+        },
+        "models": {
+            "default": "AIM,IMSIG,SUN,SAM,RARE2012,UniSal,DGII,BMS,IKN,GBVS",
+            "description": "Which models should the experiment contain.",
+            "valid_values": "A string with the model names, separated by comma's"
+        },
+        "logging_dir": {
+            "default": "logs/experiment_logs/",
+            "description": "Where should the logging data be stored.",
+            "valid_values": "A directory"
+        },
+        "input_images": {
+            "default": "./dataset/DATASET/Images/",
+            "description": "Specify the directory to the dataset.",
+            "valid_values": "A directory"
+        },
+        "input_saliencies": {
+            "default": "./dataset/DATASET/",
+            "description": "Specify the directory to the dataset.",
+            "valid_values": "A directory"
+        },
+        "recursive": {
+            "default": false,
+            "description": "Should the model recusively search for all images in the given directory?",
+            "valid_values": [true, false]
+        },
+        "overwrite": {
+            "default": false,
+            "description": "Should the model recompute the saliency?",
+            "valid_values": [true, false]
+        },
+        "verbose": {
+            "default": true,
+            "description": "Should the experiment print the current progress?",
+            "valid_values": [true, false]
+        }
+    },
+
+    "run_parameters": {
+        "model": {
+            "default": "AIM",
+            "description": "Which model should the running contain.",
+            "valid_values": "A string with the model names, separated by comma's"
+        },
+        "student_path": {
+            "default": "default",
+            "description": "The path where to load the model that we want to test.",
+            "valid_values": "A path to the file with the student weights, or default."
+        },
+        "input_images": {
+            "default": "./dataset/dummy_images/train/",
+            "description": "Specify the directory to the RGB images.",
+            "valid_values": "A directory"
+        },
+        "output_dir": {
+            "default": "./logs/run_output/",
+            "description": "Specify the directory where should the output be stored.",
+            "valid_values": "A directory"
+        },
+        "recursive": {
+            "default": false,
+            "description": "Should the model recusively search for all images in the given directory?",
+            "valid_values": [true, false]
+        },
+        "overwrite": {
+            "default": false,
+            "description": "Should the model recompute the saliency?",
+            "valid_values": [true, false]
+        },
+        "verbose": {
+            "default": true,
+            "description": "Should the experiment print the current progress?",
+            "valid_values": [true, false]
+        }
+    },
+
+    "train_parameters": {
+        "model": {
+            "default": "AIM",
+            "description": "Which models should the experiment contain.",
+            "valid_values": "A string with the model name"
+        },
+        "logging_dir": {
+            "default": "./logs/train_logs/",
+            "description": "Where should the logging data be stored.",
+            "valid_values": "A directory"
+        },
+        "input_images": {
+            "default": "./dataset/dummy_images/",
+            "description": "Specify the directory to the RGB images.",
+            "valid_values": "A directory"
+        },
+        "input_saliencies": {
+            "default": "./dataset/dummy_saliency/AIM/",
+            "description": "Specify the directory to the saliency images.",
+            "valid_values": "A directory"
+        },
+        "export_path": {
+            "default": "exported/",
+            "description": "Where do you want to export the best model",
+            "valid_values": "A directory."
+        },
+        "recursive": {
+            "default": false,
+            "description": "Should the model recusively search for all images in the given directory?",
+            "valid_values": [true, false]
+        },
+        "verbose": {
+            "default": true,
+            "description": "Should the experiment print the current progress?",
+            "valid_values": [true, false]
+        },
+        "batch_size": {
+            "default": 4,
+            "description": "The size of the batches used for training",
+            "valid_values": "A non-negative integer (typically a power of 2)"
+        },
+        "freeze_encoder_steps": {
+            "default": 5,
+            "description": "How many epochs should the encoder be initially frozen",
+            "valid_values": "A non-negative integer (typically between 0 and 10), 0 meaning the encoder is not frozen."
+        }
+    },
+
+    "test_parameters": {
+        "model": {
+            "default": "AIM",
+            "description": "Which model should the testing contain.",
+            "valid_values": "A string with the model name"
+        },
+        "student_path": {
+            "default": "models/example.pth",
+            "description": "The path where to load the model that we want to test.",
+            "valid_values": "A string with the model name"
+        },
+        "logging_dir": {
+            "default": "./logs/test_logs/",
+            "description": "Where should the logging data be stored.",
+            "valid_values": "A directory"
+        },
+        "input_images": {
+            "default": "./dataset/dummy_images/train/",
+            "description": "Specify the directory to the RGB images.",
+            "valid_values": "A directory"
+        },
+        "input_saliencies": {
+            "default": "./dataset/dummy_saliency/AIM/",
+            "description": "Specify the directory to the saliency images.",
+            "valid_values": "A directory"
+        },
+        "recursive": {
+            "default": false,
+            "description": "Should the model recusively search for all images in the given directory?",
+            "valid_values": [true, false]
+        },
+        "verbose": {
+            "default": true,
+            "description": "Should the experiment print the current progress?",
+            "valid_values": [true, false]
+        },
+        "batch_size": {
+            "default": 4,
+            "description": "The size of the batches used for training",
+            "valid_values": "A non-negative integer (typically a power of 2)"
+        },
+        "per_image_statistics": {
+            "default": true,
+            "description": "If you want to have the statistics for each image",
+            "valid_values": [true, false]
+        }
+    },
+    "preprocessing_parameters": {
+        "histogram_matching": {
+            "default": "none",
+            "description": "Specification for histogram matching. ",
+            "valid_values": ["equalization", "image-based", "biased", "none"]
+        },
+        "histogram_matching_bias_path": {
+            "default": "./dataset/mean.jpg",
+            "description": "A saliency map to be used for histogram matching ",
+            "valid_values": "A directory to the image that represents the bias"
+        },
+        "histogram_matching_image_path": {
+            "default": "../dataset/DATASET/",
+            "description": "A saliency map to be used for histogram matching for each image",
+            "valid_values": "A directory to all images"
+        },
+        "do_smoothing": {
+            "default": "none",
+            "description": "Specification for preprocessing smoothing. 'default' uses whatever smoothing step is provided by the originally released model code. 'none' turns off post-processing smoothing (though it should be noted that some implicit smoothing (eg. through image resizing) will remain). 'custom' smooths the map with a specified kernel 'proportional' smooths the map with a kernel sized to the major dimension of the image.",
+            "valid_values": ["default", "none", "custom", "proportional"]
+        },
+        "smooth_size": {
+            "default": 9.0,
+            "description": "Custom smoothing kernel size, only used when do_smoothing is set to custom.",
+            "valid_values": "Integer greater than 0"
+        },
+        "smooth_std": {
+            "default": 3.0,
+            "description": "Custom smoothing kernel standard deviation, only used when do_smoothing is set to custom.",
+            "valid_values": "Number greater than 0"
+        },
+        "smooth_prop": {
+            "default": 0.05,
+            "description": "Proportional smoothing kernel parameter, only used when do_smoothing is set to proportional. smooth_prop*max(image_height,image_width) is the standard deviation of a Gaussian kernel; size is set to 3 times this value.",
+            "valid_values": "Number between 0 and 1"
+        },
+        "scale_output": {
+            "default": "none",
+            "description": "Specification for rescaling saliency map values into a specified range. 'log-density' transforms the map to a probability density in log-space, as expected by the Information Gain metric. 'min-max' linearly rescales the values between a specified minimum and maximum. 'none' leaves the output in whatever range is dictated by the original model code 'normalized' returns normally distributed values with mean 0 and standard deviation 1.",
+            "valid_values": ["log-density", "min-max", "none", "normalized"]
+        },
+        "scale_min": {
+            "default": 0.0,
+            "description": "Minimum saliency value in the map, only valid when scale_output is set to min-max or log-density.",
+            "valid_values": "Any number less than scale_max"
+        },
+        "scale_max": {
+            "default": 1.0,
+            "description": "Maximum saliency value in the map, only valid when scale_output is set to min-max or log-density.",
+            "valid_values": "Any number greater than scale_min"
+        },
+        "center_prior": {
+            "default": "none",
+            "description": "Specification for the addition of a priori bias toward the center, usually through the post-processing application of a centered Gaussian, but sometimes built into a model in other ways. Note that this option cannot guarantee to control all forms of spatial bias toward the center, but rather provides control over any parametric or explicit steps which contribute to such a spatial bias. 'default' uses whatever central bias term is automatically provided by a given model, if one is included. 'none' turns off or removes the sources of central biasing which are accessible to SMILER. 'proportional_add' adds a central Gaussian prior with sigma proportional to the image dimensions. 'proportional_mult' multiplies the map by a central Gaussian prior with sigma proportional to the image dimensions.",
+            "valid_values": ["default", "none", "proportional_add", "proportional_mult"]
+        },
+        "center_prior_prop": {
+            "default": 0.2,
+            "description": "When incorporating a central Gaussian prior, this parameter specifies the sigma of the Gaussian as a proportion of image dimensions. Only used when center_prior is set to proportional_add or proportional_mult.",
+            "valid_values": "Number between 0 and 1"
+        },
+        "center_prior_weight": {
+            "default": 0.5,
+            "description": "When incorporating a central Gaussian prior, this parameter specifies the weight given to the prior in the form of multiplicative gain. Higher numbers will mean more emphasis is placed on the central prior, whereas lower numbers will place more emphasis on the calculated saliency map. When center_prior is set to proportional_add, the resultant map will be equal to (1-center_prior_weight)*salmap + center_prior_weight*center_prior_map. When center_prior is set to proportional_mult, the resultant map will be equal to (1-center_prior_weight)*salmap + center_prior_weight*salmap*center_prior_map. This parameter is not used in other conditions.",
+            "valid_values": "Number greater than 0"
+        },
+        "center_prior_scale_first": {
+            "default": true,
+            "description": "When incorporating a central Gaussian prior, this flag tells SMILER to first scale the saliency map to be between 0 and 1 before adding the prior (NOT the scale_output step - this takes place after adding a center prior). After adding the prior SMILER will then do any scaling specified by the scale_output parameter. It is recommended to keep this 'true' to ensure that the magnitude of the center prior is equivalent across algorithms, but this step may be skipped by setting the flag to 'false'.",
+            "valid_values": [true, false]
+        }
+    }
+}
+

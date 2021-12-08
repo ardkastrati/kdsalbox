@@ -1,0 +1,8 @@
+{
+    "name": "SUN",
+    "original_model_name": "SUN",
+    "notes" : "Knowledge distilled version with a very leightweight neural network",
+    "student_path": "SUN/exported/sun.pth",
+    "version": "1.0.0",
+    "model_type": "matlab"
+}

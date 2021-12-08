@@ -1,0 +1,8 @@
+{
+    "name": "UniSal",
+    "original_model_name": "Unisal",
+    "notes" : "Knowledge distilled version with a very leightweight neural network",
+    "student_path": "UniSal/exported/unisal.pth",
+    "version": "1.0.0",
+    "model_type": "deep learning"
+}

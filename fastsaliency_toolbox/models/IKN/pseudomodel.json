@@ -1,0 +1,8 @@
+{
+    "name": "IKN",
+    "original_model_name": "The initial model",
+    "notes" : "Knowledge distilled version with a very leightweight neural network",
+    "student_path": "IKN/exported/ikn.pth",
+    "version": "1.0.0",
+    "model_type": "matlab"
+}

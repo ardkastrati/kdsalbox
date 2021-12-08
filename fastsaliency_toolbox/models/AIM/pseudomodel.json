@@ -1,0 +1,8 @@
+{
+    "name": "AIM",
+    "original_model_name": "Attention by Information Maximization",
+    "notes" : "Knowledge distilled version with a very leightweight neural network",
+    "student_path": "AIM/exported/aim.pth",
+    "version": "1.0.0",
+    "model_type": "matlab"
+}
