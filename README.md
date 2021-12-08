@@ -29,21 +29,21 @@ $ conda activate kdsalbox
 You can use the toolbox mainly for the following three functions: train, test, run. With the train procedure you can use our pipeline to knowledge-distill our models or new models. Testing can be used to evaluate previous models. Finally, running can be used to run the models in a given dataset and produce the saliency maps. In the following we describe these in more details.
 
 
-# Running
+### Running
 You can run a model by simply specifying the name of the model, the path to the input folder and the path to output folder as follows:
 
 ```bash
 python main.py  -m "AIM" /path/to/input/folder/ /path/to/output/folder/
 ```
 
-# Testing
+### Testing
 You can evaluate the models for a given dataset 
 
 ```bash
 python main.py test -m "AIM" --input_images ./path/to/input/images/ --input_saliencies ./path/to/saliency/images/
 ```
 
-# Training
+### Training
 ```bash
 python main.py train -m "AIM" --input_images ./path/to/input/images/ --input_saliencies ./path/to/saliency/images/
 ```
