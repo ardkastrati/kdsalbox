@@ -2,10 +2,8 @@
 
 A toolbox of efficient knowledge-distilled saliency models. This repository contains the code for the toolbox presented in our paper at the SVRHM 2021:
 
-“KDSalBox: A toolbox of efficient knowledge-distilled saliency models”
-
-Ard Kastrati, Zoya Bylinskii, Eli Shechtman
-
+“KDSalBox: A toolbox of efficient knowledge-distilled saliency models”  
+Ard Kastrati, Zoya Bylinskii, Eli Shechtman  
 SVHRM @ NeurIPS ’21: 3rd Shared Visual Representations in Human & Machine Intelligence Workshop, Online, December 2021
 
 The PDF of the article is available at this [link][1].
