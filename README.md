@@ -1,6 +1,6 @@
 # KDSalBox
 
-A toolbox of efficient knowledge-distilled saliency models. This repository contains the code for the toolbox presented in our paper at the SVRHM 2021:
+This repository contains the code for the toolbox presented in our paper at the SVRHM 2021:
 
 “KDSalBox: A toolbox of efficient knowledge-distilled saliency models”  
 Ard Kastrati, Zoya Bylinskii, Eli Shechtman  
