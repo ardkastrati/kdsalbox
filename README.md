@@ -2,9 +2,9 @@
 
 A toolbox of efficient knowledge-distilled saliency models. This repository contains the code for the toolbox presented in our paper at the SVRHM 2021:
 
-“KDSalBox: A toolbox of efficient knowledge-distilled saliency models”
+***“KDSalBox: A toolbox of efficient knowledge-distilled saliency models”
 Ard Kastrati, Zoya Bylinskii, Eli Shechtman
-**SVHRM @ NeurIPS ’21: 3rd Shared Visual Representations in Human & Machine Intelligence Workshop, Online, December 2021**
+SVHRM @ NeurIPS ’21: 3rd Shared Visual Representations in Human & Machine Intelligence Workshop, Online, December 2021***
 
 The PDF of the article is available at this [link][1].
 
@@ -65,5 +65,6 @@ We start by explaining the settings that can be made:
 Parameter | Default | Description
 ------------ | ------------- | -------------
 `verbose` | True | Whether the procedure should print the progress
+
 [1]: https://tik-db.ee.ethz.ch/file/ce39d039b49f33a066d08e1c0ecb12f0/KDSalBox.pdf
 [5]: https://conda.io/docs/user-guide/install/index.html
