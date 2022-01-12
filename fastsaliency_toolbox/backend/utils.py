@@ -3,16 +3,16 @@ import textwrap
 
 
 def create_dirs_if_none(path, uid=None, gid=None):
-    if uid is None:
-        uid = os.getuid()
+    #if uid is None:
+    #    uid = os.getuid()
 
-    if gid is None:
-        gid = os.getgid()
+    #if gid is None:
+    #    gid = os.getgid()
 
     parent_path = os.path.dirname(path)
     if not os.path.isdir(parent_path):
         os.makedirs(parent_path)
-        os.chown(parent_path, uid, gid)
+        #os.chown(parent_path, uid, gid)
 
 
 def get_image_path_tuples(input_dir, output_dir, recursive=False):
