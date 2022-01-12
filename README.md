@@ -24,7 +24,7 @@ You can install the dependencies inside a conda environment as follows:
 
 ```console
 $ git clone 
-$ cd make
+$ cd kdsalbox/fastsaliency_toolbox/
 $ conda create --name kdsalbox python=3.8
 $ conda activate kdsalbox
 ```
