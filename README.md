@@ -39,7 +39,7 @@ You can use the toolbox mainly for the following three functions: train, test, r
 You can run a model by simply specifying the name of the model, the path to the input folder and the path to output folder as follows:
 
 ```bash
-python main.py  -m "AIM" /path/to/input/folder/ /path/to/output/folder/
+python main.py run -m "AIM" /path/to/input/folder/ /path/to/output/folder/
 ```
 
 ### Testing
