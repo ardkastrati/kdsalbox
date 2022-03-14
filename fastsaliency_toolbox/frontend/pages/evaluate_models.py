@@ -33,7 +33,7 @@ def app():
 
 
     # Code to read a single file 
-    uploaded_kd_image = st.file_uploader("Choose an image to test KD", type = ['jpg', 'png'])
+    uploaded_kd_image = st.file_uploader("Choose an image to test KD", type = ['jpeg', 'jpg', 'png'])
 
     if uploaded_kd_image :
         original_image = Image.open(uploaded_kd_image)
@@ -41,7 +41,7 @@ def app():
         col1.markdown("### Original Image")
         col1.image(original_image, width = 300)
         for i, name in enumerate(models):
-            orig_model = st.file_uploader("Choose the image of the original model (" + models[i] + ")", type = ['jpg', 'png'])
+            orig_model = st.file_uploader("Choose the image of the original model (" + models[i] + ")", type = ['jpeg', 'jpg', 'png'])
             
             col0, col1, col2, col3, col4 = st.columns([2, 6, 6, 6, 2])
             col1.markdown("### " + models[i])
