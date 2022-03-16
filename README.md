@@ -22,11 +22,13 @@ There are dependencies in this toolbox and we propose to use anaconda as package
 
 You can install the dependencies inside a conda environment as follows:
 
+(Conda is not able to resolve some of the packets. Thus a manual installation of the packages as follows is required)
 ```console
 $ git clone 
-$ cd kdsalbox/fastsaliency_toolbox/
-$ conda create --name kdsalbox python=3.8
-$ conda activate kdsalbox
+$ cd kdsalbox-generalization/fastsaliency_toolbox/
+$ conda create -n kdsalbox-generalization python=3.8
+$ conda activate kdsalbox-generalization
+$ pip install -r requirements.txt
 ```
 (For details on how to install `conda`, please refer to the [official documentation][5].)
 
