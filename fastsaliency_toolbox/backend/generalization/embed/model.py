@@ -6,17 +6,6 @@ from torchvision.models import mobilenet_v2
 class Decoder(nn.Module):
     def __init__(self):
         super(Decoder, self).__init__()
-
-        # embedding
-        model_cnt = 7
-        embedding_vector_size = 16
-        self.embed = nn.Embedding(model_cnt, embedding_vector_size)
-        self.pe_1 = nn.Linear(embedding_vector_size, 1280 * 512 * 3 * 3)
-        # self.pe_2 = nn.Linear(embedding_vector_size, whatever goes here 2.0)
-        # self.pe_3 = nn.Linear(embedding_vector_size, whatever goes here 3.0)
-        # self.first_eb0 = self.embed(t.tensor(0))
-
-
         self.bn7_3 = nn.BatchNorm2d(num_features=512)
         self.bn8_1 = nn.BatchNorm2d(num_features=256)
         self.bn8_2 = nn.BatchNorm2d(num_features=256)
@@ -36,23 +25,7 @@ class Decoder(nn.Module):
         self.conv10_2 = nn.Conv2d(64, 64, kernel_size=3, padding=1)
         self.output = nn.Conv2d(64, 1, kernel_size=1, padding=0)
         
-    def forward(self, lbl_and_xb):
-        # print(self.parameters)                                # DOES contain the linear & embedding layer
-
-        # embedding
-        (lbl,xb) = lbl_and_xb
-        eb = self.embed(t.tensor(lbl)) # only compute embedding of first label, otherwise cannot use as weights as size depends on batch_size
-        # print(eb)
-        eb = F.relu(self.pe_1(eb))
-        eb = eb.view((512, 1280, 3, 3))
-        # eb.retain_grad()                                      # does not change anything either
-
-        # if self.first_eb0 is not None:
-        #      print((self.first_eb0 - eb).norm())              # = 0.0
-        # print(eb.requires_grad)                               # = true
-
-        self.conv7_3.weight = nn.Parameter(eb, requires_grad=True)
-
+    def forward(self, xb):
         xb = F.relu(self.bn7_3(self.conv7_3(xb)))
         xb = self.upsample(xb)
         xb = F.relu(self.bn8_1(self.conv8_1(xb)))
@@ -65,10 +38,7 @@ class Decoder(nn.Module):
         xb = self.upsample(xb)
         xb = F.relu(self.bn10_1(self.conv10_1(xb)))
         xb = F.relu(self.bn10_2(self.conv10_2(xb)))
-
-        # print(self.conv7_3.weight.requires_grad)              # = true
-        xb = self.output(xb)
-        return xb
+        return self.output(xb)
 
 
 class Student(nn.Module):
@@ -92,9 +62,8 @@ class Student(nn.Module):
     def simple_decoder(self):
         return Decoder()
 
-    def forward(self, lbl_and_xb):
-        (lbl,xb) = lbl_and_xb
-        enc = (lbl, self.encoder(xb))
+    def forward(self, inputs):
+        enc = self.encoder(inputs)
         student_e = self.get_student_features(range(0, 18, 1), 'student_encoder')
         self.last = student_e[17]
         dec = self.decoder(enc)
