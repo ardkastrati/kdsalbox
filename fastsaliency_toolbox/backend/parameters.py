@@ -67,6 +67,12 @@ class ParameterMap(object):
         for name in self._parameters:
             self._parameters[name].pretty_print()
 
+    def __str__(self):
+        res = ""
+        for name in self._parameters:
+            res += str(self._parameters[name]) + " \n "
+        return res
+
 
 class Parameter(object):
     def __init__(self, name : str, value : Any, description : str = None, valid_values : List[Any] = None):
@@ -84,4 +90,7 @@ class Parameter(object):
         self.value = value
 
     def pretty_print(self):
-        print("Parameter: " + str(self.name) + ": " + str(self.value))
+        print(str(self))
+
+    def __str__(self):
+        return "Parameter: " + str(self.name) + ": " + str(self.value)
