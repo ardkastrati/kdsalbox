@@ -389,5 +389,86 @@ def version():
     """Displays version information."""
     click.echo("Fast Saliency Toolbox: Saliency (Psuedo-Model) Implementation ")
 
+
+########################################
+# Generalization
+@cli.command()
+@click.option('--histogram_matching', help="The type of histogram matching. Possible values: none, biased, equalization. This is applied before training which basically means that the trained model learns to output directly histogram matched saliency images.")
+@click.option('--scale', help="The type of scaling to be done. Possible values: log-density, min-max, none, normalized. This is applied before training which basically means that the trained model learns to output directly scaled saliency images.")
+@click.option('--blur', help="The type of blurring to be done. Possible values: custom, proportional. This is applied before training which basically means that the trained model learns to output directly blurred saliency images.")
+@click.option('--center_prior', help="The Gaussian center prior. Possible values none, proportional_add, proportional_mult. This is applied before training which basically means that the trained model learns to output directly Gaussian center biased saliency images.")
+
+@click.option('-l', '--logging_dir', help="The logs where should be stored.")
+@click.option('-e', '--export_path', help="The relative path where to export.")
+@click.option(
+    '-v',
+    '--verbose',
+    is_flag=True,
+    help="Verbose mode and debugging messages.")
+@click.option('-b', '--batch_size', help="The size of the batches used for training.")
+@click.option('-f', '--freeze_encoder_steps', help="Specify for how many epochs to freeze the encoder.")
+def generalization(histogram_matching, scale, blur, center_prior, logging_dir, export_path, verbose, batch_size, freeze_encoder_steps):
+    from backend.config import Config
+    c = Config('config.json')
+
+    # preprocessing
+    if histogram_matching:
+        c.preprocessing_parameter_map.set("histogram_matching", histogram_matching)
+    if scale:
+        c.preprocessing_parameter_map.set("scale_output", scale)
+    if blur:
+        c.preprocessing_parameter_map.set("do_smoothing", blur)
+    if center_prior:
+        c.preprocessing_parameter_map.set("center_prior", center_prior)
+    
+    # training
+    if logging_dir:
+        c.train_parameter_map.set("logging_dir", logging_dir)
+    if export_path:
+        c.train_parameter_map.set("export_path", export_path)
+    if verbose:
+        c.train_parameter_map.set("verbose", verbose)
+    if batch_size:
+        c.train_parameter_map.set("batch_size", batch_size)
+    if freeze_encoder_steps:
+        c.train_parameter_map.set("freeze_encoder_steps", freeze_encoder_steps)
+
+    # TODO: paths as params
+    # setup paths to data folders
+    train_folders_base_path = "/media/yanick/Yanick Zengaffinen Ext-Festpl/DATA/Images"
+    train_folders_paths = [
+        (os.path.join(train_folders_base_path, "Images/train"), os.path.join(train_folders_base_path, "AIM")),
+        (os.path.join(train_folders_base_path, "Images/train"), os.path.join(train_folders_base_path, "IKN")),
+        (os.path.join(train_folders_base_path, "Images/train"), os.path.join(train_folders_base_path, "GBVS")),
+    ]
+
+    validation_folders_base_path = "/media/yanick/Yanick Zengaffinen Ext-Festpl/DATA/Images"
+    validation_folders_paths = [
+        (os.path.join(validation_folders_base_path, "Images/val"), os.path.join(validation_folders_base_path, "AIM")),
+        (os.path.join(validation_folders_base_path, "Images/val"), os.path.join(validation_folders_base_path, "IKN")),
+        (os.path.join(validation_folders_base_path, "Images/val"), os.path.join(validation_folders_base_path, "GBVS")),
+    ]    
+
+    # Do you want to report to wandb?
+    REPORT_WANDB = True
+    os.environ['WANDB_MODE'] = 'online' if REPORT_WANDB else 'offline'
+
+    conf = dict(
+        gpu = 0,
+        preprocess_parameter_map = c.preprocessing_parameter_map,
+        train_parameter_map = c.train_parameter_map,
+        train_folders_paths = train_folders_paths,
+        val_folders_paths =  validation_folders_paths
+    )
+
+    try:
+        from backend.generalization.embed.trainer import Trainer
+        t = Trainer(conf)
+        t.execute()
+
+    except ValueError as e:
+        print(str(e))
+        exit(64)
+
 if __name__ == '__main__':
     cli()
