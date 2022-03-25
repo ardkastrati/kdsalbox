@@ -2,25 +2,9 @@ import os
 from torch.utils.data import Dataset
 import torch
 import numpy as np
-from PIL import Image
 
-from .utils import get_image_path_tuples
+from .utils import get_image_path_tuples, read_image, read_saliency
 from .image_processing import process
-
-# It needs to be moved to utils!
-def read_image(path, dtype=np.float32):
-    f = Image.open(path)
-    img = np.asarray(f, dtype)
-    if(len(img.shape) == 2):
-        print("FOUND SOMETHING WEIRD")
-        return None
-    return img
-
-# It needs to be moved to utils! 
-def read_saliency(path, dtype=np.float32, target_size=None):
-    f = Image.open(path)
-    img = np.asarray(f, dtype)
-    return img
 
 ############################################################
 # Train Dataset Manager
