@@ -3,25 +3,30 @@ from torch.utils.data import Dataset
 import torch
 import numpy as np
 
+
 from backend.utils import read_image, read_saliency
 from backend.image_processing import process
 
-class DataManager(Dataset):
+class MultiDataManager(Dataset):
     """ 
     Wraps a torch dataset around a list of images grouped by folder (each folder corresponds to a label)
     
     folders_paths specifies tuples of (path to folder containing images, path to folder containing saliencies)
+    If include_label = True then each item will be a tuple of (label, (image, saliency))
+
     """
 
-    def __init__(self, folders_paths, verbose, preprocess_parameter_map, N=None):
+    def __init__(self, folders_paths, verbose, preprocess_parameter_map, include_label=False):
 
         self.verbose = verbose
         self.preprocess_parameter_map = preprocess_parameter_map
+        self.include_label = include_label
 
         # get the paths to all images and saliencies under the specified folders
         all_images_paths = []
         all_saliencies_paths = []
         labels_to_indices = {}
+        indices_to_labels = []
         for i,(images_path,saliencies_path) in enumerate(folders_paths):
             # get the names of all images in the folder
             names = os.listdir(images_path)
@@ -36,15 +41,12 @@ class DataManager(Dataset):
             end_index = len(all_images_paths)
             
             labels_to_indices[i] = np.arange(start_index,end_index)
+            indices_to_labels.extend(np.repeat([i], end_index - start_index))
 
         self.all_images_paths = np.array(all_images_paths)
         self.all_saliencies_paths = np.array(all_saliencies_paths)
         self.labels_to_indices = labels_to_indices
-
-        # limit the amount of images
-        if N is not None:
-            all_images_paths = self.all_images_paths[:N]
-            all_saliencies_paths = self.all_saliencies_paths[:N]
+        self.indices_to_labels = np.array(indices_to_labels)
         
         if self.verbose:
             print("Init dataset")
@@ -72,7 +74,7 @@ class DataManager(Dataset):
         sal_img = torch.FloatTensor(sal_img)
         sal_img = torch.unsqueeze(sal_img, 0)
 
-        return (img, sal_img)
+        return (self.indices_to_labels[index], (img, sal_img)) if self.include_label else (img, sal_img)
 
     # returns a dictionary mapping labels to the indices of their samples
     def get_labels_to_indices(self):

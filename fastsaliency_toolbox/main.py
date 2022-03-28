@@ -450,7 +450,7 @@ def generalization(histogram_matching, scale, blur, center_prior, logging_dir, e
     ]    
 
     # Do you want to report to wandb?
-    REPORT_WANDB = True
+    REPORT_WANDB = False
     os.environ['WANDB_MODE'] = 'online' if REPORT_WANDB else 'offline'
 
     conf = dict(

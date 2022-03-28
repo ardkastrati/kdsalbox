@@ -3,9 +3,9 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader
 import wandb
-from backend.generalization.datasets import DataManager
 from backend.utils import print_pretty_header
 from backend.generalization.embed.model import Student
+from backend.datasets import TrainDataManager
 
 class Trainer(object):
     def __init__(self, conf):
@@ -21,24 +21,17 @@ class Trainer(object):
 
         self._preprocess_parameter_map = conf["preprocess_parameter_map"]
         self._gpu = str(conf["gpu"])
-
-        ds_train, ds_validate = self.get_datamanagers()
         
-        self._dataloader = {
-            'train': DataLoader(ds_train, batch_size=self._batch_size, shuffle=False, num_workers=4),
-            'val': DataLoader(ds_validate, batch_size=self._batch_size, shuffle=False, num_workers=4)
+        train_folders_paths = self._conf["train_folders_paths"]
+        val_folders_paths = self._conf["val_folders_paths"]
+
+        train_datasets = [TrainDataManager(img_path, sal_path, self._verbose, self._preprocess_parameter_map) for (img_path,sal_path) in train_folders_paths]
+        val_datasets = [TrainDataManager(img_path, sal_path, self._verbose, self._preprocess_parameter_map) for (img_path,sal_path) in val_folders_paths]
+
+        self._dataloaders = {
+            'train': [DataLoader(ds, batch_size=self._batch_size, shuffle=False, num_workers=4) for ds in train_datasets],
+            'val': [DataLoader(ds, batch_size=self._batch_size, shuffle=False, num_workers=4) for ds in val_datasets],
         }
-
-    def get_datamanagers(self):
-        if self._verbose:
-            print("Train setup:")
-        ds_train = DataManager(self._conf["train_folders_paths"], self._verbose, self._preprocess_parameter_map)
-
-        if self._verbose:
-            print("Validation setup:")
-        ds_validate = DataManager(self._conf["val_folders_paths"], self._verbose, self._preprocess_parameter_map)
-
-        return (ds_train, ds_validate)
 
     def save(self, path, model):
         d = {}
@@ -61,39 +54,52 @@ class Trainer(object):
         print('--------------------------------------------->>>>>>')
     
     # train one batch
-    def train_one(self, model, dataloader, criterion, optimizer, mode):
+    def train_one(self, model, dataloaders, criterion, optimizer, mode):
         all_loss = []
-        
-        for i, (X, y) in enumerate(dataloader[mode]):   
-            optimizer.zero_grad()
+        for lbl,dataloader in enumerate(dataloaders[mode]): # TODO: try different approach than just simply learning the models 1 by 1
+            print(f"Model {lbl}")
+            for i, (X, y) in enumerate(dataloader):   
+                print(i)
+                optimizer.zero_grad()
 
-            # put data on GPU (if cuda)
-            if torch.cuda.is_available():
-                X = X.cuda(torch.device(self._gpu))
-                y = y.cuda(torch.device(self._gpu))
-            pred = model.forward(X)
-            losses = criterion(pred, y)
+                # put data on GPU (if cuda)
+                if torch.cuda.is_available():
+                    X = X.cuda(torch.device(self._gpu))
+                    y = y.cuda(torch.device(self._gpu))
+                pred = model.forward((lbl, X))
+                losses = criterion(pred, y)
 
-            # training
-            if mode == 'train':
-                losses.backward()
-                optimizer.step()
-                all_loss.append(losses.item())
+                # training
+                if mode == 'train':
+                    # losses.retain_grad()                        # does not change anything
+                    losses.backward()
+                    # print(model.decoder.embed.weight.grad)        # = None
+                    # print(model.decoder.pe_1.weight.grad)         # = None
+                    # print(model.decoder.conv10_2.weight.grad)   # = non zero vector
 
-            # validation
-            elif mode == 'val':
-                with torch.no_grad():
+                    optimizer.step()
                     all_loss.append(losses.item())
 
-            # loggin
-            if i%100 == 0:
-                print('Batch {}: current accumulated loss {}'.format(i, np.mean(all_loss)))
-            
-            # remove batch from gpu (if cuda)
-            if torch.cuda.is_available():
-                del X
-                del y
-                torch.cuda.empty_cache()
+                # validation
+                elif mode == 'val':
+                    with torch.no_grad():
+                        all_loss.append(losses.item())
+
+                # logging
+                if i%25 == 0:
+                    wandb.log({
+                        "model": lbl,
+                        "batch": i,
+                        "loss": np.mean(all_loss)
+                    })
+                if i%100 == 0:
+                    print(f'Batch {i}: current accumulated loss {np.mean(all_loss)}')
+                
+                # remove batch from gpu (if cuda)
+                if torch.cuda.is_available():
+                    del X
+                    del y
+                    torch.cuda.empty_cache()
                 
         return np.mean(all_loss), model 
 
@@ -107,8 +113,9 @@ class Trainer(object):
         # report to wandb
         wandb.watch(student, loss, log="all", log_freq=10)
 
-        lr = 0.01
+        lr = 100 #0.01
         lr_decay = 0.1
+        # print(student.parameters)
         optimizer = torch.optim.Adam(list(student.parameters()), lr=lr)
         all_epochs = []
 
@@ -123,12 +130,12 @@ class Trainer(object):
 
             # train the student
             student.train()
-            loss_train, student = self.train_one(student, self._dataloader, loss, optimizer, 'train')
+            loss_train, student = self.train_one(student, self._dataloaders, loss, optimizer, 'train')
             if self._verbose: self.pretty_print_epoch(epoch, 'train', loss_train, lr)
 
             # validate on the student
             student.eval()
-            loss_val, model = self.train_one(student, self._dataloader, loss, optimizer, 'val')
+            loss_val, model = self.train_one(student, self._dataloaders, loss, optimizer, 'val')
             if self._verbose: self.pretty_print_epoch(epoch, 'val', loss_val, lr)
 
             # if better performance than all previous => save weights as checkpoint
@@ -170,4 +177,4 @@ class Trainer(object):
             if self._verbose: print("Done with training!")
 
     def delete(self):
-        del self._dataloader
+        del self._dataloaders
