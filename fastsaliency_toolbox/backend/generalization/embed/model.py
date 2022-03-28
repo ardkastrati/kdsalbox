@@ -25,7 +25,23 @@ class Decoder(nn.Module):
         self.conv10_2 = nn.Conv2d(64, 64, kernel_size=3, padding=1)
         self.output = nn.Conv2d(64, 1, kernel_size=1, padding=0)
         
-    def forward(self, xb):
+    def forward(self, lbl_and_xb):
+        # print(self.parameters)                                # DOES contain the linear & embedding layer
+
+        # embedding
+        (lbl,xb) = lbl_and_xb
+        eb = self.embed(t.tensor(lbl))
+        # print(eb)
+        eb = F.relu(self.pe_1(eb))
+        eb = eb.view((512, 1280, 3, 3))
+        # eb.retain_grad()                                      # does not change anything either
+
+        # if self.first_eb0 is not None:
+        #      print((self.first_eb0 - eb).norm())              # = 0.0
+        # print(eb.requires_grad)                               # = true
+
+        self.conv7_3.weight = nn.Parameter(eb, requires_grad=True)
+
         xb = F.relu(self.bn7_3(self.conv7_3(xb)))
         xb = self.upsample(xb)
         xb = F.relu(self.bn8_1(self.conv8_1(xb)))
