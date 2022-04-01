@@ -397,6 +397,7 @@ def version():
 @click.option('--scale', help="The type of scaling to be done. Possible values: log-density, min-max, none, normalized. This is applied before training which basically means that the trained model learns to output directly scaled saliency images.")
 @click.option('--blur', help="The type of blurring to be done. Possible values: custom, proportional. This is applied before training which basically means that the trained model learns to output directly blurred saliency images.")
 @click.option('--center_prior', help="The Gaussian center prior. Possible values none, proportional_add, proportional_mult. This is applied before training which basically means that the trained model learns to output directly Gaussian center biased saliency images.")
+@click.option('--base_path', help="The relative path where to export.")
 
 @click.option('-l', '--logging_dir', help="The logs where should be stored.")
 @click.option('-e', '--export_path', help="The relative path where to export.")
@@ -407,7 +408,7 @@ def version():
     help="Verbose mode and debugging messages.")
 @click.option('-b', '--batch_size', help="The size of the batches used for training.")
 @click.option('-f', '--freeze_encoder_steps', help="Specify for how many epochs to freeze the encoder.")
-def generalization(histogram_matching, scale, blur, center_prior, logging_dir, export_path, verbose, batch_size, freeze_encoder_steps):
+def generalization(histogram_matching, scale, blur, center_prior, base_path, logging_dir, export_path, verbose, batch_size, freeze_encoder_steps):
     from backend.config import Config
     c = Config('config.json')
 
@@ -435,14 +436,14 @@ def generalization(histogram_matching, scale, blur, center_prior, logging_dir, e
 
     # TODO: paths as params
     # setup paths to data folders
-    train_folders_base_path = "/media/yanick/Yanick Zengaffinen Ext-Festpl/DATA/Images"
+    train_folders_base_path = os.path.join(base_path, "Images")
     train_folders_paths = [
         (os.path.join(train_folders_base_path, "Images/train"), os.path.join(train_folders_base_path, "AIM")),
         (os.path.join(train_folders_base_path, "Images/train"), os.path.join(train_folders_base_path, "IKN")),
         (os.path.join(train_folders_base_path, "Images/train"), os.path.join(train_folders_base_path, "GBVS")),
     ]
 
-    validation_folders_base_path = "/media/yanick/Yanick Zengaffinen Ext-Festpl/DATA/Images"
+    validation_folders_base_path = os.path.join(base_path, "Images")
     validation_folders_paths = [
         (os.path.join(validation_folders_base_path, "Images/val"), os.path.join(validation_folders_base_path, "AIM")),
         (os.path.join(validation_folders_base_path, "Images/val"), os.path.join(validation_folders_base_path, "IKN")),
