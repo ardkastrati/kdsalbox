@@ -3,6 +3,7 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader
 from hypnettorch.hnets.mlp_hnet import HMLP
+from hypnettorch.mnets import MLP
 
 import wandb
 
@@ -106,7 +107,7 @@ class Trainer(object):
                         "batch": i,
                         "loss": np.mean(all_loss)
                     })
-                if i%100 == 0:
+                if i%10 == 0:
                     print(f'Batch {i}: current accumulated loss {np.mean(all_loss)}')
                 
                 # remove batch from gpu (if cuda)
@@ -121,12 +122,12 @@ class Trainer(object):
     def start_train(self):
         if self._verbose: print("Encoder frozen...")
 
-        # initialize hypernetwork
-        mnet = Student() # TODO: student should implement mainnet interface
-
+        # initialize networks
+        mnet = Student().to(self._device)
+        
         # TODO: get params from config
         hnet = HMLP(
-            mnet.param_shapes, 
+            mnet.external_param_shapes(), 
             layers=[100, 100], # the sizes of the hidden layers
             cond_in_size=16, # the size of the embeddings
             num_cond_embs=self._model_cnt # the number of embeddings we want to learn
@@ -134,11 +135,12 @@ class Trainer(object):
 
         lr = 0.01
         lr_decay = 0.1
-        optimizer = torch.optim.Adam(list(student.parameters()), lr=lr)
+        params = list(hnet.internal_params) + mnet.internal_params # learn the params of the hypernetwork as well as the internal params of the main network
+        optimizer = torch.optim.Adam(params, lr=lr)
         loss = torch.nn.BCELoss()
         
         # report to wandb
-        wandb.watch(student, loss, log="all", log_freq=10)
+        wandb.watch((hnet, mnet), loss, log="all", log_freq=10)
         
         all_epochs = []
         smallest_loss = None
@@ -150,7 +152,7 @@ class Trainer(object):
             # unfreeze the encoder after given amount of epochs
             if epoch == self._freeze_encoder_steps:
                 if self._verbose: print("Encoder unfrozen")
-                student.unfreeze_encoder()
+                mnet.unfreeze_encoder()
 
             # train the networks
             hnet.train()
@@ -170,7 +172,7 @@ class Trainer(object):
                 if not os.path.exists(checkpoint_dir):
                     os.makedirs(checkpoint_dir)
 
-                smallest_loss, best_epoch, best_model, student = self.save_weight(smallest_loss, best_epoch, best_model, loss_val, epoch, student, checkpoint_dir)
+                smallest_loss, best_epoch, best_model, hnet, mnet = self.save_weight(smallest_loss, best_epoch, best_model, loss_val, epoch, (hnet, mnet), checkpoint_dir)
             all_epochs.append([epoch, loss_train, loss_val]) 
 
             # decrease learning rate over time

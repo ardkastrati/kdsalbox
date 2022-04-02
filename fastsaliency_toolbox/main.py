@@ -436,18 +436,16 @@ def generalization(histogram_matching, scale, blur, center_prior, base_path, log
 
     # TODO: paths as params
     # setup paths to data folders
-    train_folders_base_path = os.path.join(base_path, "Images")
     train_folders_paths = [
-        (os.path.join(train_folders_base_path, "Images/train"), os.path.join(train_folders_base_path, "AIM")),
-        (os.path.join(train_folders_base_path, "Images/train"), os.path.join(train_folders_base_path, "IKN")),
-        (os.path.join(train_folders_base_path, "Images/train"), os.path.join(train_folders_base_path, "GBVS")),
+        (os.path.join(base_path, "Images/train"), os.path.join(base_path, "AIM")),
+        (os.path.join(base_path, "Images/train"), os.path.join(base_path, "IKN")),
+        (os.path.join(base_path, "Images/train"), os.path.join(base_path, "GBVS")),
     ]
 
-    validation_folders_base_path = os.path.join(base_path, "Images")
     validation_folders_paths = [
-        (os.path.join(validation_folders_base_path, "Images/val"), os.path.join(validation_folders_base_path, "AIM")),
-        (os.path.join(validation_folders_base_path, "Images/val"), os.path.join(validation_folders_base_path, "IKN")),
-        (os.path.join(validation_folders_base_path, "Images/val"), os.path.join(validation_folders_base_path, "GBVS")),
+        (os.path.join(base_path, "Images/val"), os.path.join(base_path, "AIM")),
+        (os.path.join(base_path, "Images/val"), os.path.join(base_path, "IKN")),
+        (os.path.join(base_path, "Images/val"), os.path.join(base_path, "GBVS")),
     ]    
 
     # Do you want to report to wandb?
