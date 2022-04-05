@@ -440,12 +440,20 @@ def generalization(histogram_matching, scale, blur, center_prior, base_path, log
         (os.path.join(base_path, "Images/train"), os.path.join(base_path, "AIM")),
         (os.path.join(base_path, "Images/train"), os.path.join(base_path, "IKN")),
         (os.path.join(base_path, "Images/train"), os.path.join(base_path, "GBVS")),
+        (os.path.join(base_path, "Images/train"), os.path.join(base_path, "BMS")),
+        (os.path.join(base_path, "Images/train"), os.path.join(base_path, "IMSIG")),
+        (os.path.join(base_path, "Images/train"), os.path.join(base_path, "RARE2012")),
+        (os.path.join(base_path, "Images/train"), os.path.join(base_path, "SUN"))
     ]
 
     validation_folders_paths = [
         (os.path.join(base_path, "Images/val"), os.path.join(base_path, "AIM")),
         (os.path.join(base_path, "Images/val"), os.path.join(base_path, "IKN")),
         (os.path.join(base_path, "Images/val"), os.path.join(base_path, "GBVS")),
+        (os.path.join(base_path, "Images/val"), os.path.join(base_path, "BMS")),
+        (os.path.join(base_path, "Images/val"), os.path.join(base_path, "IMSIG")),
+        (os.path.join(base_path, "Images/val"), os.path.join(base_path, "RARE2012")),
+        (os.path.join(base_path, "Images/val"), os.path.join(base_path, "SUN"))
     ]    
 
     # Do you want to report to wandb?
@@ -454,6 +462,10 @@ def generalization(histogram_matching, scale, blur, center_prior, base_path, log
 
     conf = dict(
         gpu = 0,
+        hnet_hidden_layers = [100, 100],
+        hnet_embedding_size = 16,
+        lr = 0.01,
+        lr_decay = 0.1,
         preprocess_parameter_map = c.preprocessing_parameter_map,
         train_parameter_map = c.train_parameter_map,
         train_folders_paths = train_folders_paths,

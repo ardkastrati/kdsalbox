@@ -70,51 +70,52 @@ class Trainer(object):
     def train_one(self, hnet, mnet, dataloaders, criterion, optimizer, mode):
         all_loss = []
 
+        # defines which batch will be loaded from which model
+        all_batches = np.concatenate([np.repeat(model_id, len(dataloader)) for (model_id,dataloader) in enumerate(dataloaders[mode])])
+        np.random.shuffle(all_batches)
+
         # for each model
-        for model_id,dataloader in enumerate(dataloaders[mode]): # TODO: try different approach than just simply learning the models 1 by 1
-            print(f"Model {model_id}")
+        data_iters = [iter(d) for d in dataloaders[mode]]
+        for (i,model_id) in enumerate(all_batches):
+            X,y = next(data_iters[model_id])
 
-            # for each batch
-            for i, (X, y) in enumerate(dataloader):   
-                print(f"Batch {i}")
-                optimizer.zero_grad()
+            optimizer.zero_grad()
 
-                # put data on GPU (if cuda)
-                if torch.cuda.is_available():
-                    X = X.cuda(torch.device(self._gpu))
-                    y = y.cuda(torch.device(self._gpu))
+            # put data on GPU (if cuda)
+            if torch.cuda.is_available():
+                X = X.cuda(torch.device(self._gpu))
+                y = y.cuda(torch.device(self._gpu))
 
-                weights = hnet(cond_id=model_id)
-                pred = mnet.forward(X, weights=weights)
-                loss = criterion(pred, y)
+            weights = hnet(cond_id=model_id.item())
+            pred = mnet.forward(X, weights=weights)
+            loss = criterion(pred, y)
 
-                # training
-                if mode == 'train':
-                    loss.backward()
-                    optimizer.step()
+            # training
+            if mode == 'train':
+                loss.backward()
+                optimizer.step()
 
+                all_loss.append(loss.item())
+
+            # validation
+            elif mode == 'val':
+                with torch.no_grad():
                     all_loss.append(loss.item())
 
-                # validation
-                elif mode == 'val':
-                    with torch.no_grad():
-                        all_loss.append(loss.item())
-
-                # logging
-                if i%25 == 0:
-                    wandb.log({
-                        "model": model_id,
-                        "batch": i,
-                        "loss": np.mean(all_loss)
-                    })
-                if i%10 == 0:
-                    print(f'Batch {i}: current accumulated loss {np.mean(all_loss)}')
-                
-                # remove batch from gpu (if cuda)
-                if torch.cuda.is_available():
-                    del X
-                    del y
-                    torch.cuda.empty_cache()
+            # logging
+            if i%100 == 0:
+                wandb.log({
+                    "model": model_id,
+                    "batch": i,
+                    "loss": np.mean(all_loss)
+                })
+                print(f'Batch {i}: current accumulated loss {np.mean(all_loss)}')
+            
+            # remove batch from gpu (if cuda)
+            if torch.cuda.is_available():
+                del X
+                del y
+                torch.cuda.empty_cache()
                 
         return np.mean(all_loss), hnet, mnet 
 
@@ -125,16 +126,15 @@ class Trainer(object):
         # initialize networks
         mnet = Student().to(self._device)
         
-        # TODO: get params from config
         hnet = HMLP(
             mnet.external_param_shapes(), 
-            layers=[100, 100], # the sizes of the hidden layers
-            cond_in_size=16, # the size of the embeddings
+            layers=self._conf["hnet_hidden_layers"], # the sizes of the hidden layers (excluding the last layer that generates the weights)
+            cond_in_size=self._conf["hnet_embedding_size"], # the size of the embeddings
             num_cond_embs=self._model_cnt # the number of embeddings we want to learn
         ).to(self._device)
 
-        lr = 0.01
-        lr_decay = 0.1
+        lr = self._conf["lr"]
+        lr_decay = self._conf["lr_decay"]
         params = list(hnet.internal_params) + mnet.internal_params # learn the params of the hypernetwork as well as the internal params of the main network
         optimizer = torch.optim.Adam(params, lr=lr)
         loss = torch.nn.BCELoss()
