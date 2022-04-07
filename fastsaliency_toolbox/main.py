@@ -22,6 +22,8 @@ Available Commands:
 import os
 import click
 
+from backend.student import student
+
 
 @click.group()
 def cli():
@@ -229,7 +231,7 @@ def train(model, histogram_matching, scale, blur, center_prior, logging_dir, inp
     help="More detailed testing (Such as per image statistics).")
 @click.option('-b', '--batch_size', help="The size of the batches used for testing.")
 def test(model, student_path, train_histogram_matching, train_scale, train_blur, train_center_prior, post_histogram_matching, post_scale, post_blur, post_center_prior, logging_dir, input_images, input_saliencies, recursive, verbose, detailed, batch_size):
-    """Trains model on images in a directory."""
+    """Tests model on images in a directory."""
 
     from backend.config import Config
     c = Config('config.json')
@@ -391,13 +393,14 @@ def version():
 
 
 ########################################
-# Generalization
+# Generalization - Train
 @cli.command()
 @click.option('--histogram_matching', help="The type of histogram matching. Possible values: none, biased, equalization. This is applied before training which basically means that the trained model learns to output directly histogram matched saliency images.")
 @click.option('--scale', help="The type of scaling to be done. Possible values: log-density, min-max, none, normalized. This is applied before training which basically means that the trained model learns to output directly scaled saliency images.")
 @click.option('--blur', help="The type of blurring to be done. Possible values: custom, proportional. This is applied before training which basically means that the trained model learns to output directly blurred saliency images.")
 @click.option('--center_prior', help="The Gaussian center prior. Possible values none, proportional_add, proportional_mult. This is applied before training which basically means that the trained model learns to output directly Gaussian center biased saliency images.")
-@click.option('--base_path', help="The relative path where to export.")
+@click.option('--base_path', help="The relative path where to load the input images and saliencies from")
+@click.option('--wandb', is_flag=True)
 
 @click.option('-l', '--logging_dir', help="The logs where should be stored.")
 @click.option('-e', '--export_path', help="The relative path where to export.")
@@ -408,7 +411,7 @@ def version():
     help="Verbose mode and debugging messages.")
 @click.option('-b', '--batch_size', help="The size of the batches used for training.")
 @click.option('-f', '--freeze_encoder_steps', help="Specify for how many epochs to freeze the encoder.")
-def generalization(histogram_matching, scale, blur, center_prior, base_path, logging_dir, export_path, verbose, batch_size, freeze_encoder_steps):
+def gtrain(histogram_matching, scale, blur, center_prior, base_path, wandb, logging_dir, export_path, verbose, batch_size, freeze_encoder_steps):
     from backend.config import Config
     c = Config('config.json')
 
@@ -437,36 +440,37 @@ def generalization(histogram_matching, scale, blur, center_prior, base_path, log
     # TODO: paths as params
     # setup paths to data folders
     train_folders_paths = [
+        (os.path.join(base_path, "Images/train"), os.path.join(base_path, "BMS")),
         (os.path.join(base_path, "Images/train"), os.path.join(base_path, "AIM")),
         (os.path.join(base_path, "Images/train"), os.path.join(base_path, "IKN")),
         (os.path.join(base_path, "Images/train"), os.path.join(base_path, "GBVS")),
-        (os.path.join(base_path, "Images/train"), os.path.join(base_path, "BMS")),
         (os.path.join(base_path, "Images/train"), os.path.join(base_path, "IMSIG")),
         (os.path.join(base_path, "Images/train"), os.path.join(base_path, "RARE2012")),
         (os.path.join(base_path, "Images/train"), os.path.join(base_path, "SUN"))
     ]
 
     validation_folders_paths = [
+        (os.path.join(base_path, "Images/val"), os.path.join(base_path, "BMS")),
         (os.path.join(base_path, "Images/val"), os.path.join(base_path, "AIM")),
         (os.path.join(base_path, "Images/val"), os.path.join(base_path, "IKN")),
         (os.path.join(base_path, "Images/val"), os.path.join(base_path, "GBVS")),
-        (os.path.join(base_path, "Images/val"), os.path.join(base_path, "BMS")),
         (os.path.join(base_path, "Images/val"), os.path.join(base_path, "IMSIG")),
         (os.path.join(base_path, "Images/val"), os.path.join(base_path, "RARE2012")),
         (os.path.join(base_path, "Images/val"), os.path.join(base_path, "SUN"))
     ]    
 
     # Do you want to report to wandb?
-    REPORT_WANDB = True
+    REPORT_WANDB = wandb
     os.environ['WANDB_MODE'] = 'online' if REPORT_WANDB else 'offline'
 
     conf = dict(
         gpu = 0,
-        hnet_hidden_layers = [100, 100],
+        task_cnt = len(train_folders_paths),
+        hnet_hidden_layers = [128, 128, 64],
         hnet_embedding_size = 16,
         lr = 0.01,
         lr_decay = 0.1,
-        preprocess_parameter_map = c.preprocessing_parameter_map,
+        preprocessing_parameter_map = c.preprocessing_parameter_map,
         train_parameter_map = c.train_parameter_map,
         train_folders_paths = train_folders_paths,
         val_folders_paths =  validation_folders_paths
@@ -475,6 +479,100 @@ def generalization(histogram_matching, scale, blur, center_prior, base_path, log
     try:
         from backend.generalization.embed.trainer import Trainer
         t = Trainer(conf)
+        t.execute()
+
+    except ValueError as e:
+        print(str(e))
+        exit(64)
+
+########################################
+# Generalization - Test
+@cli.command()
+@click.option('--base_path', help="The relative path where to load the input images and saliencies from.")
+@click.option('-p', '--model_path', help="The path where to load the weights.")
+
+@click.option('--train_histogram_matching', help="The type of histogram matching. Possible values: none, biased, equalization. This is done to the ground truth to compare the models.")
+@click.option('--train_scale', help="The type of scaling to be done. Possible values: log-density, min-max, none, normalized. This is done to the ground truth to compare the models.")
+@click.option('--train_blur', help="The type of blurring to be done. Possible values: custom, proportional. This is done to the ground truth to compare the models.")
+@click.option('--train_center_prior', help="The Gaussian center prior. Possible values none, proportional_add, proportional_mult. This is done to the ground truth to compare the models.")
+
+@click.option('--post_histogram_matching', help="The type of histogram matching. Possible values: none, biased, equalization. This is done to the predicted saliency maps to compare the models (can be useful as inverse histogram matching procedure).")
+@click.option('--post_scale', help="The type of scaling to be done. Possible values: log-density, min-max, none, normalized. This is done to the predicted saliency maps to compare the models. Should be used only if the model is trained without scaling.")
+@click.option('--post_blur', help="The type of blurring to be done. Possible values: custom, proportional. This is done to the predicted saliency maps to compare the models. Should be used only if the model is trained without blurring.")
+@click.option('--post_center_prior', help="The Gaussian center prior. Possible values none, proportional_add, proportional_mult. This is done to the predicted saliency maps to compare the models. Should be used only if the model is trained without gaussian center prior.")
+
+@click.option('-l', '--logging_dir', help="The logs where should be stored.")
+@click.option(
+    '-v',
+    '--verbose',
+    is_flag=True,
+    help="Verbose mode and debugging messages.")
+@click.option(
+    '-d',
+    '--detailed',
+    is_flag=True,
+    help="More detailed testing (Such as per image statistics).")
+@click.option('-b', '--batch_size', help="The size of the batches used for testing.")
+def gtest(base_path, model_path, train_histogram_matching, train_scale, train_blur, train_center_prior, post_histogram_matching, post_scale, post_blur, post_center_prior, logging_dir, verbose, detailed, batch_size):
+    from backend.config import Config
+    c = Config('config.json')
+
+    if train_histogram_matching:
+        c.preprocessing_parameter_map.set("histogram_matching", train_histogram_matching)
+    if train_scale:
+        c.preprocessing_parameter_map.set("scale_output", train_scale)
+    if train_blur:
+        c.preprocessing_parameter_map.set("do_smoothing", train_blur)
+    if train_center_prior:
+        c.preprocessing_parameter_map.set("center_prior", train_center_prior)
+    if post_histogram_matching:
+        c.postprocessing_parameter_map.set("histogram_matching", post_histogram_matching)
+    if post_scale:
+        c.postprocessing_parameter_map.set("scale_output", post_scale)
+    if post_blur:
+        c.postprocessing_parameter_map.set("do_smoothing", post_blur)
+    if post_center_prior:
+        c.postprocessing_parameter_map.set("center_prior", post_center_prior)
+    if logging_dir:
+        c.test_parameter_map.set("logging_dir", logging_dir)
+    if verbose:
+        c.test_parameter_map.set("verbose", verbose)
+    if batch_size:
+        c.test_parameter_map.set("batch_size", batch_size)
+    if detailed:
+        c.test_parameter_map.set("per_image_statistics", detailed)
+
+    c.test_parameter_map.pretty_print()
+    c.preprocessing_parameter_map.pretty_print()
+    c.postprocessing_parameter_map.pretty_print()
+
+    # TODO: paths as params
+    # setup paths to data folders
+    test_folders_paths = [
+        (os.path.join(base_path, "Images/test"), os.path.join(base_path, "BMS")),
+        (os.path.join(base_path, "Images/test"), os.path.join(base_path, "AIM")),
+        (os.path.join(base_path, "Images/test"), os.path.join(base_path, "IKN")),
+        (os.path.join(base_path, "Images/test"), os.path.join(base_path, "GBVS")),
+        (os.path.join(base_path, "Images/test"), os.path.join(base_path, "IMSIG")),
+        (os.path.join(base_path, "Images/test"), os.path.join(base_path, "RARE2012")),
+        (os.path.join(base_path, "Images/test"), os.path.join(base_path, "SUN"))
+    ] 
+
+    conf = dict(
+        model_path = model_path,
+        gpu = 0,
+        task_cnt = 7,
+        hnet_hidden_layers = [128, 128, 64],
+        hnet_embedding_size = 16,
+        preprocessing_parameter_map = c.preprocessing_parameter_map,
+        postprocessing_parameter_map = c.postprocessing_parameter_map,
+        test_parameter_map = c.test_parameter_map,
+        test_folders_paths = test_folders_paths
+    )
+
+    try:
+        from backend.generalization.embed.tester import Tester
+        t = Tester(conf)
         t.execute()
 
     except ValueError as e:
