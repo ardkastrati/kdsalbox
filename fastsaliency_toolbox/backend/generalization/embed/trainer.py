@@ -91,8 +91,8 @@ class Trainer(object):
 
             # put data on GPU (if cuda)
             if torch.cuda.is_available():
-                X = X.cuda(torch.device(self._gpu))
-                y = y.cuda(torch.device(self._gpu))
+                X = X.cuda(torch.device("cuda", self._gpu))
+                y = y.cuda(torch.device("cuda", self._gpu))
 
             weights = hnet(cond_id=model_id.item())
             pred = mnet.forward(X, weights=weights)
@@ -137,8 +137,8 @@ class Trainer(object):
         )
 
         if torch.cuda.is_available():
-            mnet = mnet.cuda(torch.device(self._gpu))
-            hnet = hnet.cuda(torch.device(self._gpu))
+            mnet = mnet.cuda(torch.device("cuda", self._gpu))
+            hnet = hnet.cuda(torch.device("cuda", self._gpu))
 
         lr = self._conf["lr"]
         lr_decay = self._conf["lr_decay"]
