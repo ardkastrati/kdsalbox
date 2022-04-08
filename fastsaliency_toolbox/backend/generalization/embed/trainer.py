@@ -24,7 +24,7 @@ class Trainer(object):
         self._freeze_encoder_steps = train_parameter_map.get_val('freeze_encoder_steps')
 
         self._preprocessing_parameter_map = conf["preprocessing_parameter_map"]
-        self._gpu = str(conf["gpu"])
+        self._gpu = conf["gpu"]
         
         train_folders_paths = self._conf["train_folders_paths"]
         val_folders_paths = self._conf["val_folders_paths"]
