@@ -25,7 +25,6 @@ class Trainer(object):
 
         self._preprocessing_parameter_map = conf["preprocessing_parameter_map"]
         self._gpu = str(conf["gpu"])
-        self._device = self._gpu if torch.cuda.is_available() else 'cpu'
         
         train_folders_paths = self._conf["train_folders_paths"]
         val_folders_paths = self._conf["val_folders_paths"]
@@ -128,14 +127,18 @@ class Trainer(object):
         if self._verbose: print("Encoder frozen...")
 
         # initialize networks
-        mnet = Student().to(self._device)
+        mnet = Student()
         
         hnet = HMLP(
             mnet.external_param_shapes(), 
             layers=self._conf["hnet_hidden_layers"], # the sizes of the hidden layers (excluding the last layer that generates the weights)
             cond_in_size=self._conf["hnet_embedding_size"], # the size of the embeddings
             num_cond_embs=self._task_cnt # the number of embeddings we want to learn
-        ).to(self._device)
+        )
+
+        if torch.cuda.is_available():
+            mnet = mnet.cuda(torch.device(self._gpu))
+            hnet = hnet.cuda(torch.device(self._gpu))
 
         lr = self._conf["lr"]
         lr_decay = self._conf["lr_decay"]
