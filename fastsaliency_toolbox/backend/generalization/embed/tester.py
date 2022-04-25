@@ -128,9 +128,6 @@ class Tester(object):
         mnet.to(self._device)
         hnet.to(self._device)
 
-        with torch.no_grad():
-            print(mnet.decoder.conv10_2.weight)
-
         return (hnet, mnet)
 
     def tester(self):

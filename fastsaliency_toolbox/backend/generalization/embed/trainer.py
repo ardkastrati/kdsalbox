@@ -47,8 +47,6 @@ class Trainer(object):
         d["hnet_model"] = hnet.state_dict()
         d["mnet_model"] = mnet.state_dict()
 
-        with torch.no_grad():
-            print(mnet.decoder.conv10_2.weight)
         torch.save(d, path)
 
         # save to wandb
@@ -136,6 +134,7 @@ class Trainer(object):
             num_cond_embs=self._task_cnt # the number of embeddings we want to learn
         )
 
+        # put models on GPU if available
         if torch.cuda.is_available():
             mnet = mnet.cuda(torch.device("cuda", self._gpu))
             hnet = hnet.cuda(torch.device("cuda", self._gpu))
