@@ -68,7 +68,7 @@ class Trainer(object):
 
     def pretty_print_epoch(self, epoch, mode, loss, lr):
         print('--------------------------------------------->>>>>>')
-        print(f'Epoch {epoch}: loss {mode} {loss}, lr {lr}')
+        print(f'Epoch {epoch}: loss {mode} {loss}, lr {lr}', flush=True)
         print('--------------------------------------------->>>>>>')
     
     # train or evaluate one epoch for all models (mode in [train, val])
@@ -110,7 +110,7 @@ class Trainer(object):
 
             # logging
             if i%100 == 0:
-                print(f'Batch {i}: current accumulated loss {np.mean(all_loss)}')
+                print(f'Batch {i}: current accumulated loss {np.mean(all_loss)}', flush=True)
             
             # remove batch from gpu (if cuda)
             if torch.cuda.is_available():
