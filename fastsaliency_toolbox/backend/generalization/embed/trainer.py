@@ -24,18 +24,20 @@ class Trainer(object):
         self._freeze_encoder_steps = train_parameter_map.get_val('freeze_encoder_steps')
 
         self._preprocessing_parameter_map = conf["preprocessing_parameter_map"]
-        self._gpu = conf["gpu"]
+        self._device = f"cuda:{conf['gpu']}" if torch.cuda.is_available() else "cpu"
         
         train_folders_paths = self._conf["train_folders_paths"]
         val_folders_paths = self._conf["val_folders_paths"]
         self._task_cnt = self._conf["task_cnt"] # the amount of models we are currently learning
 
-        train_datasets = [TrainDataManager(img_path, sal_path, self._verbose, self._preprocessing_parameter_map) for (img_path,sal_path) in train_folders_paths]
-        val_datasets = [TrainDataManager(img_path, sal_path, self._verbose, self._preprocessing_parameter_map) for (img_path,sal_path) in val_folders_paths]
+        train_datasets = [(model,TrainDataManager(img_path, sal_path, self._verbose, self._preprocessing_parameter_map)) for ((img_path,sal_path),model) in train_folders_paths]
+        val_datasets = [(model,TrainDataManager(img_path, sal_path, self._verbose, self._preprocessing_parameter_map)) for ((img_path,sal_path),model) in val_folders_paths]
+
+        self._task_model_map = {m:i for i,(m,_) in enumerate(train_datasets)} # map <model_name,model_id>
 
         self._dataloaders = {
-            'train': [DataLoader(ds, batch_size=self._batch_size, shuffle=False, num_workers=4) for ds in train_datasets],
-            'val': [DataLoader(ds, batch_size=self._batch_size, shuffle=False, num_workers=4) for ds in val_datasets],
+            'train': {model:DataLoader(ds, batch_size=self._batch_size, shuffle=False, num_workers=4) for (model,ds) in train_datasets},
+            'val': {model:DataLoader(ds, batch_size=self._batch_size, shuffle=False, num_workers=4) for (model,ds) in val_datasets},
         }
 
     # saves a hypernetwork and main network tuple to a given path under a given name
@@ -44,6 +46,7 @@ class Trainer(object):
 
         # save on disk
         d = {}
+        d["model_map"] = self._task_model_map
         d["hnet_model"] = hnet.state_dict()
         d["mnet_model"] = mnet.state_dict()
 
@@ -77,20 +80,19 @@ class Trainer(object):
         all_loss = []
 
         # defines which batch will be loaded from which model
-        all_batches = np.concatenate([np.repeat(model_id, len(dataloader)) for (model_id,dataloader) in enumerate(dataloaders[mode])])
+        all_batches = np.concatenate([np.repeat(self._task_model_map[model_name], len(dataloader)) for (model_name,dataloader) in dataloaders[mode].items()])
         np.random.shuffle(all_batches)
 
         # for each model
-        data_iters = [iter(d) for d in dataloaders[mode]]
+        data_iters = [iter(d) for d in dataloaders[mode].values()]
         for (i,model_id) in enumerate(all_batches):
             X,y = next(data_iters[model_id])
 
             optimizer.zero_grad()
 
             # put data on GPU (if cuda)
-            if torch.cuda.is_available():
-                X = X.cuda(torch.device("cuda", self._gpu))
-                y = y.cuda(torch.device("cuda", self._gpu))
+            X = X.to(self._device)
+            y = y.to(self._device)
 
             weights = hnet(cond_id=model_id.item())
             pred = mnet.forward(X, weights=weights)
@@ -135,9 +137,8 @@ class Trainer(object):
         )
 
         # put models on GPU if available
-        if torch.cuda.is_available():
-            mnet = mnet.cuda(torch.device("cuda", self._gpu))
-            hnet = hnet.cuda(torch.device("cuda", self._gpu))
+        mnet.to(self._device)
+        hnet.to(self._device)
 
         lr = self._conf["lr"]
         lr_decay = self._conf["lr_decay"]

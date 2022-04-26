@@ -439,24 +439,29 @@ def gtrain(histogram_matching, scale, blur, center_prior, base_path, wandb, logg
 
     # TODO: paths as params
     # setup paths to data folders
+    def train_folders(model):
+        return ((os.path.join(base_path, "Images/train"), os.path.join(base_path, model)), model)
+    def val_folders(model):
+        return ((os.path.join(base_path, "Images/val"), os.path.join(base_path, model)), model)
+
     train_folders_paths = [
-        (os.path.join(base_path, "Images/train"), os.path.join(base_path, "BMS")),
-        (os.path.join(base_path, "Images/train"), os.path.join(base_path, "AIM")),
-        (os.path.join(base_path, "Images/train"), os.path.join(base_path, "IKN")),
-        (os.path.join(base_path, "Images/train"), os.path.join(base_path, "GBVS")),
-        (os.path.join(base_path, "Images/train"), os.path.join(base_path, "IMSIG")),
-        (os.path.join(base_path, "Images/train"), os.path.join(base_path, "RARE2012")),
-        (os.path.join(base_path, "Images/train"), os.path.join(base_path, "SUN"))
+        train_folders("BMS"),
+        train_folders("AIM"),
+        train_folders("IKN"),
+        train_folders("GBVS"),
+        train_folders("IMSIG"),
+        train_folders("RARE2012"),
+        train_folders("SUN"),
     ]
 
     validation_folders_paths = [
-        (os.path.join(base_path, "Images/val"), os.path.join(base_path, "BMS")),
-        (os.path.join(base_path, "Images/val"), os.path.join(base_path, "AIM")),
-        (os.path.join(base_path, "Images/val"), os.path.join(base_path, "IKN")),
-        (os.path.join(base_path, "Images/val"), os.path.join(base_path, "GBVS")),
-        (os.path.join(base_path, "Images/val"), os.path.join(base_path, "IMSIG")),
-        (os.path.join(base_path, "Images/val"), os.path.join(base_path, "RARE2012")),
-        (os.path.join(base_path, "Images/val"), os.path.join(base_path, "SUN"))
+        val_folders("BMS"),
+        val_folders("AIM"),
+        val_folders("IKN"),
+        val_folders("GBVS"),
+        val_folders("IMSIG"),
+        val_folders("RARE2012"),
+        val_folders("SUN"),
     ]    
 
     # Do you want to report to wandb?
@@ -547,15 +552,19 @@ def gtest(base_path, model_path, train_histogram_matching, train_scale, train_bl
     c.postprocessing_parameter_map.pretty_print()
 
     # TODO: paths as params
+    # TODO: change to test once data generated
     # setup paths to data folders
+    def test_folders(model):
+        return ((os.path.join(base_path, "Images/val"), os.path.join(base_path, model)), model)
+
     test_folders_paths = [
-        (os.path.join(base_path, "Images/test"), os.path.join(base_path, "BMS")),
-        (os.path.join(base_path, "Images/test"), os.path.join(base_path, "AIM")),
-        (os.path.join(base_path, "Images/test"), os.path.join(base_path, "IKN")),
-        (os.path.join(base_path, "Images/test"), os.path.join(base_path, "GBVS")),
-        (os.path.join(base_path, "Images/test"), os.path.join(base_path, "IMSIG")),
-        (os.path.join(base_path, "Images/test"), os.path.join(base_path, "RARE2012")),
-        (os.path.join(base_path, "Images/test"), os.path.join(base_path, "SUN"))
+        test_folders("BMS"),
+        test_folders("AIM"),
+        test_folders("IKN"),
+        test_folders("GBVS"),
+        test_folders("IMSIG"),
+        test_folders("RARE2012"),
+        test_folders("SUN"),
     ] 
 
     conf = dict(
