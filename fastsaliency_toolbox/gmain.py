@@ -7,6 +7,7 @@ Fast-Saliency Toolbox: Pseudo-models for fast saliency research.
 import os
 import json
 import click
+import wandb
 
 @click.group()
 def cli():
@@ -29,14 +30,15 @@ def version():
 @click.option("-i", "--input_images", help="The images used for experimenting. Should contain three folders inside: train, val and run.")
 @click.option("-s", "--input_saliencies", help="Specify the directory to the saliency images. Should contain a separated folder for each model/task name.")
 
-@click.option("--wandb", is_flag=True, help="Do you want to report to wandb?")
-def experiment(skip, name, conf_file, logging_dir, input_images, input_saliencies, wandb):
+@click.option("--wdb", is_flag=True, help="Do you want to report to wandb?")
+@click.option("--resume_id", help="The id of a run you want to continue")
+def experiment(skip, name, conf_file, logging_dir, input_images, input_saliencies, wdb, resume_id):
     """Experiment with models on images in a directory."""
 
     # load config file
     with open(conf_file) as f:
         conf = json.load(f)
-    
+
     experiment_conf = conf["experiment"]
     train_conf = conf["train"]
     test_conf = conf["test"]
@@ -58,41 +60,55 @@ def experiment(skip, name, conf_file, logging_dir, input_images, input_saliencie
         train_conf["input_saliencies"] = input_saliencies
         test_conf["input_saliencies"] = input_saliencies
     
-    os.environ["WANDB_MODE"] = "online" if wandb else "offline"
+    os.environ["WANDB_MODE"] = "online" if wdb else "offline"
 
-    # build & update paths
-    logging_dir = experiment_conf["logging_dir"]
     experiment_name = experiment_conf["name"]
-    experiment_dir = os.path.abspath(os.path.join(logging_dir, experiment_name))
 
-    train_conf["logging_dir"] = os.path.join(experiment_dir, "train_logs")
-    test_conf["logging_dir"] = os.path.join(experiment_dir, "test_logs")
-    run_conf["logging_dir"] = os.path.join(experiment_dir, "run_logs")
+    resuming = False
+    if resume_id:
+        resuming = True
+        resume = "must"
+    else:
+        resume_id = None
+        resume = None
 
-    model_path = os.path.join(train_conf["logging_dir"], train_conf["export_path"], "best.pth")
-    test_conf["model_path"] = model_path
-    run_conf["model_path"] = model_path
+    wandb.login()
+    with wandb.init(project="kdsalbox-generalization", entity="ba-yanickz", name=experiment_name, config=conf, id=resume_id, resume=resume):
+        # build & update paths relative to wandb run dir
+        experiment_conf["logging_dir"] = os.path.join(wandb.run.dir, experiment_conf["logging_dir"])
+        logging_dir = experiment_conf["logging_dir"]
+        experiment_dir = os.path.abspath(os.path.join(logging_dir, experiment_name))
 
-    # DO NOT FURTHER ADJUST THE CONF FROM THIS POINT ON
+        train_conf["logging_dir"] = os.path.join(experiment_dir, "train_logs")
+        test_conf["logging_dir"] = os.path.join(experiment_dir, "test_logs")
+        run_conf["logging_dir"] = os.path.join(experiment_dir, "run_logs")
 
-    # save the current config file into the experiment folder
-    config_dump = os.path.join(experiment_dir, "used_config.json")
-    os.makedirs(os.path.dirname(config_dump), exist_ok=True)
-    with open(config_dump, "w") as f:
-        json.dump(conf, f, indent=4)
+        model_path = os.path.join(train_conf["logging_dir"], train_conf["export_path"], "best.pth")
+        test_conf["model_path"] = model_path
+        run_conf["model_path"] = model_path
 
-    try:
-        from backend.multimodel.hnet_contextmod.pipeline import Experiment
-        import wandb as wdb
-        
-        wdb.login()
-        with wdb.init(project="kdsalbox-generalization", entity="ba-yanickz", config=conf):
+        # DO NOT FURTHER ADJUST THE CONF FROM THIS POINT ON
+
+        # save the current config file into the experiment folder
+        if resuming:
+            rel_model_path = os.path.relpath(model_path, wandb.run.dir).replace("\\", "/") # wandb expects linux path
+            print(f"Restore model {rel_model_path}")
+            wandb.restore(rel_model_path)
+        else:
+            config_dump = os.path.join(experiment_dir, "used_config.json")
+            os.makedirs(os.path.dirname(config_dump), exist_ok=True)
+            with open(config_dump, "w") as f:
+                json.dump(conf, f, indent=4)
+            wandb.save(config_dump, base_path=wandb.run.dir)
+
+        try:
+            from backend.multimodel.hnet_contextmod.pipeline import Experiment
             t = Experiment(conf)
             t.execute()
 
-    except ValueError as e:
-        print(str(e))
-        exit(64)
+        except ValueError as e:
+            print(str(e))
+            exit(64)
 
 if __name__ == "__main__":
     cli()
