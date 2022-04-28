@@ -9,6 +9,12 @@ import json
 import click
 import wandb
 
+from backend.multimodel.hyper_experiment import HyperExperiment
+from backend.multimodel.hyper_model import HyperModel
+from backend.multimodel.hyper_runner import HyperRunner
+from backend.multimodel.hyper_tester import HyperTester
+from backend.multimodel.hyper_trainer import HyperTrainer
+
 @click.group()
 def cli():
     pass
@@ -102,8 +108,21 @@ def experiment(skip, name, conf_file, logging_dir, input_images, input_saliencie
             wandb.save(config_dump, base_path=wandb.run.dir)
 
         try:
-            from backend.multimodel.hnet_contextmod.pipeline import Experiment
-            t = Experiment(conf)
+            from backend.multimodel.hnet_contextmod.model import hnet_mnet_from_config as hmfc_contextmod
+            from backend.multimodel.hnet_full_chunked.model import hnet_mnet_from_config as hmfc_full_chunked
+            hnet_mnet_from_config = None
+            if conf["type"] == "contextmod":
+                hnet_mnet_from_config = hmfc_contextmod
+            elif conf["type"] == "full_chunked":
+                hnet_mnet_from_config = hmfc_full_chunked
+
+            print(f"Running {conf['type']} experiment")
+
+            t = HyperExperiment(conf, 
+                    lambda c : HyperTrainer(c, HyperModel(lambda : hnet_mnet_from_config(c), c["train"]["tasks"])), 
+                    lambda c : HyperTester(c, HyperModel(lambda : hnet_mnet_from_config(c), c["test"]["tasks"])), 
+                    lambda c : HyperRunner(c, HyperModel(lambda : hnet_mnet_from_config(c), c["run"]["tasks"]))
+                )
             t.execute()
 
         except ValueError as e:

@@ -1,18 +1,21 @@
 {
-    "type": "contextmod",
+    "type": "full_chunked",
     "gpu": 0,
 
     "model": {
         "task_cnt": 7,
         "hnet_hidden_layers": [128, 128, 64],
-        "hnet_embedding_size": 16
+        "hnet_embedding_size": 16,
+        "hnet_chunk_size": 524288,
+        "hnet_chunk_emb_per_task": true,
+        "hnet_chunk_emb_size": 8
     },
 
     "experiment": {
         "skip": [],
 
         "name": "NA",
-        "description": "Hypernetwork that learns the weights of ContextModulation layers",
+        "description": "Chunked hypernetwork that learns the weights of all decoder layers",
 
         "logging_dir": "logs/experiment_logs/",
         "verbose": true
