@@ -1,12 +1,13 @@
 import torch
 from torch.utils.data import DataLoader
-import os
-
 import numpy as np
+
+import os
+import wandb
 
 from backend.parameters import ParameterMap
 from backend.datasets import RunDataManager
-from backend.image_processing import save_image, process
+from backend.image_processing import process
 from backend.utils import print_pretty_header
 
 class HyperRunner(object):
@@ -38,15 +39,15 @@ class HyperRunner(object):
 
         # load data
         output_dir = os.path.join(self._logging_dir, task)
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
+        os.makedirs(output_dir, exist_ok=True)
         dataloader = DataLoader(RunDataManager(self._input_dir, output_dir, self._verbose, self._recursive), batch_size=1)
 
         for img_number, (image, input_path, output_path) in enumerate(dataloader):
             printable_input_path = os.path.relpath(input_path[0], self._input_dir)
+            out_path = output_path[0]
 
             # If we aren't overwriting and the file exists, skip it.
-            if not self._overwrite and os.path.isfile(output_path[0]):
+            if not self._overwrite and os.path.isfile(out_path):
                 print(f"SKIP (already exists) image [{img_number + 1}/{len(dataloader)}]: {printable_input_path}")
                 continue
 
@@ -57,7 +58,9 @@ class HyperRunner(object):
             saliency_map = self.compute_saliency(model, image, task_id)
             post_processed_image = np.clip((process(saliency_map.cpu().detach().numpy()[0, 0], self._postprocess_parameter_map)*255).astype(np.uint8), 0, 255)
 
-            save_image(output_path[0], post_processed_image)
+            img_path = os.path.relpath(out_path, wandb.run.dir).replace("\\", "/").replace(".jpg", "")
+            img = wandb.Image(post_processed_image)
+            wandb.log({img_path:img})
             
             # Remove batch from gpu
             if torch.cuda.is_available():
@@ -69,8 +72,7 @@ class HyperRunner(object):
         print(f"Done with {task}!")
 
     def start_run(self):
-        if not os.path.exists(self._logging_dir):
-            os.makedirs(self._logging_dir)
+        os.makedirs(self._logging_dir, exist_ok=True)
 
         model = self._hyper_model
         model.build()

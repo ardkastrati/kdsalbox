@@ -57,14 +57,14 @@ class HyperTrainer(object):
     # train or evaluate one epoch for all models (mode in [train, val])
     # return loss, model
     def train_one(self, model, dataloaders, criterion, optimizer, mode):
+        if mode == "train": model.train()
+        elif mode == "val": model.eval()
+
         all_loss = []
 
         # defines which batch will be loaded from which task/model
         all_batches = np.concatenate([np.repeat(model.task_to_id(task), len(dataloader)) for (task,dataloader) in dataloaders[mode].items()])
         np.random.shuffle(all_batches)
-
-        # TODO: TEMP
-        all_batches = all_batches[:1]
 
         # for each model
         data_iters = [iter(d) for d in dataloaders[mode].values()]
@@ -102,14 +102,16 @@ class HyperTrainer(object):
                 del y
                 torch.cuda.empty_cache()
                 
-        return np.mean(all_loss), model
+        return np.mean(all_loss)
 
     # run the entire training
     def start_train(self):
-        if not os.path.exists(self._logging_dir):
-            os.makedirs(self._logging_dir)
-
-        if self._verbose: print("Encoder frozen...")
+        # build folder structure
+        export_dir = os.path.join(self._logging_dir, self._export_path)
+        export_path_best = os.path.join(export_dir, "best.pth")
+        export_path_final = os.path.join(export_dir, "final.pth")
+        os.makedirs(self._logging_dir, exist_ok=True)
+        os.makedirs(export_dir, exist_ok=True)
 
         # initialize networks
         model = self._hyper_model
@@ -123,76 +125,67 @@ class HyperTrainer(object):
         loss = torch.nn.BCELoss()
         
         # report to wandb
-        wandb.watch((model.hnet, model.mnet), loss, log="all", log_freq=1)
+        wandb.watch((model.hnet, model.mnet), loss, log="all", log_freq=10)
         
         all_epochs = []
         smallest_loss = None
-        best_epoch = None
-        best_model = model
+
+        model.mnet.freeze_encoder()
+        if self._verbose: print("Encoder frozen...")
 
         # training loop
         for epoch in range(0, epochs):
+            # decrease learning rate over time
+            if epoch == 15 or epoch == 30 or epoch == 60:
+                for param_group in optimizer.param_groups:
+                    param_group["lr"] *= lr_decay
+                lr = lr * lr_decay
+
             # unfreeze the encoder after given amount of epochs
             if epoch == self._freeze_encoder_steps:
                 if self._verbose: print("Encoder unfrozen")
                 model.mnet.unfreeze_encoder()
 
             # train the networks
-            model.train()
-            loss_train, model = self.train_one(model, self._dataloaders, loss, optimizer, "train")
-
-            # log
+            loss_train = self.train_one(model, self._dataloaders, loss, optimizer, "train")
             if self._verbose: self.pretty_print_epoch(epoch, "train", loss_train, lr)
-            wandb.log({
-                    "mode": "train",
-                    "epoch": epoch,
-                    "loss": loss_train,
-                    "learning rate": lr
-                })
-
 
             # validate the networks
-            model.eval()
-            loss_val, model = self.train_one(model, self._dataloaders, loss, optimizer, "val")
-
-            # log
+            loss_val = self.train_one(model, self._dataloaders, loss, optimizer, "val")
             if self._verbose: self.pretty_print_epoch(epoch, "val", loss_val, lr)
+
+            ### REPORTING / STATS ###
+            all_epochs.append([epoch, loss_train, loss_val]) 
+
             wandb.log({
-                    "mode": "val",
                     "epoch": epoch,
-                    "loss": loss_val,
-                    "learning rate": lr
+                    "loss train": loss_train,
+                    "loss val": loss_val,
+                    "learning rate": lr,
+                    "encoder_frozen": int(epoch < self._freeze_encoder_steps)
                 })
 
             # if better performance than all previous => save weights as checkpoint
-            if smallest_loss is None or loss_val < smallest_loss or epoch % 10 == 0:
+            is_best_model = smallest_loss is None or loss_val < smallest_loss
+            if epoch % 10 == 0 or is_best_model:
                 checkpoint_dir = os.path.join(self._logging_dir, f"checkpoint_in_epoch_{epoch}/")
-                if not os.path.exists(checkpoint_dir):
-                    os.makedirs(checkpoint_dir)
+                os.makedirs(checkpoint_dir, exist_ok=True)
+                path = f"{checkpoint_dir}/{epoch}_{loss_val:f}.pth"
 
-                smallest_loss, best_epoch, best_model, model = self.save_weight(smallest_loss, best_epoch, best_model, loss_val, epoch, model, checkpoint_dir)
-            all_epochs.append([epoch, loss_train, loss_val]) 
-
-            # decrease learning rate over time
-            if epoch == 15 or epoch == 30 or epoch == 60:
-                for param_group in optimizer.param_groups:
-                    param_group["lr"] *= lr_decay
-                lr = lr * lr_decay
+                self.save(path, model)
+                
+                # overwrite the best model
+                if is_best_model:
+                    smallest_loss = loss_val
+                    self.save(export_path_best, model)
             
-            # save results to CSV
-            res_path = os.path.join(self._logging_dir, "all_results.csv")
-            np.savetxt(res_path, all_epochs, fmt="%s", delimiter=",", header="EPOCH,LOSS_TRAIN,LOSS_VAL", comments="")
-            # save to wandb
-            artifact = wandb.Artifact("all_results", type="result")
-            artifact.add_file(res_path)
-            wandb.log_artifact(artifact)
-
-        # save the final best model
-        if not os.path.exists(os.path.join(self._logging_dir, self._export_path)):
-            os.makedirs(os.path.join(self._logging_dir, self._export_path))
-            
-        if self._verbose: print(f"Save best model to {os.path.join(self._logging_dir, self._export_path, 'best.pth')}")
-        self.save(os.path.join(self._logging_dir, self._export_path, "best.pth"), best_model)
+            # save/overwrite results at the end of each epoch
+            stats_file = os.path.join(os.path.relpath(self._logging_dir, wandb.run.dir), "all_results").replace("\\", "/")
+            table = wandb.Table(data=all_epochs, columns=["Epoch", "Loss-Train", "Loss-Val"])
+            wandb.run.log({stats_file:table})
+        
+        # save the final model
+        self.save(export_path_final, model)
 
     # setup & run the entire training
     def execute(self):
@@ -203,27 +196,10 @@ class HyperTrainer(object):
     
         if self._verbose: print("Done with training!")
 
-    # saves a hypernetwork and main network tuple to a given path under a given name
+    # saves the model to disk & wandb
     def save(self, path, model):
-        # save on disk
         model.save(path)
-
-        # save to wandb
-        artifact = wandb.Artifact("hnet_and_mnet", type="hnet_and_mnet")
-        artifact.add_file(path)
-        wandb.log_artifact(artifact)
-    
-    # saves a hypernetwork and main network tuple to a given path under a given name
-    # and updates the smallest_loss and best_epoch values
-    def save_weight(self, smallest_loss, best_epoch, best_model, loss_val, epoch, model, checkpoint_dir):
-        path = f"{checkpoint_dir}/{epoch}_{loss_val:f}.pth"
-        self.save(path, model)
-        
-        if smallest_loss is None or loss_val < smallest_loss:
-            smallest_loss = loss_val
-            best_epoch = epoch
-            best_model = model
-        return smallest_loss, best_epoch, best_model, model
+        wandb.save(path, base_path=wandb.run.dir)
 
     def pretty_print_epoch(self, epoch, mode, loss, lr):
         print("--------------------------------------------->>>>>>")

@@ -13,7 +13,7 @@
         "name": "NA",
         "description": "Hypernetwork that learns the weights of ContextModulation layers",
 
-        "logging_dir": "./logs/experiment_logs/",
+        "logging_dir": "logs/experiment_logs/",
         "verbose": true
     },
 
@@ -25,8 +25,8 @@
         "input_saliencies": "./dataset/dummy_saliency/",
         "recursive": false,
         
-        "batch_size": 1,
-        "epochs": 1,
+        "batch_size": 4,
+        "epochs": 40,
         "lr": 0.01,
         "lr_decay": 0.1,
         "freeze_encoder_steps": 5,

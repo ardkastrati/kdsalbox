@@ -3,6 +3,8 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader
 
+import wandb
+
 from backend.utils import print_pretty_header
 from backend.datasets import TestDataManager
 from backend.metrics import NSS, CC, SIM
@@ -56,8 +58,6 @@ class HyperTester(object):
         my_loss = torch.nn.BCELoss()
 
         for i, (X, y, names) in enumerate(dataloader):
-            if i > 0: break
-
             X = X.to(self._device)
             y = y.to(self._device)
 
@@ -89,14 +89,17 @@ class HyperTester(object):
             if i%100 == 0:
                 print(f"Batch {i}: current accumulated loss {np.mean(all_loss)}", flush=True)
 
+            # save per image stats
             if self._per_image_statistics:
-                np.savetxt(os.path.join(self._logging_dir, f"image_statistics_{task}.csv"), np.array([all_names, all_NSS, all_CC, all_SIM]).T, fmt="%s", delimiter=",", header="IMAGE,NSS,CC,SIM", comments="")
+                stats_file = os.path.join(os.path.relpath(self._logging_dir, wandb.run.dir), "image_statistics", task).replace("\\", "/")
+                data = np.array([all_names, all_NSS, all_CC, all_SIM]).transpose().tolist()
+                table = wandb.Table(data=data, columns=["Image", "NSS", "CC", "SIM"])
+                wandb.run.log({stats_file:table})
             
         return np.mean(all_loss), np.nanmean(np.asarray(all_NSS)), np.nanmean(np.asarray(all_CC)), np.nanmean(np.asarray(all_SIM))
 
     def start_test(self):
-        if not os.path.exists(self._logging_dir):
-            os.makedirs(self._logging_dir)
+        os.makedirs(self._logging_dir, exist_ok=True)
 
         model = self._hyper_model
         model.build()
@@ -123,9 +126,12 @@ class HyperTester(object):
         all_loss.append(loss)
         all_names.append("Average")
 
-        # save to csv
-        results = [all_names, all_loss, all_NSS, all_CC, all_SIM]
-        np.savetxt(os.path.join(self._logging_dir, f"test_results.csv"), np.array(results).T, fmt="%s", delimiter=",", header="MODEL,LOSS,NSS,CC,SIM", comments="")
+        # save test results
+        stats_file = os.path.join(os.path.relpath(self._logging_dir, wandb.run.dir), "test_results").replace("\\", "/")
+        data = np.array([all_names, all_loss, all_NSS, all_CC, all_SIM]).transpose().tolist()
+        table = wandb.Table(data=data, columns=["Task", "Image", "NSS", "CC", "SIM"])
+        wandb.run.log({stats_file:table})
+        
 
     def execute(self):
         if self._verbose: print_pretty_header("TESTING " + self._model_path)
