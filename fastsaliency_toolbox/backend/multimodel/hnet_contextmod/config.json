@@ -21,7 +21,9 @@
         "tasks": ["BMS", "AIM", "IKN", "GBVS", "IMSIG", "RARE2012", "SUN"],
 
         "input_images_train": "./dataset/dummy_images/train/",
+        "imgs_per_task_train": 1500,
         "input_images_val": "./dataset/dummy_images/val/",
+        "imgs_per_task_val": 750,
         "input_saliencies": "./dataset/dummy_saliency/",
         "recursive": false,
         
@@ -41,6 +43,7 @@
         "tasks": ["BMS", "AIM", "IKN", "GBVS", "IMSIG", "RARE2012", "SUN"],
 
         "input_images_test": "./dataset/dummy_images/train/",
+        "imgs_per_task_test": 750,
         "input_saliencies": "./dataset/dummy_saliency/",
         "recursive": false,
 

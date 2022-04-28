@@ -22,10 +22,13 @@ class HyperTester(object):
 
         # params
         batch_size = test_conf["batch_size"]
+        imgs_per_task_test = test_conf["imgs_per_task_test"]
         tasks = test_conf["tasks"]
+
         self._device = f"cuda:{conf['gpu']}" if torch.cuda.is_available() else "cpu"
         self._recursive = test_conf["recursive"]
         self._per_image_statistics = test_conf["per_image_statistics"]
+        self._batches_per_task_test = imgs_per_task_test // batch_size
         self._model_path = test_conf["model_path"]
         self._logging_dir = test_conf["logging_dir"]
         self._verbose = test_conf["verbose"]
@@ -43,7 +46,12 @@ class HyperTester(object):
 
         test_datasets = [TestDataManager(test_img_path, sal_path, self._verbose, self._preprocess_parameter_map) for sal_path in sal_folders]
 
+        min_ds_len = min([len(ds) for ds in test_datasets])
+        self._data_offset = np.random.randint(0, (min_ds_len - imgs_per_task_test) // batch_size)
         self._dataloaders = {task:DataLoader(ds, batch_size=batch_size, shuffle=False, num_workers=4) for (task,ds) in zip(tasks,test_datasets)}
+
+        # sanity checks
+        assert imgs_per_task_test <= min_ds_len
 
     def pretty_print(self, epoch, mode, loss, lr):
         print("--------------------------------------------->>>>>>")
@@ -54,10 +62,16 @@ class HyperTester(object):
     def test_one(self, model, task, dataloader):
         task_id = model.task_to_id(task)
 
+        if self._verbose: print(f"Testing {task}...")
+
         all_names, all_loss, all_NSS, all_CC, all_SIM = [], [], [], [], []
         my_loss = torch.nn.BCELoss()
 
-        for i, (X, y, names) in enumerate(dataloader):
+        data_iter = iter(dataloader)
+        for i in range(self._data_offset): next(data_iter) # skip first few images
+
+        for i in range(self._batches_per_task_test):
+            (X, y, names) = next(data_iter)
             X = X.to(self._device)
             y = y.to(self._device)
 
@@ -87,7 +101,7 @@ class HyperTester(object):
                 torch.cuda.empty_cache()
 
             if i%100 == 0:
-                print(f"Batch {i}: current accumulated loss {np.mean(all_loss)}", flush=True)
+                print(f"Batch {i}/{self._batches_per_task_test}: current accumulated loss {np.mean(all_loss)}", flush=True)
 
             # save per image stats
             if self._per_image_statistics:

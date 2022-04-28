@@ -21,16 +21,20 @@ class HyperTrainer(object):
         preprocess_conf = conf["preprocess"]
 
         # params
+        batch_size = train_conf["batch_size"]
+        imgs_per_task_train = train_conf["imgs_per_task_train"]
+        imgs_per_task_val = train_conf["imgs_per_task_val"]
+
         self._device = f"cuda:{conf['gpu']}" if torch.cuda.is_available() else "cpu"
         self._logging_dir = train_conf["logging_dir"]
         self._verbose = train_conf["verbose"]
         self._export_path = train_conf["export_path"]
 
-        tasks = train_conf["tasks"]
-        assert model_conf["task_cnt"] == len(tasks)
+        self._tasks = train_conf["tasks"]
         self._task_cnt = model_conf["task_cnt"]
+        self._batches_per_task_train = imgs_per_task_train // batch_size
+        self._batches_per_task_val = imgs_per_task_val // batch_size
 
-        batch_size = train_conf["batch_size"]
         self._epochs = train_conf["epochs"]
         self._lr = train_conf["lr"]
         self._lr_decay = train_conf["lr_decay"]
@@ -44,15 +48,20 @@ class HyperTrainer(object):
         input_saliencies = train_conf["input_saliencies"]
         train_img_path = train_conf["input_images_train"]
         val_img_path = train_conf["input_images_val"]
-        sal_folders = [os.path.join(input_saliencies, model) for model in tasks] # path to saliency folder for all models
+        sal_folders = [os.path.join(input_saliencies, task) for task in self._tasks] # path to saliency folder for all models
 
         train_datasets = [TrainDataManager(train_img_path, sal_path, self._verbose, preprocess_parameter_map) for sal_path in sal_folders]
         val_datasets = [TrainDataManager(val_img_path, sal_path, self._verbose, preprocess_parameter_map) for sal_path in sal_folders]
 
         self._dataloaders = {
-            "train": {model:DataLoader(ds, batch_size=batch_size, shuffle=False, num_workers=4) for (model,ds) in zip(tasks, train_datasets)},
-            "val": {model:DataLoader(ds, batch_size=batch_size, shuffle=False, num_workers=4) for (model,ds) in zip(tasks, val_datasets)},
+            "train": {task:DataLoader(ds, batch_size=batch_size, shuffle=True, num_workers=4) for (task,ds) in zip(self._tasks, train_datasets)},
+            "val": {task:DataLoader(ds, batch_size=batch_size, shuffle=True, num_workers=4) for (task,ds) in zip(self._tasks, val_datasets)},
         }
+
+        # sanity checks
+        assert self._task_cnt == len(self._tasks)
+        assert train_conf["imgs_per_task_train"] <= min([len(ds) for ds in train_datasets])
+        assert train_conf["imgs_per_task_val"] <= min([len(ds) for ds in val_datasets])
     
     # train or evaluate one epoch for all models (mode in [train, val])
     # return loss, model
@@ -63,11 +72,12 @@ class HyperTrainer(object):
         all_loss = []
 
         # defines which batch will be loaded from which task/model
-        all_batches = np.concatenate([np.repeat(model.task_to_id(task), len(dataloader)) for (task,dataloader) in dataloaders[mode].items()])
+        limit = self._batches_per_task_train if mode == "train" else self._batches_per_task_val
+        all_batches = np.concatenate([np.repeat(model.task_to_id(task), limit) for task in self._tasks])
         np.random.shuffle(all_batches)
 
         # for each model
-        data_iters = [iter(d) for d in dataloaders[mode].values()]
+        data_iters = [iter(d) for d in dataloaders[mode].values()] # Note: DataLoader shuffles when iterator is created
         for (i,task_id) in enumerate(all_batches):
             X,y = next(data_iters[task_id])
 
@@ -94,7 +104,7 @@ class HyperTrainer(object):
 
             # logging
             if i%100 == 0:
-                print(f"Batch {i}: current accumulated loss {np.mean(all_loss)}", flush=True)
+                print(f"Batch {i}/{len(all_batches)}: current accumulated loss {np.mean(all_loss)}", flush=True)
             
             # remove batch from gpu (if cuda)
             if torch.cuda.is_available():
