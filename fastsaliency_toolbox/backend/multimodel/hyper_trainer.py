@@ -135,7 +135,7 @@ class HyperTrainer(object):
         loss = torch.nn.BCELoss()
         
         # report to wandb
-        wandb.watch((model.hnet, model.mnet), loss, log="all", log_freq=10)
+        wandb.watch((model.hnet, model.mnet), loss, log="gradients", log_freq=100)
         
         all_epochs = []
         smallest_loss = None
