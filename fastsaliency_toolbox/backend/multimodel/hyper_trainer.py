@@ -167,14 +167,6 @@ class HyperTrainer(object):
             ### REPORTING / STATS ###
             all_epochs.append([epoch, loss_train, loss_val]) 
 
-            wandb.log({
-                    "epoch": epoch,
-                    "loss train": loss_train,
-                    "loss val": loss_val,
-                    "learning rate": lr,
-                    "encoder_frozen": int(epoch < self._freeze_encoder_steps)
-                })
-
             # if better performance than all previous => save weights as checkpoint
             is_best_model = smallest_loss is None or loss_val < smallest_loss
             if epoch % 10 == 0 or is_best_model:
@@ -192,7 +184,14 @@ class HyperTrainer(object):
             # save/overwrite results at the end of each epoch
             stats_file = os.path.join(os.path.relpath(self._logging_dir, wandb.run.dir), "all_results").replace("\\", "/")
             table = wandb.Table(data=all_epochs, columns=["Epoch", "Loss-Train", "Loss-Val"])
-            wandb.run.log({stats_file:table})
+            wandb.log({
+                    "epoch": epoch,
+                    "loss train": loss_train,
+                    "loss val": loss_val,
+                    "learning rate": lr,
+                    "encoder_frozen": int(epoch < self._freeze_encoder_steps),
+                    stats_file:table
+                })
         
         # save the final model
         self.save(export_path_final, model)
