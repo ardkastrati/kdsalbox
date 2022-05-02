@@ -38,7 +38,8 @@ def version():
 
 @click.option("--wdb", is_flag=True, help="Do you want to report to wandb?")
 @click.option("--resume_id", help="The id of a run you want to continue")
-def experiment(skip, name, conf_file, logging_dir, input_images, input_saliencies, wdb, resume_id):
+@click.option("--ext_model", help="Specify the location of a model that should be used for test/run.")
+def experiment(skip, name, conf_file, logging_dir, input_images, input_saliencies, wdb, resume_id, ext_model):
     """Experiment with models on images in a directory."""
 
     # load config file
@@ -90,13 +91,13 @@ def experiment(skip, name, conf_file, logging_dir, input_images, input_saliencie
         run_conf["logging_dir"] = os.path.join(experiment_dir, "run_logs")
 
         model_path = os.path.join(train_conf["logging_dir"], train_conf["export_path"], "best.pth")
-        test_conf["model_path"] = model_path
-        run_conf["model_path"] = model_path
+        test_conf["model_path"] = ext_model if ext_model else model_path
+        run_conf["model_path"] = ext_model if ext_model else model_path
 
         # DO NOT FURTHER ADJUST THE CONF FROM THIS POINT ON
 
         # save the current config file into the experiment folder
-        if resuming:
+        if resuming and not ext_model:
             rel_model_path = os.path.relpath(model_path, wandb.run.dir).replace("\\", "/") # wandb expects linux path
             print(f"Restore model {rel_model_path}")
             wandb.restore(rel_model_path)
