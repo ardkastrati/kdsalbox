@@ -6,9 +6,15 @@ from hypnettorch.hnets import HMLP
 from hypnettorch.mnets.mnet_interface import MainNetInterface, ContextModLayer
 
 class Decoder(nn.Module):
-    def __init__(self, has_bias):
+    def __init__(self, model_conf, has_bias):
         super(Decoder, self).__init__()
         self._has_bias = has_bias
+
+        non_lins = {
+            "LeakyReLU": nn.LeakyReLU(),
+            "ReLU": nn.ReLU()
+        }
+        self.non_lin = non_lins[model_conf["decoder_non_linearity"]]
 
         self.bn7_3 = nn.BatchNorm2d(num_features=512)
         self.bn8_1 = nn.BatchNorm2d(num_features=256)
@@ -52,20 +58,20 @@ class Decoder(nn.Module):
             cm_weights.append((weights[i], weights[i+1]))
 
 
-        xb = F.relu(self.bn7_3(self.cm7(self.conv7_3(xb), cm_weights[0])))
+        xb = self.non_lin(self.bn7_3(self.cm7(self.conv7_3(xb), cm_weights[0])))
         xb = F.interpolate(xb, scale_factor=2, mode="bilinear", align_corners=False)
-        xb = F.relu(self.bn8_1(self.conv8_1(xb)))
+        xb = self.non_lin(self.bn8_1(self.conv8_1(xb)))
         xb = F.interpolate(xb, scale_factor=2, mode="bilinear", align_corners=False)
-        xb = F.relu(self.bn8_2(self.cm8(self.conv8_2(xb), cm_weights[1])))
-        xb = F.interpolate(xb, scale_factor=2, mode="bilinear", align_corners=False)
-
-        xb = F.relu(self.bn9_1(self.conv9_1(xb)))
-        xb = F.interpolate(xb, scale_factor=2, mode="bilinear", align_corners=False)
-        xb = F.relu(self.bn9_2(self.cm9(self.conv9_2(xb), cm_weights[2])))
+        xb = self.non_lin(self.bn8_2(self.cm8(self.conv8_2(xb), cm_weights[1])))
         xb = F.interpolate(xb, scale_factor=2, mode="bilinear", align_corners=False)
 
-        xb = F.relu(self.bn10_1(self.conv10_1(xb)))
-        xb = F.relu(self.bn10_2(self.cm10(self.conv10_2(xb), cm_weights[3])))
+        xb = self.non_lin(self.bn9_1(self.conv9_1(xb)))
+        xb = F.interpolate(xb, scale_factor=2, mode="bilinear", align_corners=False)
+        xb = self.non_lin(self.bn9_2(self.cm9(self.conv9_2(xb), cm_weights[2])))
+        xb = F.interpolate(xb, scale_factor=2, mode="bilinear", align_corners=False)
+
+        xb = self.non_lin(self.bn10_1(self.conv10_1(xb)))
+        xb = self.non_lin(self.bn10_2(self.cm10(self.conv10_2(xb), cm_weights[3])))
 
         xb = self.output(xb)
         return xb
@@ -76,7 +82,7 @@ class Decoder(nn.Module):
 
 
 class Student(nn.Module, MainNetInterface):
-    def __init__(self):
+    def __init__(self, model_conf):
         nn.Module.__init__(self)
         MainNetInterface.__init__(self)
 
@@ -91,7 +97,7 @@ class Student(nn.Module, MainNetInterface):
 
         # build model
         self.encoder = self.mobilenetv2_pretrain()
-        self.decoder = self.simple_decoder()
+        self.decoder = Decoder(model_conf, has_bias=self._has_bias)
         self.sigmoid = nn.Sigmoid()
 
         # params that will be trained by the hypernetwork
@@ -140,9 +146,6 @@ class Student(nn.Module, MainNetInterface):
         features = nn.Sequential(*list(model.features))
         return features
 
-    def simple_decoder(self):
-        return Decoder(has_bias=self._has_bias)
-
 
 
 ######################
@@ -153,7 +156,7 @@ class Student(nn.Module, MainNetInterface):
 def hnet_mnet_from_config(conf):
     model_conf = conf["model"]
 
-    mnet = Student()
+    mnet = Student(model_conf)
     hnet = HMLP(
         mnet.external_param_shapes(), 
         layers=model_conf["hnet_hidden_layers"], # the sizes of the hidden layers (excluding the last layer that generates the weights)

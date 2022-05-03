@@ -3,31 +3,32 @@
     "gpu": 0,
 
     "model": {
-        "task_cnt": 7,
+        "task_cnt": 1,
         "hnet_hidden_layers": [128, 128, 64],
         "hnet_embedding_size": 16,
         "hnet_chunk_size": 524288,
         "hnet_chunk_emb_per_task": true,
-        "hnet_chunk_emb_size": 8
+        "hnet_chunk_emb_size": 8,
+        "decoder_non_linearity": "LeakyReLU"
     },
 
     "experiment": {
         "skip": [],
 
-        "name": "NA",
-        "description": "Chunked hypernetwork that learns the weights of all decoder layers",
+        "name": "Full Chunked - Only one",
+        "description": "See if it can learn a single network",
 
         "logging_dir": "logs/experiment_logs/",
         "verbose": true
     },
 
     "train": {
-        "tasks": ["BMS", "AIM", "IKN", "GBVS", "IMSIG", "RARE2012", "SUN"],
+        "tasks": ["AIM"],
 
         "input_images_train": "./dataset/dummy_images/train/",
-        "imgs_per_task_train": 1500,
+        "imgs_per_task_train": 10000,
         "input_images_val": "./dataset/dummy_images/val/",
-        "imgs_per_task_val": 750,
+        "imgs_per_task_val": 5000,
         "input_saliencies": "./dataset/dummy_saliency/",
         "recursive": false,
         
@@ -44,7 +45,7 @@
     },
 
     "test": {
-        "tasks": ["BMS", "AIM", "IKN", "GBVS", "IMSIG", "RARE2012", "SUN"],
+        "tasks": ["AIM"],
 
         "input_images_test": "./dataset/dummy_images/train/",
         "imgs_per_task_test": 750,
@@ -61,7 +62,7 @@
     },
 
     "run": {
-        "tasks": ["BMS", "AIM", "IKN", "GBVS", "IMSIG", "RARE2012", "SUN"],
+        "tasks": ["AIM"],
 
         "input_images_run": "./dataset/dummy_images/train/",
         "recursive": false,

@@ -5,7 +5,8 @@
     "model": {
         "task_cnt": 7,
         "hnet_hidden_layers": [128, 128, 64],
-        "hnet_embedding_size": 16
+        "hnet_embedding_size": 16,
+        "decoder_non_linearity": "LeakyReLU"
     },
 
     "experiment": {
