@@ -48,7 +48,7 @@ class HyperTester(object):
         test_datasets = [TestDataManager(test_img_path, sal_path, self._verbose, self._preprocess_parameter_map) for sal_path in sal_folders]
 
         min_ds_len = min([len(ds) for ds in test_datasets])
-        self._data_offset = np.random.randint(0, (min_ds_len - imgs_per_task_test) // batch_size)
+        self._data_offset = 0 if min_ds_len - imgs_per_task_test == 0 else np.random.randint(0, (min_ds_len - imgs_per_task_test) // batch_size)
         self._dataloaders = {task:DataLoader(ds, batch_size=batch_size, shuffle=False, num_workers=4) for (task,ds) in zip(tasks,test_datasets)}
 
         self.KL = KLDivLoss(reduce="batchmean")
