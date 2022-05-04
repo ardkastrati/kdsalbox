@@ -3,7 +3,7 @@
     "gpu": 0,
 
     "model": {
-        "task_cnt": 1,
+        "task_cnt": 2,
         "hnet_hidden_layers": [128, 128, 64],
         "hnet_embedding_size": 16,
         "hnet_chunk_size": 524288,
@@ -23,17 +23,17 @@
     },
 
     "train": {
-        "tasks": ["AIM"],
+        "tasks": ["AIM", "IKN"],
 
         "input_images_train": "./dataset/dummy_images/train/",
-        "imgs_per_task_train": 10000,
+        "imgs_per_task_train": 5000,
         "input_images_val": "./dataset/dummy_images/val/",
-        "imgs_per_task_val": 5000,
+        "imgs_per_task_val": 2500,
         "input_saliencies": "./dataset/dummy_saliency/",
         "recursive": false,
         
         "batch_size": 4,
-        "epochs": 40,
+        "epochs": 25,
         "lr": 0.01,
         "lr_decay": 0.1,
         "freeze_encoder_steps": 5,
@@ -45,10 +45,10 @@
     },
 
     "test": {
-        "tasks": ["AIM"],
+        "tasks": ["AIM", "IKN"],
 
         "input_images_test": "./dataset/dummy_images/train/",
-        "imgs_per_task_test": 750,
+        "imgs_per_task_test": 2500,
         "input_saliencies": "./dataset/dummy_saliency/",
         "recursive": false,
 
@@ -62,7 +62,7 @@
     },
 
     "run": {
-        "tasks": ["AIM"],
+        "tasks": ["AIM", "IKN"],
 
         "input_images_run": "./dataset/dummy_images/train/",
         "recursive": false,
