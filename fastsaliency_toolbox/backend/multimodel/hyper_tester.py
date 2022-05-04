@@ -74,7 +74,6 @@ class HyperTester(object):
         for i in range(self._data_offset): next(data_iter) # skip first few images
 
         for i in range(self._batches_per_task_test):
-            if i > 0: break
             (X, y, names) = next(data_iter)
             X = X.to(self._device)
             y = y.to(self._device)
