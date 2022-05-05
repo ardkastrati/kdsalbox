@@ -26,6 +26,7 @@
         "imgs_per_task_train": 1500,
         "input_images_val": "./dataset/dummy_images/val/",
         "imgs_per_task_val": 750,
+        "input_images_run": "./dataset/dummy_images/run/",
         "input_saliencies": "./dataset/dummy_saliency/",
         "recursive": false,
         
@@ -36,6 +37,7 @@
         "freeze_encoder_steps": 5,
         
         "export_path": "exported/",
+        "auto_checkpoint_steps": 5,
         
         "logging_dir": "./logs/train_logs/",
         "verbose": true

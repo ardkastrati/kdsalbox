@@ -48,14 +48,14 @@ class HyperRunner(object):
 
             # If we aren't overwriting and the file exists, skip it.
             if not self._overwrite and os.path.isfile(out_path):
-                print(f"SKIP (already exists) image [{img_number + 1}/{len(dataloader)}]: {printable_input_path}")
+                if self._verbose: print(f"SKIP (already exists) image [{img_number + 1}/{len(dataloader)}]: {printable_input_path}")
                 continue
 
             
-            print(f"Running image [{img_number + 1}/{len(dataloader)}]: {printable_input_path}")
+            if self._verbose: print(f"Running image [{img_number + 1}/{len(dataloader)}]: {printable_input_path}")
 
             image = image.to(self._device)
-            saliency_map = self.compute_saliency(model, image, task_id)
+            saliency_map = model.compute_saliency(image, task_id)
             post_processed_image = np.clip((process(saliency_map.cpu().detach().numpy()[0, 0], self._postprocess_parameter_map)*255).astype(np.uint8), 0, 255)
 
             img_path = os.path.relpath(out_path, wandb.run.dir).replace("\\", "/").replace(".jpg", "")
@@ -69,7 +69,7 @@ class HyperRunner(object):
                 del output_path
                 torch.cuda.empty_cache()
 
-        print(f"Done with {task}!")
+        if self._verbose: print(f"Done with {task}!")
 
     def start_run(self):
         os.makedirs(self._logging_dir, exist_ok=True)
@@ -87,9 +87,3 @@ class HyperRunner(object):
         if self._verbose: print("Runner started...")
         self.start_run()
         if self._verbose: print(f"Done with {self._model_path}!")
-    
-    # runs and returns the models on an image for a given task
-    def compute_saliency(self, model, img, task_id):
-        model.eval()
-        sal = model(task_id, img)
-        return sal

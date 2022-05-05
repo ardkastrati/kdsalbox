@@ -6,8 +6,9 @@ from torch.utils.data import DataLoader
 import wandb
 
 from backend.utils import print_pretty_header
-from backend.datasets import TrainDataManager
+from backend.datasets import TrainDataManager, RunDataManager
 from backend.parameters import ParameterMap
+from backend.image_processing import process
 
 class HyperTrainer(object):
     '''
@@ -19,6 +20,7 @@ class HyperTrainer(object):
         train_conf = conf["train"]
         model_conf = conf["model"]
         preprocess_conf = conf["preprocess"]
+        postprocess_conf = conf["postprocess"]
 
         # params
         batch_size = train_conf["batch_size"]
@@ -29,6 +31,7 @@ class HyperTrainer(object):
         self._logging_dir = train_conf["logging_dir"]
         self._verbose = train_conf["verbose"]
         self._export_path = train_conf["export_path"]
+        self._auto_checkpoint_steps = train_conf["auto_checkpoint_steps"]
 
         self._tasks = train_conf["tasks"]
         self._task_cnt = model_conf["task_cnt"]
@@ -44,6 +47,9 @@ class HyperTrainer(object):
         preprocess_parameter_map = ParameterMap()
         preprocess_parameter_map.set_from_dict(preprocess_conf)
 
+        self._postprocess_parameter_map = ParameterMap()
+        self._postprocess_parameter_map.set_from_dict(postprocess_conf)
+
         # data loading
         input_saliencies = train_conf["input_saliencies"]
         train_img_path = train_conf["input_images_train"]
@@ -57,6 +63,8 @@ class HyperTrainer(object):
             "train": {task:DataLoader(ds, batch_size=batch_size, shuffle=True, num_workers=4) for (task,ds) in zip(self._tasks, train_datasets)},
             "val": {task:DataLoader(ds, batch_size=batch_size, shuffle=True, num_workers=4) for (task,ds) in zip(self._tasks, val_datasets)},
         }
+
+        self._run_dataloader = DataLoader(RunDataManager(train_conf["input_images_run"], "", verbose=False, recursive=False), batch_size=1)
 
         # sanity checks
         assert self._task_cnt == len(self._tasks)
@@ -143,6 +151,9 @@ class HyperTrainer(object):
         model.mnet.freeze_encoder()
         if self._verbose: print("Encoder frozen...")
 
+        # evaluate how the model performs initially
+        self.track_progress(-1, model)
+
         # training loop
         for epoch in range(0, epochs):
             # decrease learning rate over time
@@ -169,7 +180,7 @@ class HyperTrainer(object):
 
             # if better performance than all previous => save weights as checkpoint
             is_best_model = smallest_loss is None or loss_val < smallest_loss
-            if epoch % 10 == 0 or is_best_model:
+            if epoch % self._auto_checkpoint_steps == 0 or is_best_model:
                 checkpoint_dir = os.path.join(self._logging_dir, f"checkpoint_in_epoch_{epoch}/")
                 os.makedirs(checkpoint_dir, exist_ok=True)
                 path = f"{checkpoint_dir}/{epoch}_{loss_val:f}.pth"
@@ -180,6 +191,8 @@ class HyperTrainer(object):
                 if is_best_model:
                     smallest_loss = loss_val
                     self.save(export_path_best, model)
+                
+                self.track_progress(epoch, model)
             
             # save/overwrite results at the end of each epoch
             stats_file = os.path.join(os.path.relpath(self._logging_dir, wandb.run.dir), "all_results").replace("\\", "/")
@@ -195,6 +208,25 @@ class HyperTrainer(object):
         
         # save the final model
         self.save(export_path_final, model)
+
+    # tracks and reports some metrics of the model that is being trained
+    def track_progress(self, epoch, model):
+        cols = ["Model"]
+        cols.extend([os.path.basename(output_path[0]) for (_, _, output_path) in self._run_dataloader])
+        data = []
+        for task in self._tasks:
+            row = [task]
+            task_id = model.task_to_id(task)
+            for (image, _, _) in self._run_dataloader:
+                image = image.to(self._device)
+                saliency_map = model.compute_saliency(image, task_id)
+                post_processed_image = np.clip((process(saliency_map.cpu().detach().numpy()[0, 0], self._postprocess_parameter_map)*255).astype(np.uint8), 0, 255)
+                img = wandb.Image(post_processed_image)
+                row.append(img)
+            data.append(row)
+
+        table = wandb.Table(data=data, columns=cols)
+        wandb.log({f"Progress Epoch {epoch}": table})
 
     # setup & run the entire training
     def execute(self):

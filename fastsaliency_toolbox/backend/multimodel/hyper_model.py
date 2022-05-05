@@ -36,6 +36,12 @@ class HyperModel():
         self.hnet.eval()
         self.mnet.eval()
 
+    # runs and returns the models on an image for a given task
+    def compute_saliency(self, img, task_id):
+        self.eval()
+        sal = self(task_id, img)
+        return sal
+
     # maps a task name to a task id
     def task_to_id(self, task):
         return self._task_id_map[task]
