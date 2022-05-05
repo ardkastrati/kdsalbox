@@ -61,6 +61,7 @@ def experiment(skip, name, conf_file, logging_dir, input_images, input_saliencie
     if input_images:
         train_conf["input_images_train"] = os.path.join(input_images, "train")
         train_conf["input_images_val"] = os.path.join(input_images, "val")
+        train_conf["input_images_run"] = os.path.join(input_images, "run")
         test_conf["input_images_test"] = os.path.join(input_images, "val") # TODO: change to /test once testdata available
         run_conf["input_images_run"] = os.path.join(input_images, "run")
     if input_saliencies:
