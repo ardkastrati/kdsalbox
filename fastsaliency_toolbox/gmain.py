@@ -24,55 +24,11 @@ def version():
     """Displays version information."""
     click.echo("Fast Saliency Toolbox: Saliency (Psuedo-Model) Implementation ")
 
-
-########################################
-# Generalization - Experiment
-@cli.command()
-@click.option("--skip", help="Comma-separated list of experiment stages that should be skipped {train, test, run}")
-@click.option("-n", "--name", help="The name of the experiment.")
-@click.option("-c", "--conf_file", help="The path to the configuration file.")
-
-@click.option("-l", "--logging_dir", help="Where should the logs be stored?")
-@click.option("-i", "--input_images", help="The images used for experimenting. Should contain three folders inside: train, val and run.")
-@click.option("-s", "--input_saliencies", help="Specify the directory to the saliency images. Should contain a separated folder for each model/task name.")
-
-@click.option("--wdb", is_flag=True, help="Do you want to report to wandb?")
-@click.option("--resume_id", help="The id of a run you want to continue")
-@click.option("--ext_model", help="Specify the location of a model that should be used for test/run.")
-
-@click.option("--description", help="A description of what makes this run special")
-def experiment(skip, name, conf_file, logging_dir, input_images, input_saliencies, wdb, resume_id, ext_model, description):
-    """Experiment with models on images in a directory."""
-
-    # load config file
-    with open(conf_file) as f:
-        conf = json.load(f)
-
+def run_with_conf(conf, resume_id=None, ext_model=None):
     experiment_conf = conf["experiment"]
     train_conf = conf["train"]
     test_conf = conf["test"]
     run_conf = conf["run"]
-
-    # overwrite params given as args
-    if skip:
-        experiment_conf["skip"] = skip.split(",")
-    if name:
-        experiment_conf["name"] = name
-    if description:
-        experiment_conf["description"] = description
-    if logging_dir:
-        experiment_conf["logging_dir"] = logging_dir
-    if input_images:
-        train_conf["input_images_train"] = os.path.join(input_images, "train")
-        train_conf["input_images_val"] = os.path.join(input_images, "val")
-        train_conf["input_images_run"] = os.path.join(input_images, "run")
-        test_conf["input_images_test"] = os.path.join(input_images, "val") # TODO: change to /test once testdata available
-        run_conf["input_images_run"] = os.path.join(input_images, "run")
-    if input_saliencies:
-        train_conf["input_saliencies"] = input_saliencies
-        test_conf["input_saliencies"] = input_saliencies
-    
-    os.environ["WANDB_MODE"] = "online" if wdb else "offline"
 
     experiment_name = experiment_conf["name"]
     experiment_description = experiment_conf["description"]
@@ -135,6 +91,123 @@ def experiment(skip, name, conf_file, logging_dir, input_images, input_saliencie
         except ValueError as e:
             print(str(e))
             exit(64)
+
+########################################
+# Generalization - Experiment
+@cli.command()
+@click.option("--skip", help="Comma-separated list of experiment stages that should be skipped {train, test, run}")
+@click.option("-n", "--name", help="The name of the experiment.")
+@click.option("-c", "--conf_file", help="The path to the configuration file.")
+
+@click.option("-l", "--logging_dir", help="Where should the logs be stored?")
+@click.option("-i", "--input_images", help="The images used for experimenting. Should contain three folders inside: train, val and run.")
+@click.option("-s", "--input_saliencies", help="Specify the directory to the saliency images. Should contain a separated folder for each model/task name.")
+
+@click.option("--wdb", is_flag=True, help="Do you want to report to wandb?")
+@click.option("--resume_id", help="The id of a run you want to continue")
+@click.option("--ext_model", help="Specify the location of a model that should be used for test/run.")
+
+@click.option("--description", help="A description of what makes this run special")
+def experiment(skip, name, conf_file, logging_dir, input_images, input_saliencies, wdb, resume_id, ext_model, description):
+    """Experiment with models on images in a directory."""
+
+    # load config file
+    with open(conf_file) as f:
+        conf = json.load(f)
+
+    experiment_conf = conf["experiment"]
+    train_conf = conf["train"]
+    test_conf = conf["test"]
+    run_conf = conf["run"]
+
+    # overwrite params given as args
+    if skip:
+        experiment_conf["skip"] = skip.split(",")
+    if name:
+        experiment_conf["name"] = name
+    if description:
+        experiment_conf["description"] = description
+    if logging_dir:
+        experiment_conf["logging_dir"] = logging_dir
+    if input_images:
+        train_conf["input_images_train"] = os.path.join(input_images, "train")
+        train_conf["input_images_val"] = os.path.join(input_images, "val")
+        train_conf["input_images_run"] = os.path.join(input_images, "run")
+        test_conf["input_images_test"] = os.path.join(input_images, "val") # TODO: change to /test once testdata available
+        run_conf["input_images_run"] = os.path.join(input_images, "run")
+    if input_saliencies:
+        train_conf["input_saliencies"] = input_saliencies
+        test_conf["input_saliencies"] = input_saliencies
+    
+    os.environ["WANDB_MODE"] = "online" if wdb else "offline"
+
+    run_with_conf(conf, resume_id, ext_model)
+
+    ########################################
+# Generalization - Gridsearch
+@cli.command()
+@click.option("--skip", help="Comma-separated list of experiment stages that should be skipped {train, test, run}")
+@click.option("-n", "--name", help="The name of the experiment.")
+@click.option("-c", "--conf_file", help="The path to the configuration file.")
+
+@click.option("-l", "--logging_dir", help="Where should the logs be stored?")
+@click.option("-i", "--input_images", help="The images used for experimenting. Should contain three folders inside: train, val and run.")
+@click.option("-s", "--input_saliencies", help="Specify the directory to the saliency images. Should contain a separated folder for each model/task name.")
+
+@click.option("--wdb", is_flag=True, help="Do you want to report to wandb?")
+
+@click.option("--description", help="A description of what makes this run special")
+def gridsearch(skip, name, conf_file, logging_dir, input_images, input_saliencies, wdb, description):
+    # load config file
+    with open(conf_file) as f:
+        conf = json.load(f)
+
+    experiment_conf = conf["experiment"]
+    train_conf = conf["train"]
+    test_conf = conf["test"]
+    run_conf = conf["run"]
+
+    # overwrite params given as args
+    if skip:
+        experiment_conf["skip"] = skip.split(",")
+    if name:
+        experiment_conf["name"] = name
+    if description:
+        experiment_conf["description"] = description
+    if logging_dir:
+        experiment_conf["logging_dir"] = logging_dir
+    if input_images:
+        train_conf["input_images_train"] = os.path.join(input_images, "train")
+        train_conf["input_images_val"] = os.path.join(input_images, "val")
+        train_conf["input_images_run"] = os.path.join(input_images, "run")
+        test_conf["input_images_test"] = os.path.join(input_images, "val") # TODO: change to /test once testdata available
+        run_conf["input_images_run"] = os.path.join(input_images, "run")
+    if input_saliencies:
+        train_conf["input_saliencies"] = input_saliencies
+        test_conf["input_saliencies"] = input_saliencies
+    
+    os.environ["WANDB_MODE"] = "online" if wdb else "offline"
+
+    # TODO:
+    # 3t
+    # hnet_chunk_emb_size [8]
+    # hnet_embedding_size
+    # hnet_hidden_layers (amount x size)
+
+    base_name = experiment_conf["name"]
+    base_description = experiment_conf["name"]
+    hnet_chunk_emb_sizes = [8,32,256,1024]
+    for i,hnet_chunk_emb_size in enumerate(hnet_chunk_emb_sizes):
+        print("#############################")
+        print("NOW RUNNING {i}")
+        print("#############################")
+
+        conf["model"]["hnet_chunk_emb_size"] = hnet_chunk_emb_size
+        experiment_conf["name"] = f"({i}) {base_name} - {hnet_chunk_emb_size}"
+        experiment_conf["description"] = f"{base_description}\n hnet_chunk_emb_size={hnet_chunk_emb_size}"
+        run_with_conf(conf)
+
+    
 
 if __name__ == "__main__":
     cli()

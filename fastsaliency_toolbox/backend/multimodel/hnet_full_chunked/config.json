@@ -3,10 +3,10 @@
     "gpu": 0,
 
     "model": {
-        "task_cnt": 1,
-        "hnet_hidden_layers": [128, 128, 64],
-        "hnet_embedding_size": 16,
-        "hnet_chunk_size": 524288,
+        "task_cnt": 2,
+        "hnet_hidden_layers": [128, 128, 128],
+        "hnet_embedding_size": 256,
+        "hnet_chunk_size": 65536,
         "hnet_chunk_emb_per_task": true,
         "hnet_chunk_emb_size": 8,
         "decoder_non_linearity": "LeakyReLU"
@@ -16,19 +16,19 @@
         "skip": [],
 
         "name": "Full Chunked - Only one",
-        "description": "See if it can learn a single network",
+        "description": "Goal: Figure out the best embedding size for the smaller hnet_chunk_size=65536. This will let us use a larger second last layer of the HNET without it exploding.",
 
         "logging_dir": "logs/experiment_logs/",
         "verbose": true
     },
 
     "train": {
-        "tasks": ["IKN"],
+        "tasks": ["AIM", "SUN"],
 
         "input_images_train": "./dataset/dummy_images/train/",
-        "imgs_per_task_train": 10000,
+        "imgs_per_task_train": 5000,
         "input_images_val": "./dataset/dummy_images/val/",
-        "imgs_per_task_val": 5000,
+        "imgs_per_task_val": 2500,
         "input_images_run": "./dataset/dummy_images/run/",
         "input_saliencies": "./dataset/dummy_saliency/",
         "recursive": false,
@@ -40,17 +40,17 @@
         "freeze_encoder_steps": 5,
         
         "export_path": "exported/",
-        "auto_checkpoint_steps": 5,
+        "auto_checkpoint_steps": 7,
         
         "logging_dir": "./logs/train_logs/",
         "verbose": true
     },
 
     "test": {
-        "tasks": ["IKN"],
+        "tasks": ["AIM", "SUN"],
 
         "input_images_test": "./dataset/dummy_images/train/",
-        "imgs_per_task_test": 5000,
+        "imgs_per_task_test": 2500,
         "input_saliencies": "./dataset/dummy_saliency/",
         "recursive": false,
 
@@ -64,7 +64,7 @@
     },
 
     "run": {
-        "tasks": ["IKN"],
+        "tasks": ["AIM", "SUN"],
 
         "input_images_run": "./dataset/dummy_images/train/",
         "recursive": false,
