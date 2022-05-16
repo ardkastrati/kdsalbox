@@ -39,7 +39,9 @@ def version():
 @click.option("--wdb", is_flag=True, help="Do you want to report to wandb?")
 @click.option("--resume_id", help="The id of a run you want to continue")
 @click.option("--ext_model", help="Specify the location of a model that should be used for test/run.")
-def experiment(skip, name, conf_file, logging_dir, input_images, input_saliencies, wdb, resume_id, ext_model):
+
+@click.option("--description", help="A description of what makes this run special")
+def experiment(skip, name, conf_file, logging_dir, input_images, input_saliencies, wdb, resume_id, ext_model, description):
     """Experiment with models on images in a directory."""
 
     # load config file
@@ -56,6 +58,8 @@ def experiment(skip, name, conf_file, logging_dir, input_images, input_saliencie
         experiment_conf["skip"] = skip.split(",")
     if name:
         experiment_conf["name"] = name
+    if description:
+        experiment_conf["description"] = description
     if logging_dir:
         experiment_conf["logging_dir"] = logging_dir
     if input_images:
@@ -71,6 +75,7 @@ def experiment(skip, name, conf_file, logging_dir, input_images, input_saliencie
     os.environ["WANDB_MODE"] = "online" if wdb else "offline"
 
     experiment_name = experiment_conf["name"]
+    experiment_description = experiment_conf["description"]
 
     resuming = False
     if resume_id:
@@ -81,7 +86,7 @@ def experiment(skip, name, conf_file, logging_dir, input_images, input_saliencie
         resume = None
 
     wandb.login()
-    with wandb.init(project="kdsalbox-generalization", entity="ba-yanickz", name=experiment_name, config=conf, id=resume_id, resume=resume):
+    with wandb.init(project="kdsalbox-generalization", entity="ba-yanickz", name=experiment_name, config=conf, id=resume_id, resume=resume, notes=experiment_description):
         # build & update paths relative to wandb run dir
         experiment_conf["logging_dir"] = os.path.join(wandb.run.dir, experiment_conf["logging_dir"])
         logging_dir = experiment_conf["logging_dir"]
