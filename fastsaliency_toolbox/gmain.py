@@ -212,6 +212,7 @@ def gridsearch(skip, name, conf_file, logging_dir, input_images, input_saliencie
         run_with_conf(conf)
 
     hnet_chunk_emb_sizes = [8,16,32,128]
+    conf["model"]["hnet_chunk_emb_per_task"] = False
     for i,hnet_chunk_emb_size in enumerate(hnet_chunk_emb_sizes):
         print("#############################")
         print(f"NOW RUNNING {4+i}")
