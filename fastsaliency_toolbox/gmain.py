@@ -41,8 +41,9 @@ def run_with_conf(conf, resume_id=None, ext_model=None):
         resume_id = None
         resume = None
 
+    original_logging_dir = experiment_conf["logging_dir"]
     wandb.login()
-    with wandb.init(project="kdsalbox-generalization", entity="ba-yanickz", name=experiment_name, config=conf, id=resume_id, resume=resume, notes=experiment_description):
+    with wandb.init(project="kdsalbox-generalization", entity="ba-yanickz", name=experiment_name, config=conf, id=resume_id, resume=resume, notes=experiment_description, reinit=True):
         # build & update paths relative to wandb run dir
         experiment_conf["logging_dir"] = os.path.join(wandb.run.dir, experiment_conf["logging_dir"])
         logging_dir = experiment_conf["logging_dir"]
@@ -61,10 +62,10 @@ def run_with_conf(conf, resume_id=None, ext_model=None):
         # save the current config file into the experiment folder
         if resuming and not ext_model:
             rel_model_path = os.path.relpath(model_path, wandb.run.dir).replace("\\", "/") # wandb expects linux path
-            print(f"Restore model {rel_model_path}")
             wandb.restore(rel_model_path)
         else:
             config_dump = os.path.join(experiment_dir, "used_config.json")
+            print(config_dump)
             os.makedirs(os.path.dirname(config_dump), exist_ok=True)
             with open(config_dump, "w") as f:
                 json.dump(conf, f, indent=4)
@@ -91,6 +92,8 @@ def run_with_conf(conf, resume_id=None, ext_model=None):
         except ValueError as e:
             print(str(e))
             exit(64)
+
+        experiment_conf["logging_dir"] = original_logging_dir # reset the logging dir for the next run, the other paths are then built ontop of it
 
 ########################################
 # Generalization - Experiment
@@ -196,18 +199,28 @@ def gridsearch(skip, name, conf_file, logging_dir, input_images, input_saliencie
 
     base_name = experiment_conf["name"]
     base_description = experiment_conf["name"]
-    hnet_chunk_emb_sizes = [8,32,256,1024]
+    hnet_chunk_emb_sizes = [16,32,128]
+    conf["model"]["hnet_chunk_emb_per_task"] = True
     for i,hnet_chunk_emb_size in enumerate(hnet_chunk_emb_sizes):
         print("#############################")
-        print("NOW RUNNING {i}")
+        print(f"NOW RUNNING {i}")
         print("#############################")
 
         conf["model"]["hnet_chunk_emb_size"] = hnet_chunk_emb_size
-        experiment_conf["name"] = f"({i}) {base_name} - {hnet_chunk_emb_size}"
-        experiment_conf["description"] = f"{base_description}\n hnet_chunk_emb_size={hnet_chunk_emb_size}"
+        experiment_conf["name"] = f"({i}) {base_name} - {hnet_chunk_emb_size} - True"
+        experiment_conf["description"] = f"{base_description}\nhnet_chunk_emb_size={hnet_chunk_emb_size}\nhnet_chunk_emb_per_task=True"
         run_with_conf(conf)
 
-    
+    hnet_chunk_emb_sizes = [8,16,32,128]
+    for i,hnet_chunk_emb_size in enumerate(hnet_chunk_emb_sizes):
+        print("#############################")
+        print(f"NOW RUNNING {4+i}")
+        print("#############################")
+
+        conf["model"]["hnet_chunk_emb_size"] = hnet_chunk_emb_size
+        experiment_conf["name"] = f"({i}) {base_name} - {hnet_chunk_emb_size} - False"
+        experiment_conf["description"] = f"{base_description}\nhnet_chunk_emb_size={hnet_chunk_emb_size}\nhnet_chunk_emb_per_task=False"
+        run_with_conf(conf)
 
 if __name__ == "__main__":
     cli()
