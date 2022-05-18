@@ -193,34 +193,26 @@ def gridsearch(skip, name, conf_file, logging_dir, input_images, input_saliencie
 
     # TODO:
     # 3t
-    # hnet_chunk_emb_size [8]
     # hnet_embedding_size
     # hnet_hidden_layers (amount x size)
 
     base_name = experiment_conf["name"]
     base_description = experiment_conf["name"]
-    hnet_chunk_emb_sizes = [16,32,128]
-    conf["model"]["hnet_chunk_emb_per_task"] = True
-    for i,hnet_chunk_emb_size in enumerate(hnet_chunk_emb_sizes):
+    hnets = [
+        [128, 128, 128],
+        [128, 128, 128, 128],
+        [128, 128, 128, 128, 128],
+        [256, 256, 256],
+        [128, 256, 512],
+    ]
+    for i,hnet_hidden_layers in enumerate(hnets):
         print("#############################")
         print(f"NOW RUNNING {i}")
         print("#############################")
 
-        conf["model"]["hnet_chunk_emb_size"] = hnet_chunk_emb_size
-        experiment_conf["name"] = f"({i}) {base_name} - {hnet_chunk_emb_size} - True"
-        experiment_conf["description"] = f"{base_description}\nhnet_chunk_emb_size={hnet_chunk_emb_size}\nhnet_chunk_emb_per_task=True"
-        run_with_conf(conf)
-
-    hnet_chunk_emb_sizes = [8,16,32,128]
-    conf["model"]["hnet_chunk_emb_per_task"] = False
-    for i,hnet_chunk_emb_size in enumerate(hnet_chunk_emb_sizes):
-        print("#############################")
-        print(f"NOW RUNNING {4+i}")
-        print("#############################")
-
-        conf["model"]["hnet_chunk_emb_size"] = hnet_chunk_emb_size
-        experiment_conf["name"] = f"({i}) {base_name} - {hnet_chunk_emb_size} - False"
-        experiment_conf["description"] = f"{base_description}\nhnet_chunk_emb_size={hnet_chunk_emb_size}\nhnet_chunk_emb_per_task=False"
+        conf["model"]["hnet_hidden_layers"] = hnet_hidden_layers
+        experiment_conf["name"] = f"({i}) {base_name} - {hnet_hidden_layers}"
+        experiment_conf["description"] = f"{base_description}\nhnet_hidden_layers={hnet_hidden_layers}"
         run_with_conf(conf)
 
 if __name__ == "__main__":

@@ -3,12 +3,12 @@
     "gpu": 0,
 
     "model": {
-        "task_cnt": 2,
+        "task_cnt": 3,
         "hnet_hidden_layers": [128, 128, 128],
         "hnet_embedding_size": 256,
         "hnet_chunk_size": 65536,
-        "hnet_chunk_emb_per_task": true,
-        "hnet_chunk_emb_size": 8,
+        "hnet_chunk_emb_per_task": false,
+        "hnet_chunk_emb_size": 16,
         "decoder_non_linearity": "LeakyReLU"
     },
 
@@ -23,12 +23,12 @@
     },
 
     "train": {
-        "tasks": ["AIM", "SUN"],
+        "tasks": ["AIM", "SUN", "IKN"],
 
         "input_images_train": "./dataset/dummy_images/train/",
-        "imgs_per_task_train": 5000,
+        "imgs_per_task_train": 3500,
         "input_images_val": "./dataset/dummy_images/val/",
-        "imgs_per_task_val": 2500,
+        "imgs_per_task_val": 1750,
         "input_images_run": "./dataset/dummy_images/run/",
         "input_saliencies": "./dataset/dummy_saliency/",
         "recursive": false,
@@ -47,10 +47,10 @@
     },
 
     "test": {
-        "tasks": ["AIM", "SUN"],
+        "tasks": ["AIM", "SUN", "IKN"],
 
         "input_images_test": "./dataset/dummy_images/train/",
-        "imgs_per_task_test": 2500,
+        "imgs_per_task_test": 1750,
         "input_saliencies": "./dataset/dummy_saliency/",
         "recursive": false,
 
@@ -64,7 +64,7 @@
     },
 
     "run": {
-        "tasks": ["AIM", "SUN"],
+        "tasks": ["AIM", "SUN", "IKN"],
 
         "input_images_run": "./dataset/dummy_images/train/",
         "recursive": false,
