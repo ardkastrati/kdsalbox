@@ -201,9 +201,7 @@ def gridsearch(skip, name, conf_file, logging_dir, input_images, input_saliencie
     hnets = [
         [128, 128, 128],
         [128, 128, 128, 128],
-        [128, 128, 128, 128, 128],
         [256, 256, 256],
-        [128, 256, 512],
     ]
     for i,hnet_hidden_layers in enumerate(hnets):
         print("#############################")

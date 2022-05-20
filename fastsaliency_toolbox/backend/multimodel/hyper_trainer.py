@@ -38,6 +38,7 @@ class HyperTrainer(object):
         self._batches_per_task_train = imgs_per_task_train // batch_size
         self._batches_per_task_val = imgs_per_task_val // batch_size
 
+        self._loss_fn = train_conf["loss"]
         self._epochs = train_conf["epochs"]
         self._lr = train_conf["lr"]
         self._lr_decay = train_conf["lr_decay"]
@@ -140,7 +141,12 @@ class HyperTrainer(object):
         lr = self._lr
         lr_decay = self._lr_decay
         optimizer = torch.optim.Adam(model.parameters(), lr=lr)
-        loss = torch.nn.BCELoss()
+
+        losses = {
+            "BCELoss": torch.nn.BCELoss(),
+            "L1Loss": torch.nn.L1Loss()
+        }
+        loss = losses[self._loss_fn]
         
         # report to wandb
         wandb.watch((model.hnet, model.mnet), loss, log="gradients", log_freq=100)

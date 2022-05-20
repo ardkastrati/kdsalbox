@@ -30,6 +30,7 @@
         "input_saliencies": "./dataset/dummy_saliency/",
         "recursive": false,
         
+        "loss": "L1Loss",
         "batch_size": 4,
         "epochs": 40,
         "lr": 0.01,
