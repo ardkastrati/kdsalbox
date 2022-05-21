@@ -203,14 +203,16 @@ def gridsearch(skip, name, conf_file, logging_dir, input_images, input_saliencie
         [128, 128, 128, 128],
         [256, 256, 256],
     ]
-    for i,hnet_hidden_layers in enumerate(hnets):
+    consecutive_batches_per_tasks = [4,16,64]
+    for i,(hnet_hidden_layers,consecutive_batches_per_task) in enumerate([(h, b) for h in hnets for b in consecutive_batches_per_tasks]):
         print("#############################")
         print(f"NOW RUNNING {i}")
         print("#############################")
 
         conf["model"]["hnet_hidden_layers"] = hnet_hidden_layers
-        experiment_conf["name"] = f"({i}) {base_name} - {hnet_hidden_layers}"
-        experiment_conf["description"] = f"{base_description}\nhnet_hidden_layers={hnet_hidden_layers}"
+        train_conf["consecutive_batches_per_task"] = consecutive_batches_per_task
+        experiment_conf["name"] = f"({i}) {base_name} - {hnet_hidden_layers} - {consecutive_batches_per_task}"
+        experiment_conf["description"] = f"{base_description}\nhnet_hidden_layers={hnet_hidden_layers}\nconsecutive_batches_per_task={consecutive_batches_per_task}"
         run_with_conf(conf)
 
 if __name__ == "__main__":

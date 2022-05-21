@@ -40,6 +40,7 @@ class HyperTrainer(object):
 
         self._loss_fn = train_conf["loss"]
         self._epochs = train_conf["epochs"]
+        self._consecutive_batches_per_task = train_conf["consecutive_batches_per_task"]
         self._lr = train_conf["lr"]
         self._lr_decay = train_conf["lr_decay"]
         self._freeze_encoder_steps = train_conf["freeze_encoder_steps"]
@@ -81,9 +82,13 @@ class HyperTrainer(object):
         all_loss = []
 
         # defines which batch will be loaded from which task/model
-        limit = self._batches_per_task_train if mode == "train" else self._batches_per_task_val
-        all_batches = np.concatenate([np.repeat(model.task_to_id(task), limit) for task in self._tasks])
-        np.random.shuffle(all_batches)
+        if mode == "train":
+            limit = self._batches_per_task_train // self._consecutive_batches_per_task
+            all_batches = np.concatenate([np.repeat(model.task_to_id(task), limit) for task in self._tasks])
+            np.random.shuffle(all_batches)
+            all_batches = np.repeat(all_batches, self._consecutive_batches_per_task)
+        else:
+            all_batches = np.concatenate([np.repeat(model.task_to_id(task), self._batches_per_task_val) for task in self._tasks])
 
         # for each model
         data_iters = [iter(d) for d in dataloaders[mode].values()] # Note: DataLoader shuffles when iterator is created

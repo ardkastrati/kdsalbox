@@ -33,8 +33,9 @@
         "input_saliencies": "./dataset/dummy_saliency/",
         "recursive": false,
         
-        "loss": "L1Loss",
+        "loss": "BCELoss",
         "batch_size": 4,
+        "consecutive_batches_per_task": 8,
         "epochs": 10,
         "lr": 0.01,
         "lr_decay": 0.1,
