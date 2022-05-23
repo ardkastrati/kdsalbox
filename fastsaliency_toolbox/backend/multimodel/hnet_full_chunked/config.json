@@ -39,7 +39,8 @@
         "epochs": 10,
         "lr": 0.01,
         "lr_decay": 0.1,
-        "freeze_encoder_steps": 5,
+        "freeze_encoder_steps": 3,
+        "decay_epochs": [3, 8],
         
         "export_path": "exported/",
         "auto_checkpoint_steps": 7,

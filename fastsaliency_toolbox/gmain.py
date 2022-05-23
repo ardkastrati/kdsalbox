@@ -191,11 +191,6 @@ def gridsearch(skip, name, conf_file, logging_dir, input_images, input_saliencie
     
     os.environ["WANDB_MODE"] = "online" if wdb else "offline"
 
-    # TODO:
-    # 3t
-    # hnet_embedding_size
-    # hnet_hidden_layers (amount x size)
-
     base_name = experiment_conf["name"]
     base_description = experiment_conf["name"]
     hnets = [
@@ -203,16 +198,14 @@ def gridsearch(skip, name, conf_file, logging_dir, input_images, input_saliencie
         [128, 128, 128, 128],
         [256, 256, 256],
     ]
-    consecutive_batches_per_tasks = [4,16,64]
-    for i,(hnet_hidden_layers,consecutive_batches_per_task) in enumerate([(h, b) for h in hnets for b in consecutive_batches_per_tasks]):
+    for i,hnet_hidden_layers in enumerate(hnets):
         print("#############################")
         print(f"NOW RUNNING {i}")
         print("#############################")
 
         conf["model"]["hnet_hidden_layers"] = hnet_hidden_layers
-        train_conf["consecutive_batches_per_task"] = consecutive_batches_per_task
-        experiment_conf["name"] = f"({i}) {base_name} - {hnet_hidden_layers} - {consecutive_batches_per_task}"
-        experiment_conf["description"] = f"{base_description}\nhnet_hidden_layers={hnet_hidden_layers}\nconsecutive_batches_per_task={consecutive_batches_per_task}"
+        experiment_conf["name"] = f"({i}) {base_name} - {hnet_hidden_layers}"
+        experiment_conf["description"] = f"{base_description}\nhnet_hidden_layers={hnet_hidden_layers}\ndecay_epochs={train_conf['decay_epochs']}\nfreeze_encoder_steps={train_conf['freeze_encoder_steps']}"
         run_with_conf(conf)
 
 if __name__ == "__main__":

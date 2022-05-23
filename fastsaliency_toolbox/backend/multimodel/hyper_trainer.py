@@ -44,6 +44,7 @@ class HyperTrainer(object):
         self._lr = train_conf["lr"]
         self._lr_decay = train_conf["lr_decay"]
         self._freeze_encoder_steps = train_conf["freeze_encoder_steps"]
+        self._decay_epochs = train_conf["decay_epochs"]
 
         # convert to preprocess params
         preprocess_parameter_map = ParameterMap()
@@ -168,7 +169,7 @@ class HyperTrainer(object):
         # training loop
         for epoch in range(0, epochs):
             # decrease learning rate over time
-            if epoch == 15 or epoch == 30 or epoch == 60:
+            if epoch in self._decay_epochs:
                 for param_group in optimizer.param_groups:
                     param_group["lr"] *= lr_decay
                 lr = lr * lr_decay
@@ -213,7 +214,7 @@ class HyperTrainer(object):
                     "loss train": loss_train,
                     "loss val": loss_val,
                     "learning rate": lr,
-                    "encoder_frozen": int(epoch < self._freeze_encoder_steps),
+                    "encoder_frozen": float(epoch < self._freeze_encoder_steps),
                     stats_file:table
                 })
         
