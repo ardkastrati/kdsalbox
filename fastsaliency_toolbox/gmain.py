@@ -152,6 +152,7 @@ def experiment(skip, name, conf_file, logging_dir, input_images, input_saliencie
 @click.option("--skip", help="Comma-separated list of experiment stages that should be skipped {train, test, run}")
 @click.option("-n", "--name", help="The name of the experiment.")
 @click.option("-c", "--conf_file", help="The path to the configuration file.")
+@click.option("-p", "--param_grid_file", help="The path to the gridsearch params file.")
 
 @click.option("-l", "--logging_dir", help="Where should the logs be stored?")
 @click.option("-i", "--input_images", help="The images used for experimenting. Should contain three folders inside: train, val and run.")
@@ -160,7 +161,11 @@ def experiment(skip, name, conf_file, logging_dir, input_images, input_saliencie
 @click.option("--wdb", is_flag=True, help="Do you want to report to wandb?")
 
 @click.option("--description", help="A description of what makes this run special")
-def gridsearch(skip, name, conf_file, logging_dir, input_images, input_saliencies, wdb, description):
+def gridsearch(skip, name, conf_file, param_grid_file, logging_dir, input_images, input_saliencies, wdb, description):
+    # load param_grid
+    with open(param_grid_file) as f:
+        param_grid = json.load(f)
+    
     # load config file
     with open(conf_file) as f:
         conf = json.load(f)
@@ -192,21 +197,32 @@ def gridsearch(skip, name, conf_file, logging_dir, input_images, input_saliencie
     os.environ["WANDB_MODE"] = "online" if wdb else "offline"
 
     base_name = experiment_conf["name"]
-    base_description = experiment_conf["name"]
-    hnets = [
-        [128, 128, 128],
-        [128, 128, 128, 128],
-        [256, 256, 256],
-    ]
-    for i,hnet_hidden_layers in enumerate(hnets):
-        print("#############################")
-        print(f"NOW RUNNING {i}")
-        print("#############################")
 
-        conf["model"]["hnet_hidden_layers"] = hnet_hidden_layers
-        experiment_conf["name"] = f"({i}) {hnet_hidden_layers}"
-        experiment_conf["description"] = f"{base_description}\nhnet_hidden_layers={hnet_hidden_layers}\ndecay_epochs={train_conf['decay_epochs']}\nfreeze_encoder_steps={train_conf['freeze_encoder_steps']}"
-        run_with_conf(conf, group=base_name)
+    def _gridsearch(conf, param_grid, indices=[]):
+        param_grid = param_grid.copy()
+        if len(param_grid) == 0:
+            print("#############################")
+            print(f"NOW RUNNING {indices}")
+            print("#############################")
+
+            run_with_conf(conf, group=base_name)
+        else:
+            path,values = param_grid.pop(0)
+            paths = path.split("/")
+            c = conf.copy()
+            bn = c["experiment"]["name"]
+            bd = c["experiment"]["description"] 
+            d = c
+            for p in paths[0:-1]:
+                d = c[p]
+            
+            for i,v in enumerate(values):
+                c["experiment"]["name"] = f"{bn} - {v}"
+                c["experiment"]["description"] = f"{bd}\n{path} = {v}"
+                d[paths[-1]] = v
+                _gridsearch(c, param_grid, indices+[i])
+        
+    _gridsearch(conf, param_grid)
 
 if __name__ == "__main__":
     cli()
