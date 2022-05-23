@@ -24,7 +24,7 @@ def version():
     """Displays version information."""
     click.echo("Fast Saliency Toolbox: Saliency (Psuedo-Model) Implementation ")
 
-def run_with_conf(conf, resume_id=None, ext_model=None):
+def run_with_conf(conf, group=None, resume_id=None, ext_model=None):
     experiment_conf = conf["experiment"]
     train_conf = conf["train"]
     test_conf = conf["test"]
@@ -43,7 +43,7 @@ def run_with_conf(conf, resume_id=None, ext_model=None):
 
     original_logging_dir = experiment_conf["logging_dir"]
     wandb.login()
-    with wandb.init(project="kdsalbox-generalization", entity="ba-yanickz", name=experiment_name, config=conf, id=resume_id, resume=resume, notes=experiment_description, reinit=True):
+    with wandb.init(project="kdsalbox-generalization", entity="ba-yanickz", name=experiment_name, config=conf, group=group, id=resume_id, resume=resume, notes=experiment_description, reinit=True):
         # build & update paths relative to wandb run dir
         experiment_conf["logging_dir"] = os.path.join(wandb.run.dir, experiment_conf["logging_dir"])
         logging_dir = experiment_conf["logging_dir"]
@@ -144,7 +144,7 @@ def experiment(skip, name, conf_file, logging_dir, input_images, input_saliencie
     
     os.environ["WANDB_MODE"] = "online" if wdb else "offline"
 
-    run_with_conf(conf, resume_id, ext_model)
+    run_with_conf(conf, resume_id=resume_id, ext_model=ext_model)
 
     ########################################
 # Generalization - Gridsearch
@@ -204,9 +204,9 @@ def gridsearch(skip, name, conf_file, logging_dir, input_images, input_saliencie
         print("#############################")
 
         conf["model"]["hnet_hidden_layers"] = hnet_hidden_layers
-        experiment_conf["name"] = f"({i}) {base_name} - {hnet_hidden_layers}"
+        experiment_conf["name"] = f"({i}) {hnet_hidden_layers}"
         experiment_conf["description"] = f"{base_description}\nhnet_hidden_layers={hnet_hidden_layers}\ndecay_epochs={train_conf['decay_epochs']}\nfreeze_encoder_steps={train_conf['freeze_encoder_steps']}"
-        run_with_conf(conf)
+        run_with_conf(conf, group=base_name)
 
 if __name__ == "__main__":
     cli()
