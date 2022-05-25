@@ -76,7 +76,8 @@ class Decoder(nn.Module):
 
         non_lins = {
             "LeakyReLU": nn.LeakyReLU(),
-            "ReLU": nn.ReLU()
+            "ReLU": nn.ReLU(),
+            "ReLU6": nn.ReLU6()
         }
         self.non_lin = non_lins[model_conf["decoder_non_linearity"]]
 
