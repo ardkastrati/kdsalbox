@@ -1,3 +1,5 @@
+from turtle import forward
+from torch import Block, Tensor
 import torch.nn as nn
 import torch.nn.functional as F
 from torchvision.models import mobilenet_v2
@@ -5,18 +7,72 @@ from torchvision.models import mobilenet_v2
 from hypnettorch.hnets.chunked_mlp_hnet import ChunkedHMLP
 from hypnettorch.mnets.mnet_interface import MainNetInterface
 
+class BatchNorm2DF(nn.BatchNorm2d):
+    """
+        Hacky BatchNorm2D layer that allows for custom weight and bias tensors but still supports all the tracking of running stats
+    """
+    def forward(self, input, weight, bias):
+        # Copy-pasted from BatchNorm superclass but adjusted to use custom weight and bias
+        self._check_input_dim(input)
+
+        if self.momentum is None:
+            exponential_average_factor = 0.0
+        else:
+            exponential_average_factor = self.momentum
+
+        if self.training and self.track_running_stats:
+            if self.num_batches_tracked is not None:
+                self.num_batches_tracked.add_(1)
+                if self.momentum is None:
+                    exponential_average_factor = 1.0 / float(self.num_batches_tracked)
+                else:
+                    exponential_average_factor = self.momentum
+
+        if self.training:
+            bn_training = True
+        else:
+            bn_training = (self.running_mean is None) and (self.running_var is None)
+
+        return F.batch_norm(
+            input,
+            self.running_mean
+            if not self.training or self.track_running_stats
+            else None,
+            self.running_var if not self.training or self.track_running_stats else None,
+            weight,
+            bias,
+            bn_training,
+            exponential_average_factor,
+            self.eps,
+        )
+
+class BlockF:
+    """ A block consisting of a conv2d-layer, batchnorm2d-layer and activation function where all the weights and bias are provided externally """
+    def __init__(self, in_channels, out_channels, non_lin, interpolate):
+        conv = nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1)
+        self.bn = BatchNorm2DF(num_features=out_channels)
+
+        self.non_lin = non_lin
+        self.interpolate = interpolate
+
+        self.external_param_shapes = []
+        self.external_param_shapes.extend([p.size() for p in conv.parameters()])
+        self.external_param_shapes.extend([p.size() for p in self.bn.parameters()])
+        
+    def forward(self, xb, conv_w, conv_b, bn_w, bn_b):
+        xb = F.conv2d(xb, weight=conv_w, bias=conv_b, padding=1)
+        xb = self.bn.forward(xb, weight=bn_w, bias=bn_b)
+        xb = self.non_lin(xb)
+
+        if self.interpolate:
+            xb = F.interpolate(xb, scale_factor=2, mode="bilinear", align_corners=False)
+
+        return xb
+
 class Decoder(nn.Module):
     def __init__(self, model_conf, has_bias):
         super(Decoder, self).__init__()
         self._has_bias = has_bias
-
-        self.bn7_3 = nn.BatchNorm2d(num_features=512)
-        self.bn8_1 = nn.BatchNorm2d(num_features=256)
-        self.bn8_2 = nn.BatchNorm2d(num_features=256)
-        self.bn9_1 = nn.BatchNorm2d(num_features=128)
-        self.bn9_2 = nn.BatchNorm2d(num_features=128)
-        self.bn10_1 = nn.BatchNorm2d(num_features=64)
-        self.bn10_2 = nn.BatchNorm2d(num_features=64)
 
         non_lins = {
             "LeakyReLU": nn.LeakyReLU(),
@@ -25,27 +81,25 @@ class Decoder(nn.Module):
         self.non_lin = non_lins[model_conf["decoder_non_linearity"]]
 
         # layers not actually used in forward but providing the param shapes
-        conv7_3 = nn.Conv2d(1280, 512, kernel_size=3, padding=1)
-        conv8_1 = nn.Conv2d(512, 256, kernel_size=3, padding=1)
-        conv8_2 = nn.Conv2d(256, 256, kernel_size=3, padding=1)
-        conv9_1 = nn.Conv2d(256, 128, kernel_size=3, padding=1)
-        conv9_2 = nn.Conv2d(128, 128, kernel_size=3, padding=1)
-        conv10_1 = nn.Conv2d(128, 64, kernel_size=3, padding=1)
-        conv10_2 = nn.Conv2d(64, 64, kernel_size=3, padding=1)
+        self.blocks = [
+            BlockF(1280, 512, self.non_lin, True),
+            BlockF(512, 256, self.non_lin, True),
+            BlockF(256, 256, self.non_lin, True),
+            BlockF(256, 128, self.non_lin, True),
+            BlockF(128, 128, self.non_lin, True),
+            BlockF(128, 64, self.non_lin, False),
+            BlockF(64, 64, self.non_lin, False)
+        ]
+
         output = nn.Conv2d(64, 1, kernel_size=1, padding=0)
 
         # generate the shapes of the params that are learned by the hypernetwork
         self._external_param_shapes = []
-        self._external_param_shapes.extend([p.size() for p in conv7_3.parameters()])
-        self._external_param_shapes.extend([p.size() for p in conv8_1.parameters()])
-        self._external_param_shapes.extend([p.size() for p in conv8_2.parameters()])
-        self._external_param_shapes.extend([p.size() for p in conv9_1.parameters()])
-        self._external_param_shapes.extend([p.size() for p in conv9_2.parameters()])
-        self._external_param_shapes.extend([p.size() for p in conv10_1.parameters()])
-        self._external_param_shapes.extend([p.size() for p in conv10_2.parameters()])
+        for b in self.blocks:
+            self._external_param_shapes.extend(b.external_param_shapes)
         self._external_param_shapes.extend([p.size() for p in output.parameters()])
 
-        
+
     def forward(self, xb, weights):
         w_weights = []
         b_weights = []
@@ -55,22 +109,10 @@ class Decoder(nn.Module):
             else:
                 w_weights.append(p)
 
-        xb = self.non_lin(self.bn7_3(F.conv2d(xb, w_weights[0], b_weights[0], padding=1)))
-        xb = F.interpolate(xb, scale_factor=2, mode="bilinear", align_corners=False)
-        xb = self.non_lin(self.bn8_1(F.conv2d(xb, w_weights[1], b_weights[1], padding=1)))
-        xb = F.interpolate(xb, scale_factor=2, mode="bilinear", align_corners=False)
-        xb = self.non_lin(self.bn8_2(F.conv2d(xb, w_weights[2], b_weights[2], padding=1)))
-        xb = F.interpolate(xb, scale_factor=2, mode="bilinear", align_corners=False)
-
-        xb = self.non_lin(self.bn9_1(F.conv2d(xb, w_weights[3], b_weights[3], padding=1)))
-        xb = F.interpolate(xb, scale_factor=2, mode="bilinear", align_corners=False)
-        xb = self.non_lin(self.bn9_2(F.conv2d(xb, w_weights[4], b_weights[4], padding=1)))
-        xb = F.interpolate(xb, scale_factor=2, mode="bilinear", align_corners=False)
-
-        xb = self.non_lin(self.bn10_1(F.conv2d(xb, w_weights[5], b_weights[5], padding=1)))
-        xb = self.non_lin(self.bn10_2(F.conv2d(xb, w_weights[6], b_weights[6], padding=1)))
-
-        xb = F.conv2d(xb, w_weights[7], b_weights[7], padding=0)
+        for i,b in enumerate(self.blocks):
+            xb = b.forward(xb, w_weights[2*i], b_weights[2*i], w_weights[2*i+1], b_weights[2*i+1])
+        
+        xb = F.conv2d(xb, w_weights[-1], b_weights[-1], padding=0)
         return xb
 
     # gets the shape of the parameters of which we expect the weights to be generated by the hypernetwork
