@@ -43,7 +43,14 @@
         "auto_checkpoint_steps": 5,
         
         "logging_dir": "./logs/train_logs/",
-        "verbose": true
+        "verbose": true,
+
+        "wandb": {
+            "watch": {
+                "log": null,
+                "log_freq": 100
+            }
+        }
     },
 
     "test": {

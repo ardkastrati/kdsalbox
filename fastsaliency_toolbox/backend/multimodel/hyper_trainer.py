@@ -19,6 +19,7 @@ class HyperTrainer(object):
 
         train_conf = conf["train"]
         model_conf = conf["model"]
+        wandb_conf = train_conf["wandb"]
         preprocess_conf = conf["preprocess"]
         postprocess_conf = conf["postprocess"]
 
@@ -45,6 +46,9 @@ class HyperTrainer(object):
         self._lr_decay = train_conf["lr_decay"]
         self._freeze_encoder_steps = train_conf["freeze_encoder_steps"]
         self._decay_epochs = train_conf["decay_epochs"]
+
+        self.wandb_watch_log = wandb_conf["watch"]["log"]
+        self.wandb_watch_log_freq = wandb_conf["watch"]["log_freq"]
 
         # convert to preprocess params
         preprocess_parameter_map = ParameterMap()
@@ -155,7 +159,7 @@ class HyperTrainer(object):
         loss = losses[self._loss_fn]
         
         # report to wandb
-        wandb.watch((model.hnet, model.mnet), loss, log="gradients", log_freq=100)
+        wandb.watch((model.hnet, model.mnet), loss, log=self.wandb_watch_log, log_freq=self.wandb_watch_log_freq)
         
         all_epochs = []
         smallest_loss = None
