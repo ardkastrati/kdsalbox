@@ -181,6 +181,13 @@ class Student(nn.Module, MainNetInterface):
     # Other #
     #########
 
+    # TODO: come up with a fancy way to put the wrapped batchnorm layers running_mean and running_var onto the correct device without intercepting the "to"-call
+    def to(self, device, dtype=None, non_blocking=False):
+        super(Student, self).to(device, dtype, non_blocking)
+        
+        for b in self.decoder.blocks:
+            b.bn.to(device, dtype, non_blocking)
+        
     def mobilenetv2_pretrain(self, pretrained=True):
         model = mobilenet_v2(pretrained=pretrained, progress=False)
         features = nn.Sequential(*list(model.features))
