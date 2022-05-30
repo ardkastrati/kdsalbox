@@ -9,7 +9,8 @@
         "hnet_chunk_size": 65536,
         "hnet_chunk_emb_per_task": false,
         "hnet_chunk_emb_size": 16,
-        "decoder_non_linearity": "ReLU6"
+        "decoder_non_linearity": "ReLU6",
+        "mobilenet_cutoff": 19
     },
 
     "experiment": {

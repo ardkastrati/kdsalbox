@@ -4,6 +4,7 @@ from torchvision.models import mobilenet_v2
 from hypnettorch.hnets.chunked_mlp_hnet import ChunkedHMLP
 
 import backend.multimodel.custom_weight_layers as cwl
+from backend.multimodel.mobilenetv2_wrapper import mobilenet_v2_pretrained
 
 class Decoder(cwl.CustomWeightsLayer):
     def __init__(self, model_conf):
@@ -33,8 +34,9 @@ class Student(cwl.CustomWeightsLayer):
     def __init__(self, model_conf):
         super(Student, self).__init__()
 
-        # build model
-        self.register_layer(self.mobilenetv2_pretrain(), "encoder")
+        self.mobilenet_cutoff = model_conf["mobilenet_cutoff"]
+
+        self.register_layer(mobilenet_v2_pretrained(self.mobilenet_cutoff), "encoder")
         self.register_layer(Decoder(model_conf), "decoder")
         self.register_layer(nn.Sigmoid(), "sigmoid")
 
@@ -47,11 +49,6 @@ class Student(cwl.CustomWeightsLayer):
     def unfreeze_encoder(self):
         for param in self.get_layer("encoder").parameters():
             param.requires_grad_(True)
-
-    def mobilenetv2_pretrain(self, pretrained=True):
-        model = mobilenet_v2(pretrained=pretrained, progress=False)
-        features = nn.Sequential(*list(model.features))
-        return features
 
 
 ######################
