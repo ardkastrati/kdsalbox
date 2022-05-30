@@ -21,7 +21,7 @@ class HyperModel():
     # gets all the parameters of the model
     def parameters(self):
         # learn the params of the hypernetwork as well as the internal params of the main network
-        return list(self.hnet.internal_params) + self.mnet.internal_params
+        return list(self.hnet.parameters()) + list(self.mnet.parameters())
 
     def __call__(self, task_id, X):
         weights = self.hnet(cond_id=task_id)

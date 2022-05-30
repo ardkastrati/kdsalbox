@@ -1,193 +1,53 @@
-from turtle import forward
-from torch import Block, Tensor
 import torch.nn as nn
-import torch.nn.functional as F
 from torchvision.models import mobilenet_v2
 
 from hypnettorch.hnets.chunked_mlp_hnet import ChunkedHMLP
-from hypnettorch.mnets.mnet_interface import MainNetInterface
 
-class BatchNorm2DF(nn.BatchNorm2d):
-    """
-        Hacky BatchNorm2D layer that allows for custom weight and bias tensors but still supports all the tracking of running stats
-    """
-    def forward(self, input, weight, bias):
-        # Copy-pasted from BatchNorm superclass but adjusted to use custom weight and bias
-        self._check_input_dim(input)
+import backend.multimodel.custom_weight_layers as cwl
 
-        if self.momentum is None:
-            exponential_average_factor = 0.0
-        else:
-            exponential_average_factor = self.momentum
-
-        if self.training and self.track_running_stats:
-            if self.num_batches_tracked is not None:
-                self.num_batches_tracked.add_(1)
-                if self.momentum is None:
-                    exponential_average_factor = 1.0 / float(self.num_batches_tracked)
-                else:
-                    exponential_average_factor = self.momentum
-
-        if self.training:
-            bn_training = True
-        else:
-            bn_training = (self.running_mean is None) and (self.running_var is None)
-
-        return F.batch_norm(
-            input,
-            self.running_mean
-            if not self.training or self.track_running_stats
-            else None,
-            self.running_var if not self.training or self.track_running_stats else None,
-            weight,
-            bias,
-            bn_training,
-            exponential_average_factor,
-            self.eps,
-        )
-
-class BlockF:
-    """ A block consisting of a conv2d-layer, batchnorm2d-layer and activation function where all the weights and bias are provided externally """
-    def __init__(self, in_channels, out_channels, non_lin, interpolate):
-        conv = nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1)
-        self.bn = BatchNorm2DF(num_features=out_channels)
-
-        self.non_lin = non_lin
-        self.interpolate = interpolate
-
-        self.external_param_shapes = []
-        self.external_param_shapes.extend([p.size() for p in conv.parameters()])
-        self.external_param_shapes.extend([p.size() for p in self.bn.parameters()])
-        
-    def forward(self, xb, conv_w, conv_b, bn_w, bn_b):
-        xb = F.conv2d(xb, weight=conv_w, bias=conv_b, padding=1)
-        xb = self.bn.forward(xb, weight=bn_w, bias=bn_b)
-        xb = self.non_lin(xb)
-
-        if self.interpolate:
-            xb = F.interpolate(xb, scale_factor=2, mode="bilinear", align_corners=False)
-
-        return xb
-
-class Decoder(nn.Module):
-    def __init__(self, model_conf, has_bias):
+class Decoder(cwl.CustomWeightsLayer):
+    def __init__(self, model_conf):
         super(Decoder, self).__init__()
-        self._has_bias = has_bias
-
         non_lins = {
             "LeakyReLU": nn.LeakyReLU(),
             "ReLU": nn.ReLU(),
             "ReLU6": nn.ReLU6()
         }
-        self.non_lin = non_lins[model_conf["decoder_non_linearity"]]
+        non_lin = non_lins[model_conf["decoder_non_linearity"]]
 
         # layers not actually used in forward but providing the param shapes
-        self.blocks = [
-            BlockF(1280, 512, self.non_lin, True),
-            BlockF(512, 256, self.non_lin, True),
-            BlockF(256, 256, self.non_lin, True),
-            BlockF(256, 128, self.non_lin, True),
-            BlockF(128, 128, self.non_lin, True),
-            BlockF(128, 64, self.non_lin, False),
-            BlockF(64, 64, self.non_lin, False)
-        ]
-
-        output = nn.Conv2d(64, 1, kernel_size=1, padding=0)
+        self.register_layer(cwl.block(1280, 512, non_lin, interpolate=True))
+        self.register_layer(cwl.block(512, 256, non_lin, interpolate=True))
+        self.register_layer(cwl.block(256, 256, non_lin, interpolate=True))
+        self.register_layer(cwl.block(256, 128, non_lin, interpolate=True))
+        self.register_layer(cwl.block(128, 128, non_lin, interpolate=True))
+        self.register_layer(cwl.block(128, 64, non_lin, interpolate=False))
+        self.register_layer(cwl.block(64, 64, non_lin, interpolate=False))
+        self.register_layer(cwl.conv2d(64, 1, kernel_size=1, padding=0))
 
         # generate the shapes of the params that are learned by the hypernetwork
-        self._external_param_shapes = []
-        for b in self.blocks:
-            self._external_param_shapes.extend(b.external_param_shapes)
-        self._external_param_shapes.extend([p.size() for p in output.parameters()])
+        self.compute_cw_param_shapes()
 
 
-    def forward(self, xb, weights):
-        w_weights = []
-        b_weights = []
-        for i, p in enumerate(weights):
-            if i % 2 == 1:
-                b_weights.append(p)
-            else:
-                w_weights.append(p)
-
-        for i,b in enumerate(self.blocks):
-            xb = b.forward(xb, w_weights[2*i], b_weights[2*i], w_weights[2*i+1], b_weights[2*i+1])
-        
-        xb = F.conv2d(xb, w_weights[-1], b_weights[-1], padding=0)
-        return xb
-
-    # gets the shape of the parameters of which we expect the weights to be generated by the hypernetwork
-    def get_external_param_shapes(self):
-        return self._external_param_shapes
-
-
-class Student(nn.Module, MainNetInterface):
+class Student(cwl.CustomWeightsLayer):
     def __init__(self, model_conf):
-        nn.Module.__init__(self)
-        MainNetInterface.__init__(self)
-
-        # MNET setup
-        self._has_fc_out = False 
-        self._mask_fc_out = False
-        self._has_linear_out = False
-        self._has_bias = True
-
-        self._layer_weight_tensors = nn.ParameterList()
-        self._layer_bias_vectors = nn.ParameterList()
+        super(Student, self).__init__()
 
         # build model
-        self.encoder = self.mobilenetv2_pretrain()
-        self.decoder = Decoder(model_conf, has_bias=self._has_bias)
-        self.sigmoid = nn.Sigmoid()
+        self.register_layer(self.mobilenetv2_pretrain(), "encoder")
+        self.register_layer(Decoder(model_conf), "decoder")
+        self.register_layer(nn.Sigmoid(), "sigmoid")
 
-        # params that will be trained by the hypernetwork
-        self._external_param_shapes = self.decoder.get_external_param_shapes()
-
-        # params that will be trained by the model itself
-        self._internal_params = list(self.parameters())
-        self._param_shapes = []
-        for param in self._internal_params:
-            self._param_shapes.append(list(param.size()))
-
-
-        self._is_properly_setup()
-
-    def forward(self, xb, weights):
-        enc = self.encoder(xb)
-        dec = self.decoder(enc, weights)
-        prob = self.sigmoid(dec)
-        return prob
-
+        self.compute_cw_param_shapes()
 
     def freeze_encoder(self):
-        for param in self.encoder.parameters():
+        for param in self.get_layer("encoder").parameters():
             param.requires_grad_(False)
 
     def unfreeze_encoder(self):
-        for param in self.encoder.parameters():
+        for param in self.get_layer("encoder").parameters():
             param.requires_grad_(True)
-    
-    def external_param_shapes(self):
-        return self._external_param_shapes
 
-    ####################
-    # MainNetInterface #
-    ####################
-
-    def distillation_targets(self):
-        return None # we do not have any distillation targets
-
-    #########
-    # Other #
-    #########
-
-    # TODO: come up with a fancy way to put the wrapped batchnorm layers running_mean and running_var onto the correct device without intercepting the "to"-call
-    def to(self, device, dtype=None, non_blocking=False):
-        super(Student, self).to(device, dtype, non_blocking)
-        
-        for b in self.decoder.blocks:
-            b.bn.to(device, dtype, non_blocking)
-        
     def mobilenetv2_pretrain(self, pretrained=True):
         model = mobilenet_v2(pretrained=pretrained, progress=False)
         features = nn.Sequential(*list(model.features))
@@ -204,7 +64,7 @@ def hnet_mnet_from_config(conf):
 
     mnet = Student(model_conf)
     hnet = ChunkedHMLP(
-        target_shapes=mnet.external_param_shapes(), 
+        target_shapes=mnet.get_cw_param_shapes(), 
         chunk_size=model_conf["hnet_chunk_size"],
         layers=model_conf["hnet_hidden_layers"], # the sizes of the hidden layers (excluding the last layer that generates the weights)
         cond_in_size=model_conf["hnet_embedding_size"], # the size of the embeddings
