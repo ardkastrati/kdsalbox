@@ -3,13 +3,13 @@
     "gpu": 0,
 
     "model": {
-        "task_cnt": 3,
-        "hnet_hidden_layers": [128, 128, 128],
+        "task_cnt": 4,
+        "hnet_hidden_layers": [512, 512, 512, 512],
         "hnet_embedding_size": 256,
         "hnet_chunk_size": 65536,
         "hnet_chunk_emb_per_task": false,
         "hnet_chunk_emb_size": 16,
-        "decoder_non_linearity": "LeakyReLU"
+        "decoder_non_linearity": "ReLU6"
     },
 
     "experiment": {
@@ -23,12 +23,12 @@
     },
 
     "train": {
-        "tasks": ["AIM", "SUN", "IKN"],
+        "tasks": ["AIM", "SUN", "IKN", "GBVS"],
 
         "input_images_train": "./dataset/dummy_images/train/",
-        "imgs_per_task_train": 3500,
+        "imgs_per_task_train": 2500,
         "input_images_val": "./dataset/dummy_images/val/",
-        "imgs_per_task_val": 1750,
+        "imgs_per_task_val": 1250,
         "input_images_run": "./dataset/dummy_images/run/",
         "input_saliencies": "./dataset/dummy_saliency/",
         "recursive": false,
@@ -37,10 +37,10 @@
         "batch_size": 4,
         "consecutive_batches_per_task": 8,
         "epochs": 10,
-        "lr": 0.01,
+        "lr": 0.001,
         "lr_decay": 0.1,
         "freeze_encoder_steps": 3,
-        "decay_epochs": [3, 8],
+        "decay_epochs": [],
         
         "export_path": "exported/",
         "auto_checkpoint_steps": 7,
@@ -57,10 +57,10 @@
     },
 
     "test": {
-        "tasks": ["AIM", "SUN", "IKN"],
+        "tasks": ["AIM", "SUN", "IKN", "GBVS"],
 
         "input_images_test": "./dataset/dummy_images/train/",
-        "imgs_per_task_test": 1750,
+        "imgs_per_task_test": 1250,
         "input_saliencies": "./dataset/dummy_saliency/",
         "recursive": false,
 
@@ -74,7 +74,7 @@
     },
 
     "run": {
-        "tasks": ["AIM", "SUN", "IKN"],
+        "tasks": ["AIM", "SUN", "IKN", "GBVS"],
 
         "input_images_run": "./dataset/dummy_images/train/",
         "recursive": false,
