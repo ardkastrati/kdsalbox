@@ -36,7 +36,7 @@ class CustomWeightsLayer(nn.Module):
         if isinstance(layer, CustomWeightsLayer):
             self._cw_layers[name] = layer
         else:
-            self._cw_layers[name] = _ModuleWrapper(layer)
+            self._cw_layers[name] = _LeafModule(layer)
 
     def get_layer(self, name:str):
         return self._cw_layers[name]
@@ -50,14 +50,16 @@ class CustomWeightsLayer(nn.Module):
     def get_cw_param_shapes(self):
         return self._cw_param_shapes
 
-class _ModuleWrapper(CustomWeightsLayer):
+class _LeafModule(CustomWeightsLayer):
     """
         Wraps a nn.Module in a CWL
-        Cannot add sub-layers
+        Does not treat any of the nn.Module's parameters as external/custom
         Simply calls the layer in the forward pass
+
+        Cannot add sub-layers
     """
     def __init__(self, layer):
-        super(_ModuleWrapper, self).__init__()
+        super(_LeafModule, self).__init__()
         
         self.layer = layer
 
@@ -72,9 +74,13 @@ class _ModuleWrapper(CustomWeightsLayer):
     def compute_cw_param_shapes(self):
         self._cw_param_shapes = []
 
-class CWLWrapper(CustomWeightsLayer):
+class ModuleWrapper(CustomWeightsLayer):
     """
-        Wraps a nn.Module in a CWL with all of its parameters being learned externally
+        Wraps a nn.Module in a CWL 
+        Will learn all parameters of the blueprint externally
+        Simply calls the provided forward method with the external weights
+
+        Cannot add sub-layers
     """
     def __init__(self, blueprint : nn.Module, forward):
         """
@@ -104,7 +110,7 @@ def conv2d(in_channels, out_channels, kernel_size, stride=1, padding=0, dilation
     """ Builds a Conv2d layer with custom weights """
     with_bias = lambda x, weights : F.conv2d(x, weight=weights[0], bias=weights[1], stride=stride, padding=padding, dilation=dilation, groups=groups)
     without_bias = lambda x, weights : F.conv2d(x, weight=weights[0], stride=stride, padding=padding, dilation=dilation, groups=groups)
-    cwl = CWLWrapper(
+    cwl = ModuleWrapper(
         nn.Conv2d(in_channels, out_channels, kernel_size, stride, padding, dilation, groups, bias),
         with_bias if bias else without_bias
     )
