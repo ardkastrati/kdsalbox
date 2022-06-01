@@ -74,8 +74,62 @@ class PreTrainer(object):
             "val": DataLoader(train_ds, batch_size=batch_size, shuffle=False, num_workers=4) # TODO: custom validation dataset
         }
 
+        # self._evaluate_model_differences(target_model_weights)
+
         # sanity checks
         assert self._task_cnt == len(self._tasks)
+    
+    # evaluate how different the layers of the models are
+    def _evaluate_model_differences(self, target_model_weights):
+        model_p = [(task, os.path.join(target_model_weights, task.upper(), "exported", f"{task.lower()}.pth")) for task in self._tasks] # paths to all trained models
+        model_weights = []
+        for t,p in model_p:
+            model = stud.student()
+            state_dict = torch.load(p, map_location=torch.device('cpu'))
+            model.load_state_dict(state_dict['student_model'])
+            
+            model_weights.append((t,{n:p.data.flatten() for n,p in model.named_parameters()}))
+            
+
+        for i in range(len(model_weights)):
+            for j in range(i+1, len(model_weights)):
+                t1,ws1 = model_weights[i]
+                t2,ws2 = model_weights[j]
+
+                # compare the two different models
+                print(f"{t1} vs {t2}")
+
+                total_dist = 0.0
+                total_dist_enc = 0.0
+                total_enc = 0
+                total_dist_dec = 0.0
+                total_dec = 0
+
+                all_dist = []
+                for n in ws1.keys():
+                    w1 = ws1[n]
+                    w2 = ws2[n]
+                    dist = torch.sum(torch.abs(w1 - w2)) / len(w1)
+                    total_dist += dist
+
+                    if "encoder" in n:
+                        total_dist_enc += dist
+                        total_enc += 1
+                    elif "decoder" in n:
+                        total_dist_dec += dist
+                        total_dec += 1
+                    
+                    all_dist.append((n, dist))
+                
+
+                print(f"Average {total_dist / len(ws1.keys())}")
+                print(f"Average Encoder {total_dist_enc / total_enc}")
+                print(f"Average Decoder {total_dist_dec / total_dec}")
+
+                # all_dist = sorted(all_dist, key=(lambda t : t[1]), reverse=True)
+                # for n,d in all_dist:
+                #     if d < 0.5: continue
+                #     print(f"\t{n}: {d:.3}")
 
     def map_old_to_new_weights(self, named_weights):
         selection = [
@@ -197,7 +251,7 @@ class PreTrainer(object):
                 # if better performance than all previous => save weights as checkpoint
                 is_best_model = smallest_loss is None or loss_val < smallest_loss
                 if epoch % self._auto_checkpoint_steps == 0 or is_best_model:
-                    checkpoint_dir = os.path.join(self._logging_dir, f"checkpoint_in_epoch_{epoch}/")
+                    checkpoint_dir = os.path.join(self._logging_dir, f"pretrain_checkpoint_in_epoch_{epoch}/")
                     os.makedirs(checkpoint_dir, exist_ok=True)
                     path = f"{checkpoint_dir}/{epoch}_{loss_val:f}.pth"
 
@@ -209,13 +263,13 @@ class PreTrainer(object):
                         self.save(export_path_best, model)
                 
                 # save/overwrite results at the end of each epoch
-                stats_file = os.path.join(os.path.relpath(self._logging_dir, wandb.run.dir), "all_results").replace("\\", "/")
+                stats_file = os.path.join(os.path.relpath(self._logging_dir, wandb.run.dir), "pretrain_all_results").replace("\\", "/")
                 table = wandb.Table(data=all_epochs, columns=["Epoch", "Loss-Train", "Loss-Val"])
                 wandb.log({
-                        "epoch": epoch,
-                        "loss train": loss_train,
-                        "loss val": loss_val,
-                        "learning rate": lr,
+                        "pretrain - epoch": epoch,
+                        "pretrain - loss train": loss_train,
+                        "pretrain - loss val": loss_val,
+                        "pretrain - learning rate": lr,
                         stats_file:table
                     })
         
