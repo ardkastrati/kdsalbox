@@ -25,9 +25,9 @@ class WeightDataset(Dataset):
         model = stud.student()
         state_dict = torch.load(path, map_location=torch.device('cpu'))
         model.load_state_dict(state_dict['student_model'])
-        
-        named_weights = {n:p.data.flatten() for n,p in model.decoder.named_parameters()}
-        weights = rearrange_weights_fn(named_weights)
+
+        named_weights = {n:p.data.flatten() for n,p in model.named_parameters()}
+        weights = rearrange_weights_fn(named_weights, model)
 
         return torch.cat(weights)
     
@@ -65,6 +65,9 @@ class PreTrainer(object):
         self.wandb_watch_log = wandb_conf["watch"]["log"]
         self.wandb_watch_log_freq = wandb_conf["watch"]["log_freq"]
 
+        # build model
+        self._hyper_model.build()
+
         # data loading
         target_model_weights = pretrain_conf["target_model_weights"]
         model_paths = [(hyper_model.task_to_id(task), os.path.join(target_model_weights, task.upper(), "exported", f"{task.lower()}.pth")) for task in self._tasks] # paths to all trained models
@@ -78,6 +81,14 @@ class PreTrainer(object):
 
         # sanity checks
         assert self._task_cnt == len(self._tasks)
+
+        # check if the extpected output format of the HNET matches the labels/weights loaded from the original models
+        new_shapes = self._hyper_model.mnet.get_cw_param_shapes()
+        old_stud = stud.student()
+        old_shapes = self.map_old_to_new_weights({n:p.size() for n,p in old_stud.named_parameters()}, old_stud, verbose=self._verbose) 
+        assert len(new_shapes) == len(old_shapes), f"HNET output generates {len(new_shapes)} weight tensors whereas we only loaded {len(old_shapes)} into the label from the original models!"
+        for new,old in zip(new_shapes, old_shapes):
+            assert new == old, "Mismatch between HNET output format and loaded model weight format. Make sure the order of parameters is the same!"
     
     # evaluate how different the layers of the models are
     def _evaluate_model_differences(self, target_model_weights):
@@ -131,8 +142,8 @@ class PreTrainer(object):
                 #     if d < 0.5: continue
                 #     print(f"\t{n}: {d:.3}")
 
-    def map_old_to_new_weights(self, named_weights):
-        selection = [
+    def map_old_to_new_weights(self, named_weights, model, verbose=False):
+        decoder_selection = [
             "conv7_3.weight",   "conv7_3.bias",     "bn7_3.weight",     "bn7_3.bias",
             "conv8_1.weight",   "conv8_1.bias",     "bn8_1.weight",     "bn8_1.bias",
             "conv8_2.weight",   "conv8_2.bias",     "bn8_2.weight",     "bn8_2.bias", 
@@ -144,8 +155,19 @@ class PreTrainer(object):
         ]
         
         new_weights = []
-        for s in selection:
-            new_weights.append(named_weights[s])
+        new_encoder_param_cnt = len(list(self._hyper_model.mnet.get_layer("encoder").parameters()))
+        # select the first few params, assuming that 
+        encoder_selection = [n for n,p in model.encoder.named_parameters()][new_encoder_param_cnt:] 
+
+        if verbose: print("selecting encoder.")
+        for s in encoder_selection:
+            if verbose: print(f"\t{s}")
+            new_weights.append(named_weights[f"encoder.{s}"])    
+
+        if verbose: print("selecting decoder.")
+        for s in decoder_selection:
+            if verbose: print(f"\t{s}")
+            new_weights.append(named_weights[f"decoder.{s}"])
 
         return new_weights
 
@@ -201,13 +223,6 @@ class PreTrainer(object):
 
         # initialize networks
         model = self._hyper_model
-        model.build()
-
-        # new_shapes = model.mnet.get_cw_param_shapes()
-        # old_shapes = self.map_old_to_new_weights({n:p.size() for n,p in stud.student().decoder.named_parameters()}) 
-        # for new,old in zip(new_shapes, old_shapes):
-        #     if new != old:
-        #         print("shit")
 
         hnet = model.hnet
         hnet.to(self._device)
