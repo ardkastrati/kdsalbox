@@ -3,14 +3,18 @@
     "gpu": 0,
 
     "model": {
-        "task_cnt": 4,
-        "hnet_hidden_layers": [512, 512, 512, 512],
-        "hnet_embedding_size": 256,
-        "hnet_chunk_size": 65536,
-        "hnet_chunk_emb_per_task": false,
-        "hnet_chunk_emb_size": 16,
-        "decoder_non_linearity": "ReLU6",
-        "mobilenet_cutoff": 19
+        "hnet": {
+            "task_cnt": 4,
+            "hidden_layers": [512, 512, 512, 512],
+            "embedding_size": 256,
+            "chunk_size": 65536,
+            "chunk_emb_per_task": false,
+            "chunk_emb_size": 16
+        },
+        "mnet": {
+            "decoder_non_linearity": "ReLU6",
+            "mobilenet_cutoff": 19
+        }
     },
 
     "experiment": {
@@ -21,6 +25,32 @@
 
         "logging_dir": "logs/experiment_logs/",
         "verbose": true
+    },
+
+    "pretrain": {
+        "tasks": ["AIM", "SUN", "IKN", "GBVS"],
+
+        "target_model_weights": "./models/",
+
+        "loss": "MSELoss",
+        "batch_size": 4,
+        "epochs": 1000,
+        "lr": 0.001,
+        "lr_decay": 0.1,
+        "decay_epochs": [],
+        
+        "export_path": "exported/pretrained/",
+        "auto_checkpoint_steps": 25,
+        
+        "logging_dir": "./logs/pretrain_logs/",
+        "verbose": true,
+
+        "wandb": {
+            "watch": {
+                "log": null,
+                "log_freq": 100
+            }
+        }
     },
 
     "train": {
@@ -43,6 +73,7 @@
         "freeze_encoder_steps": 3,
         "decay_epochs": [],
         
+        "pretrained_model_path": "exported/pretrained/",
         "export_path": "exported/",
         "auto_checkpoint_steps": 7,
         

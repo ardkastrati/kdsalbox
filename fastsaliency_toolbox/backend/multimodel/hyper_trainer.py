@@ -32,10 +32,11 @@ class HyperTrainer(object):
         self._logging_dir = train_conf["logging_dir"]
         self._verbose = train_conf["verbose"]
         self._export_path = train_conf["export_path"]
+        self._pretrained_model_path = train_conf["pretrained_model_path"]
         self._auto_checkpoint_steps = train_conf["auto_checkpoint_steps"]
 
         self._tasks = train_conf["tasks"]
-        self._task_cnt = model_conf["task_cnt"]
+        self._task_cnt = model_conf["hnet"]["task_cnt"]
         self._batches_per_task_train = imgs_per_task_train // batch_size
         self._batches_per_task_val = imgs_per_task_val // batch_size
 
@@ -145,6 +146,7 @@ class HyperTrainer(object):
         # initialize networks
         model = self._hyper_model
         model.build()
+        model.load(self._pretrained_model_path, self._device)
         model.to(self._device)
 
         epochs = self._epochs

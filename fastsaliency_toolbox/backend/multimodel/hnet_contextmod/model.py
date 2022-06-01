@@ -6,7 +6,7 @@ from hypnettorch.hnets import HMLP
 from hypnettorch.mnets.mnet_interface import MainNetInterface, ContextModLayer
 
 class Decoder(nn.Module):
-    def __init__(self, model_conf, has_bias):
+    def __init__(self, mnet_conf, has_bias):
         super(Decoder, self).__init__()
         self._has_bias = has_bias
 
@@ -15,7 +15,7 @@ class Decoder(nn.Module):
             "ReLU": nn.ReLU(),
             "ReLU6": nn.ReLU6()
         }
-        self.non_lin = non_lins[model_conf["decoder_non_linearity"]]
+        self.non_lin = non_lins[mnet_conf["decoder_non_linearity"]]
 
         self.bn7_3 = nn.BatchNorm2d(num_features=512)
         self.bn8_1 = nn.BatchNorm2d(num_features=256)
@@ -83,7 +83,7 @@ class Decoder(nn.Module):
 
 
 class Student(nn.Module, MainNetInterface):
-    def __init__(self, model_conf):
+    def __init__(self, mnet_conf):
         nn.Module.__init__(self)
         MainNetInterface.__init__(self)
 
@@ -98,7 +98,7 @@ class Student(nn.Module, MainNetInterface):
 
         # build model
         self.encoder = self.mobilenetv2_pretrain()
-        self.decoder = Decoder(model_conf, has_bias=self._has_bias)
+        self.decoder = Decoder(mnet_conf, has_bias=self._has_bias)
         self.sigmoid = nn.Sigmoid()
 
         # params that will be trained by the hypernetwork
@@ -156,13 +156,15 @@ class Student(nn.Module, MainNetInterface):
 # builds a hypernetwork and mainnetwork
 def hnet_mnet_from_config(conf):
     model_conf = conf["model"]
+    hnet_conf = model_conf["hnet"]
+    mnet_conf = model_conf["mnet"]
 
-    mnet = Student(model_conf)
+    mnet = Student(mnet_conf)
     hnet = HMLP(
         mnet.external_param_shapes(), 
-        layers=model_conf["hnet_hidden_layers"], # the sizes of the hidden layers (excluding the last layer that generates the weights)
-        cond_in_size=model_conf["hnet_embedding_size"], # the size of the embeddings
-        num_cond_embs=model_conf["task_cnt"] # the number of embeddings we want to learn
+        layers=hnet_conf["hidden_layers"], # the sizes of the hidden layers (excluding the last layer that generates the weights)
+        cond_in_size=hnet_conf["embedding_size"], # the size of the embeddings
+        num_cond_embs=hnet_conf["task_cnt"] # the number of embeddings we want to learn
     )
 
     return hnet,mnet

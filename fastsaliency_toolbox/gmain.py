@@ -14,6 +14,7 @@ from backend.multimodel.hyper_model import HyperModel
 from backend.multimodel.hyper_runner import HyperRunner
 from backend.multimodel.hyper_tester import HyperTester
 from backend.multimodel.hyper_trainer import HyperTrainer
+from backend.multimodel.pretrainer import PreTrainer
 
 @click.group()
 def cli():
@@ -26,6 +27,7 @@ def version():
 
 def run_with_conf(conf, group=None, resume_id=None, ext_model=None):
     experiment_conf = conf["experiment"]
+    pretrain_conf = conf["pretrain"]
     train_conf = conf["train"]
     test_conf = conf["test"]
     run_conf = conf["run"]
@@ -49,10 +51,13 @@ def run_with_conf(conf, group=None, resume_id=None, ext_model=None):
         logging_dir = experiment_conf["logging_dir"]
         experiment_dir = os.path.abspath(os.path.join(logging_dir, experiment_name))
 
+        pretrain_conf["logging_dir"] = os.path.join(experiment_dir, "pretrain_logs")
         train_conf["logging_dir"] = os.path.join(experiment_dir, "train_logs")
         test_conf["logging_dir"] = os.path.join(experiment_dir, "test_logs")
         run_conf["logging_dir"] = os.path.join(experiment_dir, "run_logs")
 
+        pretrained_model_path = os.path.join(pretrain_conf["logging_dir"], pretrain_conf["export_path"], "best.pth")
+        train_conf["pretrained_model_path"] = pretrained_model_path
         model_path = os.path.join(train_conf["logging_dir"], train_conf["export_path"], "best.pth")
         test_conf["model_path"] = ext_model if ext_model else model_path
         run_conf["model_path"] = ext_model if ext_model else model_path
@@ -83,6 +88,7 @@ def run_with_conf(conf, group=None, resume_id=None, ext_model=None):
             print(f"Running {conf['type']} experiment")
 
             t = HyperExperiment(conf, 
+                    lambda c : PreTrainer(c, HyperModel(lambda : hnet_mnet_from_config(c), c["pretrain"]["tasks"])),
                     lambda c : HyperTrainer(c, HyperModel(lambda : hnet_mnet_from_config(c), c["train"]["tasks"])), 
                     lambda c : HyperTester(c, HyperModel(lambda : hnet_mnet_from_config(c), c["test"]["tasks"])), 
                     lambda c : HyperRunner(c, HyperModel(lambda : hnet_mnet_from_config(c), c["run"]["tasks"]))
