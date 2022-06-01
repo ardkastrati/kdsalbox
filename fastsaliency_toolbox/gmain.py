@@ -220,7 +220,7 @@ def gridsearch(skip, name, conf_file, param_grid_file, logging_dir, input_images
             bd = c["experiment"]["description"] 
             d = c
             for p in paths[0:-1]:
-                d = c[p]
+                d = d[p]
             
             for i,v in enumerate(values):
                 c["experiment"]["name"] = f"{bn} - {v}"
