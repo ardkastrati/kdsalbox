@@ -1,5 +1,5 @@
 [
-    ["model/hnet_hidden_layers", 
+    ["model/hnet/hidden_layers", 
         [
             [128, 128, 128], 
             [512, 512, 512, 512]
