@@ -146,7 +146,11 @@ class HyperTrainer(object):
         # initialize networks
         model = self._hyper_model
         model.build()
-        model.load(self._pretrained_model_path, self._device)
+        if os.path.exists(self._pretrained_model_path):
+            print(f"Load pretrained model from {self._pretrained_model_path}")
+            model.load(self._pretrained_model_path, self._device)
+        else:
+            print(f"Not using a pretrained model")
         model.to(self._device)
 
         epochs = self._epochs
