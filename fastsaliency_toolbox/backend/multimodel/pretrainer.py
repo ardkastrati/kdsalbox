@@ -29,7 +29,7 @@ class WeightDataset(Dataset):
         named_weights = {n:p.data.flatten() for n,p in model.decoder.named_parameters()}
         weights = rearrange_weights_fn(named_weights)
 
-        return torch.concat(weights)
+        return torch.cat(weights)
     
 
 
@@ -113,7 +113,7 @@ class PreTrainer(object):
 
             task_ids = task_ids.tolist()
             weights = hnet(cond_id=task_ids) 
-            weights = torch.stack([torch.concat([w.flatten() for w in batch]) for batch in weights])
+            weights = torch.stack([torch.cat([w.flatten() for w in batch]) for batch in weights])
             loss = criterion(weights, y)
 
             # training
