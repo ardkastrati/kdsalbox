@@ -1,3 +1,12 @@
+"""
+ParameterMap
+------------
+
+Represents a collection of named parameters, where each parameter has 
+a value, description and a list of valid values.
+
+"""
+
 import copy
 from typing import Any, List
 
