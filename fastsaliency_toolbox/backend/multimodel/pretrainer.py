@@ -22,7 +22,7 @@ class WeightDataset(Dataset):
         return len(self._models)
 
     def load_model_weights(self, path, rearrange_weights_fn):
-        model = stud.student()
+        model = stud.Student()
         state_dict = torch.load(path, map_location=torch.device('cpu'))
         model.load_state_dict(state_dict['student_model'])
 
@@ -84,7 +84,7 @@ class PreTrainer(object):
 
         # check if the extpected output format of the HNET matches the labels/weights loaded from the original models
         new_shapes = self._hyper_model.mnet.get_cw_param_shapes()
-        old_stud = stud.student()
+        old_stud = stud.Student()
         old_shapes = self.map_old_to_new_weights({n:p.size() for n,p in old_stud.named_parameters()}, old_stud, verbose=self._verbose) 
         assert len(new_shapes) == len(old_shapes), f"HNET output generates {len(new_shapes)} weight tensors whereas we only loaded {len(old_shapes)} into the label from the original models!"
         for new,old in zip(new_shapes, old_shapes):
@@ -95,7 +95,7 @@ class PreTrainer(object):
         model_p = [(task, os.path.join(target_model_weights, task.upper(), "exported", f"{task.lower()}.pth")) for task in self._tasks] # paths to all trained models
         model_weights = []
         for t,p in model_p:
-            model = stud.student()
+            model = stud.Student()
             state_dict = torch.load(p, map_location=torch.device('cpu'))
             model.load_state_dict(state_dict['student_model'])
             
