@@ -4,6 +4,7 @@ import scipy.misc
 import scipy.stats
 from skimage import exposure
 from skimage.exposure import match_histograms
+
 from .utils import read_saliency
 
 

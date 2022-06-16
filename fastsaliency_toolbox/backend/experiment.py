@@ -6,14 +6,9 @@ Executes Trainer, Tester and Runner in sequence.
 
 """
 
-
 import os
-import torch as t
-from torch.utils.data import DataLoader
-
-from .parameters import ParameterMap
+import torch
 import time
-import numpy as np
 
 from .runner import Runner
 from .trainer import Trainer
@@ -57,7 +52,7 @@ class Experiment(object):
             if not os.path.exists(experiment_logging_dir):
                 os.makedirs(experiment_logging_dir)
 
-            if t.cuda.is_available(): 
+            if torch.cuda.is_available(): 
                 self._model_manager.cuda(selected_model.name)
                 self.memory_check("Position 1")
 
@@ -72,9 +67,9 @@ class Experiment(object):
             execution_train = Trainer(model_manager=self._model_manager, train_parameter_map=my_train_map, preprocess_parameter_map=my_train_preprocess_map, gpu=self._gpu)
             execution_train.execute()
             
-            if t.cuda.is_available():
+            if torch.cuda.is_available():
                 del execution_train
-                t.cuda.empty_cache()
+                torch.cuda.empty_cache()
                 self.memory_check("Position 2")
 
             my_test_map = self._experiment_config.test_parameter_map.clone()
@@ -89,9 +84,9 @@ class Experiment(object):
             execution_test = Tester(model_manager=self._model_manager, test_parameter_map=my_test_map, preprocessing_parameter_map=my_test_preprocess_map, postprocessing_parameter_map=my_test_postprocess_map, gpu=self._gpu)
             execution_test.execute()
 
-            if t.cuda.is_available(): 
+            if torch.cuda.is_available(): 
                 del execution_test
-                t.cuda.empty_cache()
+                torch.cuda.empty_cache()
                 self.memory_check("Position 3")
 
             my_run_map = self._experiment_config.run_parameter_map.clone()
@@ -105,12 +100,12 @@ class Experiment(object):
             execution_run = Runner(model_manager=self._model_manager, run_parameter_map=my_run_map, postprocessing_parameter_map=my_run_postprocess_map, gpu=self._gpu)
             execution_run.execute()
 
-            if t.cuda.is_available(): 
+            if torch.cuda.is_available(): 
                 execution_run.delete()
-                t.cuda.empty_cache()
+                torch.cuda.empty_cache()
                 self.memory_check("Position 5")
                 self._model_manager.delete(selected_model.name)
-                t.cuda.empty_cache()
+                torch.cuda.empty_cache()
                 self.memory_check("Position 6")
 
     def execute(self):
@@ -121,8 +116,8 @@ class Experiment(object):
     def memory_check(self, position=None):
         print(position)
         for i in range(8):
-            print(t.cuda.memory_reserved(i))
-            print(t.cuda.memory_allocated(i))
+            print(torch.cuda.memory_reserved(i))
+            print(torch.cuda.memory_allocated(i))
             print("")
 
     

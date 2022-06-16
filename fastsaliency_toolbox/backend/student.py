@@ -11,7 +11,7 @@ Architecture:
 
 """
 
-import torch as t
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torchvision.models import mobilenet_v2
@@ -66,8 +66,6 @@ class student(nn.Module):
     def mobilenetv2_pretrain(self, pretrained=True, forward_hook_index=range(1,19,1)):
         model = mobilenet_v2(pretrained=pretrained, progress=False)
         features = list(model.features)
-        #for i, x in enumerate(features): print(i, x)
-        #exit()
         if forward_hook_index is not None:
             self.register_layers(features, forward_hook_index, 'student_encoder')
 
@@ -115,16 +113,6 @@ if __name__ == '__main__':
     m.eval()
 
     model = student()
-    checkpoint = t.load("../example.pth", map_location=t.device('cpu'))
+    checkpoint = torch.load("../example.pth", map_location=torch.device('cpu'))
     model.load_state_dict(checkpoint['student_model'])
     model.eval()
-
-#    x2 = t.ones((1,3,192,256))
-#    y = m(x)
-#    y2 = m(x2)
-#    y = y.detach().numpy()
-#    y2 = y2.detach().numpy()
-
-#    for i, prediction in enumerate(y[:, 0, :, :]):
-#        img_data = post_process_png(prediction, (256,192))
-#        print(img_data.shape)

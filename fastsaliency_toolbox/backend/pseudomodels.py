@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import os
 import json
-from .student import student
-#from image_processing import resize
 import torch
 import re
+
+from .student import student
 
 ############################################################
 # FastSaliency Models
@@ -50,7 +50,6 @@ class PseudoModel(object):
     def compute_saliency(self, img):
         self.my_student.eval()
         sal = self.my_student(img)
-        orig_shape = (img.shape[2], img.shape[3])
         return sal
 
     def cuda(self):
@@ -78,8 +77,6 @@ class ModelManager(object):
         self._pretrained = pretrained
         self._gpu = gpu
 
-        #self._models = [name for name in re.split("[ ,]", models) if name]
-        #print(self._models)
         self._model_map = self.find_and_load_models(self._models_path)
 
     def find_and_load_models(self, start_path):

@@ -7,8 +7,10 @@ Fast-Saliency Toolbox: Pseudo-models for fast saliency research. This file offer
 import os
 import torch
 import numpy as np
+
 from .image_processing import process
 from .metrics import NSS, CC, SIM
+
 HERE_PATH = os.path.dirname(os.path.realpath(__file__))
 PARENT_PATH = os.path.abspath(os.path.join(HERE_PATH, os.pardir))
 

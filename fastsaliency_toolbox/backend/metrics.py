@@ -1,7 +1,8 @@
-from functools import partial
 import numpy as np
+from functools import partial
 from numpy import random
 from skimage.transform import resize
+
 from .image_processing import normalize
 
 def AUC_Judd(saliency_map, fixation_map, jitter=True):

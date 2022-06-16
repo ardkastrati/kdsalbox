@@ -1,8 +1,8 @@
 import streamlit as st
 import numpy as np
-from PIL import Image
 import matplotlib.pyplot as plt
 import pandas as pd
+from PIL import Image
 
 # Helper functions (Just for developing)!
 def read_image(path, dtype=np.float32):

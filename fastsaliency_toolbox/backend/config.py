@@ -18,8 +18,9 @@ Look at fastsaliency_toolbox/config.json for more information.
 
 import json
 import copy
-from .parameters import ParameterMap
 import os
+
+from .parameters import ParameterMap
 
 HERE_PATH = os.path.dirname(os.path.realpath(__file__))
 PARENT_PATH = os.path.abspath(os.path.join(HERE_PATH, os.pardir))

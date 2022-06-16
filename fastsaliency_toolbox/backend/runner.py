@@ -54,7 +54,6 @@ class Runner(object):
                     image = image.cuda(torch.device(self._gpu))
                 
                 saliency_map = self._model.compute_saliency(image)
-                #print(saliency_map[0][0][140][0:10])
 
                 post_processed_image = np.clip((process(saliency_map.cpu().detach().numpy()[0, 0], self._postprocessing_parameter_map)*255).astype(np.uint8), 0, 255)
                 print(post_processed_image.shape)

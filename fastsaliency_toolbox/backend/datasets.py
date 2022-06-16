@@ -7,9 +7,9 @@ Contains custom dataset implementations for training, testing and running.
 """
 
 import os
-from torch.utils.data import Dataset
-import torch
 import numpy as np
+import torch
+from torch.utils.data import Dataset
 
 from .utils import get_image_path_tuples, read_image, read_saliency
 from .image_processing import process
@@ -57,8 +57,8 @@ class TrainDataManager(Dataset):
         return self.list_names.shape[0]
 
     def __getitem__(self, index):
-        # set path
         
+        # set path
         ima_name = self.list_names[index]+'.jpg'
         img_path = os.path.join(self.path_images, ima_name)
 
