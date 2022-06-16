@@ -59,6 +59,18 @@ You can evaluate the models for a given dataset
 ```bash
 python main.py test -m "AIM" --input_images ./path/to/input/images/ --input_saliencies ./path/to/saliency/images/
 ```
+Make sure to follow this folder structure:
+```
+./path/to/input/images/ 
+│  <some name>.jpg
+│  <some other name>.jpg
+   ...
+
+./path/to/saliency/images/
+│   <some name>.jpg
+│   <some other name>.jpg
+    ...
+```
 
 ### Training
 ```bash
