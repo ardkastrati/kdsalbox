@@ -1,13 +1,12 @@
 
+import os
+import numpy as np
 import torch
 from torch.utils.data import DataLoader
-import os
 
-import numpy as np
 from .datasets import RunDataManager
-from .image_processing import save_image, process
-from .utils import print_pretty_header
 from .image_processing import process
+from .utils import print_pretty_header, save_image
 
 class Runner(object):
     def __init__(self,

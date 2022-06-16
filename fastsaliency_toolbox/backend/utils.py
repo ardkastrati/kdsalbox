@@ -1,5 +1,7 @@
 import os
 import textwrap
+import numpy as np
+from PIL import Image
 
 
 def create_dirs_if_none(path, uid=None, gid=None):
@@ -59,8 +61,24 @@ def pretty_print_parameters(parameter_list):
         print('    None.')
 
 
-def save_image(path, image):
-    from PIL import Image
-    import numpy as np
-    result = Image.fromarray((image*255).astype(np.uint8))
+def save_image(path, image, create_parent=True, uid=None, gid=None):
+    if create_parent:
+        create_dirs_if_none(path, uid=uid, gid=gid)
+
+    result = Image.fromarray(image)
     result.save(path)
+
+
+def read_image(path, dtype=np.float32):
+    f = Image.open(path)
+    img = np.asarray(f, dtype)
+    if(len(img.shape) == 2):
+        print("FOUND SOMETHING WEIRD")
+        return None
+    return img
+
+def read_saliency(path, dtype=np.float32):
+    f = Image.open(path)
+    img = np.asarray(f, dtype)
+    return img / 255.0
+

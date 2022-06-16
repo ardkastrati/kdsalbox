@@ -1,26 +1,10 @@
-import os
 import numpy as np
-from PIL import Image, ImageCms
 import scipy.ndimage
 import scipy.misc
 import scipy.stats
 from skimage import exposure
 from skimage.exposure import match_histograms
-from .utils import create_dirs_if_none
-
-# It needs to be moved to utils! 
-def read_saliency(path, dtype=np.float32, target_size=None):
-    f = Image.open(path)
-    img = np.asarray(f, dtype)
-    return img / 255
-
-# It needs to be moved to utils! 
-def save_image(path, image, create_parent=True, uid=None, gid=None):
-    if create_parent:
-        create_dirs_if_none(path, uid=uid, gid=gid)
-
-    result = Image.fromarray(image)
-    result.save(path)
+from .utils import read_saliency
 
 
 def _gauss2d(shape=(3, 3), sigma=0.5):
