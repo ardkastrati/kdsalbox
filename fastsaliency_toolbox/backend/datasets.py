@@ -1,3 +1,11 @@
+"""
+Datasets
+--------
+
+Contains custom dataset implementations for training, testing and running.
+
+"""
+
 import os
 from torch.utils.data import Dataset
 import torch
@@ -5,16 +13,31 @@ import numpy as np
 
 from .utils import get_image_path_tuples, read_image, read_saliency
 from .image_processing import process
+from .parameters import ParameterMap
 
 ############################################################
 # Train Dataset Manager
 ############################################################
 class TrainDataManager(Dataset):
+    """
+    Loads all images from "input_images"-folder and their corresponding saliency images from "input_saliencies"-folder.
+    Expects the original image to have the same size as the saliency image.
 
-    def __init__(self, input_images, input_saliencies, verbose, preprocess_parameter_map, N=None):
+    Args:
+        input_images (str): path to a folder containing the original images [.jpg format]
+        input_saliencies (str): path to a folder continain the saliency images for all the images in input_images. 
+            The images are matched via their name. [.jpg format]
+        verbose (bool): do logging
+        preprocess_parameter_map (ParameterMap): parameter map specifying the preprocessing that will be applied to the saliency image.
+        N (int): If None then all images of the input_images folder will be loaded. Otherwise only the first N images will be used.
+
+    Yields (original image, saliency image).
+    
+    """
+    def __init__(self, input_images : str, input_saliencies : str, verbose : bool, preprocess_parameter_map : ParameterMap, N : int = None):
 
         self.verbose = verbose
-        self.path_images = input_images #os.path.join(input_dir, 'Images', mode)
+        self.path_images = input_images
         self.path_saliency = input_saliencies
         self.preprocess_parameter_map = preprocess_parameter_map
 
@@ -64,12 +87,28 @@ class TrainDataManager(Dataset):
 
         return (img, sal_img)
 
+
 ############################################################
 # Test Dataset Manager
 ############################################################
 class TestDataManager(Dataset):
 
-    def __init__(self, input_images, input_saliencies, verbose, preprocess_parameter_map, N=None):
+    """
+    Loads all images from "input_images"-folder and their corresponding saliency images from "input_saliencies"-folder.
+    Expects the original image to have the same size as the saliency image.
+
+    Args:
+        input_images (str): path to a folder containing the original images [.jpg format]
+        input_saliencies (str): path to a folder continain the saliency images for all the images in input_images. 
+            The images are matched via their name. [.jpg format]
+        verbose (bool): do logging
+        preprocess_parameter_map (ParameterMap): parameter map specifying the preprocessing that will be applied to the saliency image.
+        N (int): If None then all images of the input_images folder will be loaded. Otherwise only the first N images will be used.
+
+    Yields (original image, saliency image, image name).
+    
+    """
+    def __init__(self, input_images : str, input_saliencies : str, verbose : bool, preprocess_parameter_map : ParameterMap, N : int = None):
 
         self.verbose = verbose
         self.path_images = input_images #os.path.join(input_dir, 'Images', mode)
@@ -126,9 +165,18 @@ class TestDataManager(Dataset):
 ############################################################
 class RunDataManager(Dataset):
     """
-        Data manager for Run
+    Loads all images from "input_dir"-folder.
+
+    Args:
+        input_dir (str): path to a folder containing the original images
+        output_dir (str): path to a folder where the computed saliency images will be put
+        verbose (bool): do logging
+        recursive (bool): load images from subfolders
+
+    Yields (original image, original image path, output image path).
+    
     """
-    def __init__(self, input_dir, output_dir, verbose=False, recursive=False, N=None):
+    def __init__(self, input_dir : str, output_dir : str, verbose : bool = False, recursive : bool = False):
 
         self.verbose = verbose
         self.recursive = recursive

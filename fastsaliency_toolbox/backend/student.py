@@ -1,3 +1,16 @@
+"""
+Student
+-------
+
+The pytorch network that is used to approximate the original models.
+
+Architecture:
+    - Encoder (MobilenetV2 features)
+    - Decoder (CNN with BN layers and upsampling to achieve original input shape)
+    - Sigmoid Activation Function
+
+"""
+
 import torch as t
 import torch.nn as nn
 import torch.nn.functional as F

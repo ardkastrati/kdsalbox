@@ -1,3 +1,12 @@
+"""
+Experiment
+----------
+
+Executes Trainer, Tester and Runner in sequence.
+
+"""
+
+
 import os
 import torch as t
 from torch.utils.data import DataLoader

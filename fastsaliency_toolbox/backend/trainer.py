@@ -1,3 +1,12 @@
+"""
+Trainer
+-------
+
+Does train a student on all original images in a folder using all saliency images in a different folder. 
+Checkout the TrainDataLoader documentation for further details.
+
+"""
+
 import os
 import numpy as np
 import torch

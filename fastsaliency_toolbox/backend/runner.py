@@ -1,3 +1,10 @@
+"""
+Runner
+------
+
+Produces the saliency images for all original images in a folder for a specific model.
+
+"""
 
 import os
 import numpy as np

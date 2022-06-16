@@ -1,3 +1,21 @@
+"""
+Config
+------
+
+Configures how the training, testing etc behave.
+
+Configuration for:
+    - Preprocessing (applied to saliency images when loaded by DataLoader)
+    - Postprocessing (applied to computed saliency images)
+    - Train (trains the models using some original images and the corresponding saliency images)
+    - Test (evaluates how good the models do)
+    - Run (generates images using the trained models)
+    - Experiment (runs Train, Test and Run in sequence)
+
+Look at fastsaliency_toolbox/config.json for more information.
+
+"""
+
 import json
 import copy
 from .parameters import ParameterMap
@@ -10,7 +28,7 @@ PARENT_PATH = os.path.abspath(os.path.join(HERE_PATH, os.pardir))
 # Config
 ############################################################
 class Config(object):
-    def __init__(self, config_path=None):
+    def __init__(self, config_path : str = None):
         if config_path is None:
             config_path = os.path.join(PARENT_PATH, 'config.json') # TO BE CHECKED
 

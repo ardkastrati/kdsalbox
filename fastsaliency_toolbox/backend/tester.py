@@ -1,3 +1,12 @@
+"""
+Tester
+------
+
+Generates NSS, CC, SIM, loss metrics for all the original images in a folder.
+If per_image_statistics is enabled it will additionally log the metrics per image.
+
+"""
+
 import os
 import numpy as np
 import torch
