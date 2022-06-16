@@ -17,23 +17,34 @@ Additionally we provide a GUI on top of this toolbox to facilitate the evaluatio
 We caution the users knowledge-distilled models are not meant to replace the original models for every case in absolute sense. As they are knowledge-distilled versions they should be used always with their limitations in mind. We invite the users to consult Table 2 in our paper for an estimate of how the different knowledge-distilled models generalize to different image types. The main goal in this work is to facilitate the evaluation and the selection of saliency models for different applications. The original models that are Matlab-based are not efficient and require a Matlab license to run. Our knowledge-distilled models can be beneficial in cases where the behaviour of the original models is better and efficiency is important.
 
 ## Installation (Environment)
+This toolbox requires additional python packages to be installed.
+We recommend using the conda package manager.
 
-There are dependencies in this toolbox and we propose to use anaconda as package manager.
+### Conda
+Make sure you have conda installed (for details on how to install `conda`, please refer to the [official documentation][5].)
+1. Clone the repo
+2. Create a new conda environment
+   ```console
+   $ conda create --name kdsalbox python=3.8
+   $ conda activate kdsalbox
+   ```
+3. Install the required packages
+   ```console
+   $ cd kdsalbox/fastsaliency_toolbox
+   $ pip install -r requirements.txt
+   ```
 
-You can install the dependencies inside a conda environment as follows:
-
-```console
-$ git clone 
-$ cd kdsalbox/fastsaliency_toolbox/
-$ conda create --name kdsalbox python=3.8
-$ conda activate kdsalbox
-```
-(For details on how to install `conda`, please refer to the [official documentation][5].)
 
 ## Usage of Toolbox
 
 You can use the toolbox mainly for the following three functions: train, test, run. With the train procedure you can use our pipeline to knowledge-distill our models or new models. Testing can be used to evaluate previous models. Finally, running can be used to run the models in a given dataset and produce the saliency maps. In the following we describe these in more details.
 
+### UI
+You can start the streamlit UI by:
+```console
+$ cd kdsalbox/fastsaliency_toolbox
+$ streamlit run app.py
+```
 
 ### Running
 You can run a model by simply specifying the name of the model, the path to the input folder and the path to output folder as follows:
@@ -54,6 +65,26 @@ python main.py test -m "AIM" --input_images ./path/to/input/images/ --input_sali
 python main.py train -m "AIM" --input_images ./path/to/input/images/ --input_saliencies ./path/to/saliency/images/
 ```
 
+Make sure to follow this folder structure:
+```
+./path/to/input/images/ 
+│
+└─── train
+│   │   <some name>.jpg
+│   │   <some other name>.jpg
+│       ...
+└─── val
+    │   <another name>.jpg
+        ...
+
+./path/to/saliency/images/
+│   <some name>.jpg
+│   <some other name>.jpg
+|   <another name>.jpg
+    ...
+```
+
+
 ## Configuration
 
 There are more detailed configurations that you can do for each function (train, test, run) in more detail in the config.json file.
@@ -67,4 +98,4 @@ Parameter | Default | Description
 `verbose` | True | Whether the procedure should print the progress
 
 [1]: https://tik-db.ee.ethz.ch/file/ce39d039b49f33a066d08e1c0ecb12f0/KDSalBox.pdf
-[5]: https://conda.io/docs/user-guide/install/index.html
+[5]: https://docs.conda.io/en/latest/
