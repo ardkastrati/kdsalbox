@@ -2,12 +2,24 @@
 # -*- coding: utf-8 -*-
 """
 Fast-Saliency Toolbox: Pseudo-models for fast saliency research.
+
+Available Commands:
+    - Train (trains the models using some original images and the corresponding saliency images) 
+        [python main.py train <ARGUMENTS>]
+    - Test (evaluates how good the models do)
+        [python main.py test <ARGUMENTS>]
+    - Run (generates images using the trained models)
+        [python main.py run <ARGUMENTS>]
+    - Experiment (runs Train, Test and Run in sequence)
+        [python main.py experiment <ARGUMENTS>]
+
+    - python main.py version
+
+    Check out the commands to see all the supported arguments.
+
 """
 
-import sys
 import os
-import subprocess
-
 import click
 
 
@@ -174,7 +186,7 @@ def train(model, histogram_matching, scale, blur, center_prior, logging_dir, inp
 
         c.train_parameter_map.pretty_print()
         from backend.trainer import Trainer
-        t = Trainer(m, c.train_parameter_map)
+        t = Trainer(m, c.train_parameter_map, c.preprocessing_parameter_map)
         t.execute()
 
     except ValueError as e:

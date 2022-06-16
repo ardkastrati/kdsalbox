@@ -1,9 +1,9 @@
 # Load important libraries 
 import pandas as pd
 import streamlit as st 
-from PIL import Image
 import numpy as np
 import pandas as pd
+from PIL import Image
 
 @st.cache
 def compute_sali(model_name, img):

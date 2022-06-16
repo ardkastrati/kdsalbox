@@ -7,13 +7,16 @@ Fast-Saliency Toolbox: Pseudo-models for fast saliency research. This file offer
 import os
 import torch
 import numpy as np
+
+from .parameters import ParameterMap
 from .image_processing import process
 from .metrics import NSS, CC, SIM
+
 HERE_PATH = os.path.dirname(os.path.realpath(__file__))
 PARENT_PATH = os.path.abspath(os.path.join(HERE_PATH, os.pardir))
 
 class Interface:
-    def __init__(self, pretrained_models_path='./models/', gpu=-1):
+    def __init__(self, pretrained_models_path : str = './models/', gpu : int = -1):
         self._gpu = 'cuda:' + str(gpu)
         from .pseudomodels import ModelManager
         from .config import Config
@@ -31,14 +34,14 @@ class Interface:
                 self.memory_check("Position 1")
         print(self._model_manager._model_map)
 
-    def memory_check(self, position=None):
+    def memory_check(self, position = None):
         print(position)
         for i in range(8):
             print(torch.cuda.memory_reserved(i))
             print(torch.cuda.memory_allocated(i))
             print("")
 
-    def postprocess(self, sal_map, postprocessing_parameter_map):
+    def postprocess(self, sal_map : torch.Tensor, postprocessing_parameter_map : ParameterMap) -> torch.Tensor:
         my_map = postprocessing_parameter_map.clone()
         postprocessed = process(sal_map, my_map)
         return np.interp(postprocessed, (postprocessed.min(), postprocessed.max()), (0, 1))

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import os
 import json
-from .student import student
-#from image_processing import resize
 import torch
 import re
+
+from .student import Student
 
 ############################################################
 # FastSaliency Models
@@ -35,11 +35,11 @@ class PseudoModel(object):
         if None in (self.name, self.original_model_name, self.student_path, self.model_type, self.version):
             raise ValueError("Invalid pseudomodel.json file contents.")
 
-        self.my_student = student()
+        self.my_student = Student()
         if self.pretrained:
             self.update_weights(os.path.join(self.root_path, self.student_path))
 
-    def update_weights(self, path):
+    def update_weights(self, path : str):
         print("Updating weights")
         if torch.cuda.is_available():
             checkpoint = torch.load(path, map_location=torch.device('cuda'))
@@ -47,10 +47,9 @@ class PseudoModel(object):
             checkpoint = torch.load(path, map_location=torch.device('cpu'))
         self.my_student.load_state_dict(checkpoint['student_model'])
 
-    def compute_saliency(self, img):
+    def compute_saliency(self, img : torch.Tensor) -> torch.Tensor:
         self.my_student.eval()
         sal = self.my_student(img)
-        orig_shape = (img.shape[2], img.shape[3])
         return sal
 
     def cuda(self):
@@ -72,17 +71,15 @@ class PseudoModel(object):
 # Model Manager
 ############################################################
 class ModelManager(object):
-    def __init__(self, models_path, verbose, pretrained=False, gpu='cuda:0'):
+    def __init__(self, models_path : str, verbose : bool, pretrained : bool = False, gpu : str = 'cuda:0'):
         self._models_path = models_path
         self._verbose = verbose
         self._pretrained = pretrained
         self._gpu = gpu
 
-        #self._models = [name for name in re.split("[ ,]", models) if name]
-        #print(self._models)
         self._model_map = self.find_and_load_models(self._models_path)
 
-    def find_and_load_models(self, start_path):
+    def find_and_load_models(self, start_path : str):
         print("Entered Find and Load Models")
         def _yield_all_pseudomodel_jsons(start_path):
             for dirpath, dirnames, filenames in os.walk(start_path):
@@ -99,7 +96,7 @@ class ModelManager(object):
         print("Finished with that")
         return models
 
-    def load_model(self, pseudomodel_json_path, models=None):
+    def load_model(self, pseudomodel_json_path : str):
         try:
             with open(pseudomodel_json_path) as fp:
                 model_data = json.load(fp)
@@ -113,14 +110,14 @@ class ModelManager(object):
         model_data['gpu'] = self._gpu
         return PseudoModel(**model_data)
 
-    def cuda(self, model_name):
+    def cuda(self, model_name : str):
         if model_name.lower() in self._model_map:
             self._model_map[model_name.lower()].cuda()
         else:
             msg = """Unknown model name '{}'.""".format(model_name)
             raise ValueError(msg)
 
-    def delete(self, model_name):
+    def delete(self, model_name : str):
         if model_name.lower() in self._model_map:
             self._model_map[model_name.lower()].delete()
             del self._model_map[model_name.lower()]
@@ -128,21 +125,21 @@ class ModelManager(object):
             msg = """Unknown model name '{}'.""".format(model_name)
             raise ValueError(msg)
 
-    def update_model(self, model_name, student_path):
+    def update_model(self, model_name : str, student_path : str):
         if model_name.lower() in self._model_map:
             self._model_map[model_name.lower()].update_weights(student_path)
         else:
             msg = """Unknown model name '{}'.""".format(model_name)
             raise ValueError(msg)
 
-    def get_matching(self, model_name):
+    def get_matching(self, model_name : str):
         if model_name.lower() in self._model_map:
             return self._model_map[model_name.lower()]
         else:
             msg = """Unknown model name '{}'.""".format(model_name)
             raise ValueError(msg)
 
-    def get_matchings(self, model_names):
+    def get_matchings(self, model_names : str):
         clean_names = [name for name in re.split("[ ,]", model_names) if name]
         result = set()
         for name in clean_names:

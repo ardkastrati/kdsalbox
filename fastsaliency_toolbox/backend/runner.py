@@ -1,19 +1,29 @@
+"""
+Runner
+------
 
+Produces the saliency images for all original images in a folder for a specific model.
+
+"""
+
+import os
+import numpy as np
 import torch
 from torch.utils.data import DataLoader
-import os
 
-import numpy as np
+
 from .datasets import RunDataManager
-from .image_processing import save_image, process
-from .utils import print_pretty_header
+from .pseudomodels import ModelManager
+from .parameters import ParameterMap
 from .image_processing import process
+from .utils import print_pretty_header, save_image
 
 class Runner(object):
     def __init__(self,
-                 model_manager,
-                 run_parameter_map,
-                 postprocessing_parameter_map, gpu=0):
+                 model_manager : ModelManager,
+                 run_parameter_map : ParameterMap,
+                 postprocessing_parameter_map : ParameterMap, 
+                 gpu : int = 0):
 
         self._model = model_manager.get_matching(run_parameter_map.get_val('model'))
         self._input_dir = run_parameter_map.get_val('input_images')
@@ -48,7 +58,6 @@ class Runner(object):
                     image = image.cuda(torch.device(self._gpu))
                 
                 saliency_map = self._model.compute_saliency(image)
-                #print(saliency_map[0][0][140][0:10])
 
                 post_processed_image = np.clip((process(saliency_map.cpu().detach().numpy()[0, 0], self._postprocessing_parameter_map)*255).astype(np.uint8), 0, 255)
                 print(post_processed_image.shape)
