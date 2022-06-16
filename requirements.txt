@@ -8,4 +8,7 @@ click
 scikit-image==0.18.3
 streamlit==0.89.0
 scikit-learn
+learn2learn
+hypnettorch
+wandb
 # Python 3.8 (worked for me, maybe newer versions of Python will need newer versions of the librarier, but generally it should work)

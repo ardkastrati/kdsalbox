@@ -5,7 +5,6 @@ from PIL import Image
 
 from .parameters import ParameterMap
 
-
 def create_dirs_if_none(path : str):
     parent_path = os.path.dirname(path)
     if not os.path.isdir(parent_path):
@@ -72,8 +71,8 @@ def read_image(path : str, dtype=np.float32):
         return None
     return img
 
+
 def read_saliency(path : str, dtype=np.float32):
     f = Image.open(path)
     img = np.asarray(f, dtype)
     return img / 255.0
-

@@ -34,7 +34,6 @@ Make sure you have conda installed (for details on how to install `conda`, pleas
    $ pip install -r requirements.txt
    ```
 
-
 ## Usage of Toolbox
 
 You can use the toolbox mainly for the following three functions: train, test, run. With the train procedure you can use our pipeline to knowledge-distill our models or new models. Testing can be used to evaluate previous models. Finally, running can be used to run the models in a given dataset and produce the saliency maps. In the following we describe these in more details.
