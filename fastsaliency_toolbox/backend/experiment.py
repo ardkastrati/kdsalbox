@@ -10,21 +10,22 @@ import os
 import torch
 import time
 
+from .config import Config
 from .runner import Runner
 from .trainer import Trainer
 from .tester import Tester
+from .pseudomodels import ModelManager
 
 HERE_PATH = os.path.dirname(os.path.realpath(__file__))
 
 class Experiment(object):
-    def __init__(self, c, gpu):
+    def __init__(self, config : Config, gpu : int):
         self._gpu = 'cuda:' + str(gpu)
-        from .pseudomodels import ModelManager
-        self._model_manager = ModelManager('models/', verbose=c.experiment_parameter_map.get_val("verbose"), pretrained=False, gpu=self._gpu)
+        self._model_manager = ModelManager('models/', verbose=config.experiment_parameter_map.get_val("verbose"), pretrained=False, gpu=self._gpu)
         print(self._model_manager._model_map)
-        self._experiment_config = c.clone()
+        self._experiment_config = config.clone()
 
-        c.experiment_parameter_map.pretty_print()
+        config.experiment_parameter_map.pretty_print()
 
         self._executions = []
 
@@ -113,7 +114,7 @@ class Experiment(object):
             print("EXECUTION IS STARTING")
             execution.execute()
 
-    def memory_check(self, position=None):
+    def memory_check(self, position : str = None):
         print(position)
         for i in range(8):
             print(torch.cuda.memory_reserved(i))
@@ -123,11 +124,9 @@ class Experiment(object):
     
 
 if __name__ == '__main__':
-    from pseudomodels import ModelManager
     m = ModelManager('../models/', verbose=True, pretrained=False)
     print(m._model_map)
 
-    from config import Config
     c = Config('../config.json')
     c.train_parameter_map.pretty_print()
     c.test_parameter_map.pretty_print()

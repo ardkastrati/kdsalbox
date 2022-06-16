@@ -56,7 +56,7 @@ class TrainDataManager(Dataset):
     def __len__(self):
         return self.list_names.shape[0]
 
-    def __getitem__(self, index):
+    def __getitem__(self, index : int):
         
         # set path
         ima_name = self.list_names[index]+'.jpg'
@@ -130,7 +130,7 @@ class TestDataManager(Dataset):
     def __len__(self):
         return self.list_names.shape[0]
 
-    def __getitem__(self, index):
+    def __getitem__(self, index : int):
         # set path
         ima_name = self.list_names[index]+'.jpg'
         img_path = os.path.join(self.path_images, ima_name)
@@ -191,7 +191,7 @@ class RunDataManager(Dataset):
     def __len__(self):
         return self.num_paths
 
-    def __getitem__(self, index):
+    def __getitem__(self, index : int):
         input_path = self.image_path_tuples[index][0]
         output_path = self.image_path_tuples[index][1]
 

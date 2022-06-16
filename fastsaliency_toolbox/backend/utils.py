@@ -3,14 +3,16 @@ import textwrap
 import numpy as np
 from PIL import Image
 
+from .parameters import ParameterMap
 
-def create_dirs_if_none(path):
+
+def create_dirs_if_none(path : str):
     parent_path = os.path.dirname(path)
     if not os.path.isdir(parent_path):
         os.makedirs(parent_path)
 
 
-def get_image_path_tuples(input_dir, output_dir, recursive=False):
+def get_image_path_tuples(input_dir : str, output_dir : str, recursive : bool = False):
     if recursive:
         image_path_map = {}
         for dirpath, dirnames, filenames in os.walk(input_dir):
@@ -31,13 +33,13 @@ def get_image_path_tuples(input_dir, output_dir, recursive=False):
     return sorted(image_path_map.items())
 
 
-def print_pretty_header(header_text, width=60):
+def print_pretty_header(header_text : str, width : int = 60):
     print("*" * width)
     print(" {} ".format(header_text).center(width, "*"))
     print("*" * width)
 
 
-def pretty_print_parameters(parameter_list):
+def pretty_print_parameters(parameter_list : ParameterMap):
     parameters = sorted(parameter_list, key=lambda x: x.name)
     if parameters:
         for param in parameters:
@@ -54,7 +56,7 @@ def pretty_print_parameters(parameter_list):
         print('    None.')
 
 
-def save_image(path, image, create_parent=True):
+def save_image(path : str, image, create_parent : bool = True):
     if create_parent:
         create_dirs_if_none(path)
 
@@ -62,7 +64,7 @@ def save_image(path, image, create_parent=True):
     result.save(path)
 
 
-def read_image(path, dtype=np.float32):
+def read_image(path : str, dtype=np.float32):
     f = Image.open(path)
     img = np.asarray(f, dtype)
     if(len(img.shape) == 2):
@@ -70,7 +72,7 @@ def read_image(path, dtype=np.float32):
         return None
     return img
 
-def read_saliency(path, dtype=np.float32):
+def read_saliency(path : str, dtype=np.float32):
     f = Image.open(path)
     img = np.asarray(f, dtype)
     return img / 255.0

@@ -31,7 +31,7 @@ PARENT_PATH = os.path.abspath(os.path.join(HERE_PATH, os.pardir))
 class Config(object):
     def __init__(self, config_path : str = None):
         if config_path is None:
-            config_path = os.path.join(PARENT_PATH, 'config.json') # TO BE CHECKED
+            config_path = os.path.join(PARENT_PATH, 'config.json') # TODO: TO BE CHECKED
 
         with open(config_path, 'rb') as fp:
             self._config = json.load(fp)
@@ -67,8 +67,10 @@ class Config(object):
         print("Test parameters:  --------------------------------------------------------")
         self.test_parameter_map.pretty_print()
 
-    def update(self, model=None, do_smoothing=None, smooth_size=None, smooth_std=None, smooth_prop=None, scale_output=None, scale_min=None, scale_max=None, 
-               center_prior=None, center_prior_prop=None, center_prior_weight=None, center_prior_scale_first=None):
+    def update(self, model : str = None, 
+        do_smoothing : str = None, smooth_size : float = None, smooth_std : float = None, smooth_prop : float = None, 
+        scale_output : str = None, scale_min : float = None, scale_max : float = None, 
+        center_prior : str = None, center_prior_prop : float = None, center_prior_weight : float = None, center_prior_scale_first : bool = None):
         
         if model is not None:
             self.run_parameter_map.set(name="model", value=model)

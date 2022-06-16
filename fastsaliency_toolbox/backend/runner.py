@@ -11,15 +11,19 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader
 
+
 from .datasets import RunDataManager
+from .pseudomodels import ModelManager
+from .parameters import ParameterMap
 from .image_processing import process
 from .utils import print_pretty_header, save_image
 
 class Runner(object):
     def __init__(self,
-                 model_manager,
-                 run_parameter_map,
-                 postprocessing_parameter_map, gpu=0):
+                 model_manager : ModelManager,
+                 run_parameter_map : ParameterMap,
+                 postprocessing_parameter_map : ParameterMap, 
+                 gpu : int = 0):
 
         self._model = model_manager.get_matching(run_parameter_map.get_val('model'))
         self._input_dir = run_parameter_map.get_val('input_images')

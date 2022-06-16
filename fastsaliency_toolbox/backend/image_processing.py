@@ -5,6 +5,7 @@ import scipy.stats
 from skimage import exposure
 from skimage.exposure import match_histograms
 
+from .parameters import ParameterMap
 from .utils import read_saliency
 
 
@@ -22,7 +23,7 @@ def _gauss2d(shape=(3, 3), sigma=0.5):
         h /= sumh
     return h
 
-def process(img, parameter_map):
+def process(img, parameter_map : ParameterMap):
     """Pre-processes/Post-process saliency images based on options generated from config ParameterMap.
 
 	Args:

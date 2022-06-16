@@ -12,15 +12,22 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader
 
-from .utils import print_pretty_header
+from .student import Student
+from .parameters import ParameterMap
+from .pseudomodels import ModelManager
 from .datasets import TestDataManager
 from .metrics import NSS, CC, SIM
 from .image_processing import process
+from .utils import print_pretty_header
 
 class Tester(object):
     def __init__(self,
-                 model_manager,
-                 test_parameter_map, preprocessing_parameter_map, postprocessing_parameter_map, gpu=0):
+                 model_manager : ModelManager,
+                 test_parameter_map : ParameterMap, 
+                 preprocessing_parameter_map : ParameterMap, 
+                 postprocessing_parameter_map : ParameterMap, 
+                 gpu : int = 0):
+
 
         self._model = model_manager.get_matching(test_parameter_map.get_val('model'))
         self._logging_dir = test_parameter_map.get_val('logging_dir')
@@ -41,12 +48,12 @@ class Tester(object):
         ds_test = TestDataManager(self._input_images, self._input_saliencies, self._verbose, self._preprocessing_parameter_map)
         self._dataloader = DataLoader(ds_test, batch_size=self._batch_size, shuffle=False, num_workers=4)
 
-    def pretty_print(self, epoch, mode, loss, lr):
+    def pretty_print(self, epoch : int, mode : str, loss : float, lr : float):
         print('--------------------------------------------->>>>>>')
         print('Epoch {}: loss {} {}, lr {}'.format(epoch, mode, loss, lr))
         print('--------------------------------------------->>>>>>')
     
-    def test_one(self, model, dataloader):
+    def test_one(self, model : Student, dataloader : DataLoader):
         all_names, all_loss, all_NSS, all_CC, all_SIM = [], [], [], [], []
         my_loss = torch.nn.BCELoss()
 

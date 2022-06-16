@@ -4,7 +4,7 @@ class ParameterMap(object):
     def __init__(self):
         self._parameters = {}
 
-    def set_from_dict(self, parameter_dict):
+    def set_from_dict(self, parameter_dict : dict):
         for name, properties in parameter_dict.items():
             if not isinstance(properties, dict):
                 raise ValueError(
@@ -16,7 +16,7 @@ class ParameterMap(object):
                 description=properties.get('description'),
                 valid_values=properties.get('valid_values'))
 
-    def set(self, name, value, description=None, valid_values=None):
+    def set(self, name, value, description = None, valid_values = None):
         if name in self._parameters:
             self._parameters[name].update(
                 value, description=description, valid_values=valid_values)

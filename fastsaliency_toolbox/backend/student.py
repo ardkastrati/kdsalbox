@@ -15,6 +15,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torchvision.models import mobilenet_v2
+from typing import List
 
 class Decoder(nn.Module):
     def __init__(self):
@@ -38,7 +39,7 @@ class Decoder(nn.Module):
         self.conv10_2 = nn.Conv2d(64, 64, kernel_size=3, padding=1)
         self.output = nn.Conv2d(64, 1, kernel_size=1, padding=0)
         
-    def forward(self, xb):
+    def forward(self, xb : torch.Tensor) -> torch.Tensor:
         xb = F.relu(self.bn7_3(self.conv7_3(xb)))
         xb = self.upsample(xb)
         xb = F.relu(self.bn8_1(self.conv8_1(xb)))
@@ -54,16 +55,16 @@ class Decoder(nn.Module):
         return self.output(xb)
 
 
-class student(nn.Module):
+class Student(nn.Module):
     def __init__(self):
-        super(student, self).__init__()
+        super(Student, self).__init__()
         self.activation = {}
         self.encoder = self.mobilenetv2_pretrain()
         self.decoder = self.simple_decoder()
         self.sigmoid = nn.Sigmoid()
 
 
-    def mobilenetv2_pretrain(self, pretrained=True, forward_hook_index=range(1,19,1)):
+    def mobilenetv2_pretrain(self, pretrained : bool = True, forward_hook_index=range(1,19,1)):
         model = mobilenet_v2(pretrained=pretrained, progress=False)
         features = list(model.features)
         if forward_hook_index is not None:
@@ -75,7 +76,7 @@ class student(nn.Module):
     def simple_decoder(self):
         return Decoder()
 
-    def forward(self, inputs):
+    def forward(self, inputs : torch.Tensor) -> torch.Tensor:
         enc = self.encoder(inputs)
         student_e = self.get_student_features(range(0, 18, 1), 'student_encoder')
         self.last = student_e[17]
@@ -83,12 +84,12 @@ class student(nn.Module):
         prob = self.sigmoid(dec)
         return prob
 
-    def register_layers(self, model, name_list, prefix):
+    def register_layers(self, model : nn.Module, name_list : List[str], prefix : str) -> nn.Module:
         for i, idx in enumerate(name_list):
             model[idx].register_forward_hook(self.get_activation(prefix+'_{}'.format(i)))
         return model
 
-    def get_student_features(self, name_list, prefix):
+    def get_student_features(self, name_list : List[str], prefix : str):
         data = []
         for name in name_list:
             data.append(self.activation[prefix+'_{}'.format(name)])
@@ -103,16 +104,16 @@ class student(nn.Module):
             param.requires_grad_(True)
 
     
-    def get_activation(self, name):
+    def get_activation(self, name : str):
         def hook(model, input, output):
             self.activation[name] = output
         return hook
 
 if __name__ == '__main__':
-    m = student()
+    m = Student()
     m.eval()
 
-    model = student()
+    model = Student()
     checkpoint = torch.load("../example.pth", map_location=torch.device('cpu'))
     model.load_state_dict(checkpoint['student_model'])
     model.eval()
