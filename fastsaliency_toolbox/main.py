@@ -16,7 +16,7 @@ Available Commands:
     - python main.py version
 
     Check out the commands to see all the supported arguments.
-    
+
 """
 
 import os
@@ -186,7 +186,7 @@ def train(model, histogram_matching, scale, blur, center_prior, logging_dir, inp
 
         c.train_parameter_map.pretty_print()
         from backend.trainer import Trainer
-        t = Trainer(m, c.train_parameter_map)
+        t = Trainer(m, c.train_parameter_map, c.preprocessing_parameter_map)
         t.execute()
 
     except ValueError as e:
