@@ -20,6 +20,7 @@ cucumber-report.json
 **/.vscode-test/**
 **/.vscode test/**
 **/.vscode-smoke/**
+**/.vscode/**
 **/.venv*/
 port.txt
 precommit.hook
