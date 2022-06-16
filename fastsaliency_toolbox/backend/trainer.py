@@ -48,9 +48,6 @@ class Trainer(object):
         d = {}
         d['student_model'] = model.state_dict()
         torch.save(d, path)
-        #if optimizer:
-        #    d['optimizer'] = optimizer.state_dict()
-        #t.save(d, path)
         
     def save_weight(self, smallest_val, best_epoch, best_model, loss_val, epoch, model, checkpoint_dir):
         path = '{}/{}_{:f}.pth'.format(checkpoint_dir, epoch, loss_val)
@@ -76,9 +73,8 @@ class Trainer(object):
             print("")
     
     def train_one(self, model, dataloader, optimizer, mode):
-        all_loss, all_NSS, all_CC, all_SIM = [], [], [], []
+        all_loss = []
         my_loss = torch.nn.BCELoss()
-        # my_loss = lambda s_map1, s_map2: kldiv(s_map1, s_map2) - nss(s_map1, s_map2) - cc(s_map1, s_map2)
         
         for i, (X, y) in enumerate(dataloader[mode]):   
             optimizer.zero_grad()
@@ -112,11 +108,6 @@ class Trainer(object):
     def start_train(self):
         if self._verbose: print("Encoder frozen...")
         student = self._model.get_student()
-
-        #def count_parameters(model):
-        #    return sum(p.numel() for p in model.parameters() if p.requires_grad)
-        #print(count_parameters(student))
-        #print(count_parameters(student.encoder))
 
         lr = 0.01
         lr_decay = 0.1

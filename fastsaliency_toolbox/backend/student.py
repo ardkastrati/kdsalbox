@@ -103,7 +103,7 @@ class student(nn.Module):
             param.requires_grad_(True)
 
     
-    def get_activation(self,name):
+    def get_activation(self, name):
         def hook(model, input, output):
             self.activation[name] = output
         return hook

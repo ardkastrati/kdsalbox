@@ -66,9 +66,9 @@ class TrainDataManager(Dataset):
         sal_path = os.path.join(self.path_saliency, ima_name)
 
         # IMAGE
-        img = read_image(img_path) # Needs to be able to take the shape and put it to saliency for generality (some models can be weird)
+        img = read_image(img_path) # TODO: Needs to be able to take the shape and put it to saliency for generality (some models can be weird)
 
-        if img is None:
+        if img is None: # TODO: could cause index out of bounds!
             ima_name = self.list_names[index + 1]+'.jpg'
             img_path = os.path.join(self.path_images, ima_name)
 
