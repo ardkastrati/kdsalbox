@@ -45,61 +45,68 @@ def run_with_conf(conf, group=None, resume_id=None, ext_model=None):
 
     original_logging_dir = experiment_conf["logging_dir"]
     wandb.login()
-    with wandb.init(project="kdsalbox-generalization", entity="ba-yanickz", name=experiment_name, config=conf, group=group, id=resume_id, resume=resume, notes=experiment_description, reinit=True):
-        # build & update paths relative to wandb run dir
-        experiment_conf["logging_dir"] = os.path.join(wandb.run.dir, experiment_conf["logging_dir"])
-        logging_dir = experiment_conf["logging_dir"]
-        experiment_dir = os.path.abspath(os.path.join(logging_dir, experiment_name))
 
-        pretrain_conf["logging_dir"] = os.path.join(experiment_dir, "pretrain_logs")
-        train_conf["logging_dir"] = os.path.join(experiment_dir, "train_logs")
-        test_conf["logging_dir"] = os.path.join(experiment_dir, "test_logs")
-        run_conf["logging_dir"] = os.path.join(experiment_dir, "run_logs")
+    run = wandb.init(project="kdsalbox-generalization", entity="ba-yanickz", 
+        name=experiment_name, notes=experiment_description, group=group, 
+        id=resume_id, resume=resume,  reinit=True, 
+        config=conf, settings=wandb.Settings(start_method="fork"))
 
-        pretrained_model_path = os.path.join(pretrain_conf["logging_dir"], pretrain_conf["export_path"], "best.pth")
-        train_conf["pretrained_model_path"] = pretrained_model_path
-        model_path = os.path.join(train_conf["logging_dir"], train_conf["export_path"], "best.pth")
-        test_conf["model_path"] = ext_model if ext_model else model_path
-        run_conf["model_path"] = ext_model if ext_model else model_path
+    # build & update paths relative to wandb run dir
+    experiment_conf["logging_dir"] = os.path.join(wandb.run.dir, experiment_conf["logging_dir"])
+    logging_dir = experiment_conf["logging_dir"]
+    experiment_dir = os.path.abspath(os.path.join(logging_dir, experiment_name))
 
-        # DO NOT FURTHER ADJUST THE CONF FROM THIS POINT ON
+    pretrain_conf["logging_dir"] = os.path.join(experiment_dir, "pretrain_logs")
+    train_conf["logging_dir"] = os.path.join(experiment_dir, "train_logs")
+    test_conf["logging_dir"] = os.path.join(experiment_dir, "test_logs")
+    run_conf["logging_dir"] = os.path.join(experiment_dir, "run_logs")
 
-        # save the current config file into the experiment folder
-        if resuming and not ext_model:
-            rel_model_path = os.path.relpath(model_path, wandb.run.dir).replace("\\", "/") # wandb expects linux path
-            wandb.restore(rel_model_path)
-        else:
-            config_dump = os.path.join(experiment_dir, "used_config.json")
-            print(config_dump)
-            os.makedirs(os.path.dirname(config_dump), exist_ok=True)
-            with open(config_dump, "w") as f:
-                json.dump(conf, f, indent=4)
-            wandb.save(config_dump, base_path=wandb.run.dir)
+    pretrained_model_path = os.path.join(pretrain_conf["logging_dir"], pretrain_conf["export_path"], "best.pth")
+    train_conf["pretrained_model_path"] = pretrained_model_path
+    model_path = os.path.join(train_conf["logging_dir"], train_conf["export_path"], "best.pth")
+    test_conf["model_path"] = ext_model if ext_model else model_path
+    run_conf["model_path"] = ext_model if ext_model else model_path
 
-        try:
-            from backend.multimodel.hnet_contextmod.model import hnet_mnet_from_config as hmfc_contextmod
-            from backend.multimodel.hnet_full_chunked.model import hnet_mnet_from_config as hmfc_full_chunked
-            hnet_mnet_from_config = None
-            if conf["type"] == "contextmod":
-                hnet_mnet_from_config = hmfc_contextmod
-            elif conf["type"] == "full_chunked":
-                hnet_mnet_from_config = hmfc_full_chunked
+    # DO NOT FURTHER ADJUST THE CONF FROM THIS POINT ON
 
-            print(f"Running {conf['type']} experiment")
+    # save the current config file into the experiment folder
+    if resuming and not ext_model:
+        rel_model_path = os.path.relpath(model_path, wandb.run.dir).replace("\\", "/") # wandb expects linux path
+        wandb.restore(rel_model_path)
+    else:
+        config_dump = os.path.join(experiment_dir, "used_config.json")
+        print(config_dump)
+        os.makedirs(os.path.dirname(config_dump), exist_ok=True)
+        with open(config_dump, "w") as f:
+            json.dump(conf, f, indent=4)
+        wandb.save(config_dump, base_path=wandb.run.dir)
 
-            t = HyperExperiment(conf, 
-                    lambda c : PreTrainer(c, HyperModel(lambda : hnet_mnet_from_config(c), c["pretrain"]["tasks"])),
-                    lambda c : HyperTrainer(c, HyperModel(lambda : hnet_mnet_from_config(c), c["train"]["tasks"])), 
-                    lambda c : HyperTester(c, HyperModel(lambda : hnet_mnet_from_config(c), c["test"]["tasks"])), 
-                    lambda c : HyperRunner(c, HyperModel(lambda : hnet_mnet_from_config(c), c["run"]["tasks"]))
-                )
-            t.execute()
+    try:
+        from backend.multimodel.hnet_contextmod.model import hnet_mnet_from_config as hmfc_contextmod
+        from backend.multimodel.hnet_full_chunked.model import hnet_mnet_from_config as hmfc_full_chunked
+        hnet_mnet_from_config = None
+        if conf["type"] == "contextmod":
+            hnet_mnet_from_config = hmfc_contextmod
+        elif conf["type"] == "full_chunked":
+            hnet_mnet_from_config = hmfc_full_chunked
 
-        except ValueError as e:
-            print(str(e))
-            exit(64)
+        print(f"Running {conf['type']} experiment")
 
-        experiment_conf["logging_dir"] = original_logging_dir # reset the logging dir for the next run, the other paths are then built ontop of it
+        t = HyperExperiment(conf, 
+                lambda c : PreTrainer(c, HyperModel(lambda : hnet_mnet_from_config(c), c["pretrain"]["tasks"])),
+                lambda c : HyperTrainer(c, HyperModel(lambda : hnet_mnet_from_config(c), c["train"]["tasks"])), 
+                lambda c : HyperTester(c, HyperModel(lambda : hnet_mnet_from_config(c), c["test"]["tasks"])), 
+                lambda c : HyperRunner(c, HyperModel(lambda : hnet_mnet_from_config(c), c["run"]["tasks"]))
+            )
+        t.execute()
+
+    except ValueError as e:
+        print(str(e))
+        exit(64)
+
+    run.finish()
+
+    experiment_conf["logging_dir"] = original_logging_dir # reset the logging dir for the next run, the other paths are then built ontop of it
 
 ########################################
 # Generalization - Experiment
