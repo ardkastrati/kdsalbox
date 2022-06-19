@@ -1,44 +1,49 @@
+"""
+Trainer
+-------
+
+Trains a hypernetwork and mainnetwork on multiple tasks at the same time
+and reports the progress and metrics to wandb.
+
+TODO: add a lot more documentation here about all the parameters
+
+"""
+
 import os
 import numpy as np
 import torch
 from torch.utils.data import DataLoader
-
 import wandb
 
-from backend.utils import print_pretty_header
 from backend.datasets import TrainDataManager, RunDataManager
 from backend.parameters import ParameterMap
 from backend.image_processing import process
+from backend.multitask.pipeline.pipeline import AStage
+from backend.multitask.hnet.hyper_model import HyperModel
 
-class HyperTrainer(object):
-    '''
-    Class that trains a hypernetwork & main network architecture and reports to wandb
-    '''
-    def __init__(self, conf, hyper_model):
-        self._hyper_model = hyper_model
+class Trainer(AStage):
+    def __init__(self, conf, name, verbose):
+        super().__init__(name=name, verbose=verbose)
+        self._model : HyperModel = None
 
         train_conf = conf["train"]
-        model_conf = conf["model"]
-        wandb_conf = train_conf["wandb"]
-        preprocess_conf = conf["preprocess"]
-        postprocess_conf = conf["postprocess"]
 
-        # params
-        batch_size = train_conf["batch_size"]
-        imgs_per_task_train = train_conf["imgs_per_task_train"]
-        imgs_per_task_val = train_conf["imgs_per_task_val"]
+        self._batch_size = train_conf["batch_size"]
+        self._imgs_per_task_train = train_conf["imgs_per_task_train"]
+        self._imgs_per_task_val = train_conf["imgs_per_task_val"]
 
+        self._export_path = "export/"
         self._device = f"cuda:{conf['gpu']}" if torch.cuda.is_available() else "cpu"
-        self._logging_dir = train_conf["logging_dir"]
-        self._verbose = train_conf["verbose"]
-        self._export_path = train_conf["export_path"]
-        self._pretrained_model_path = train_conf["pretrained_model_path"]
         self._auto_checkpoint_steps = train_conf["auto_checkpoint_steps"]
+        self._input_saliencies = train_conf["input_saliencies"]
+        self._train_img_path = train_conf["input_images_train"]
+        self._input_images_run = train_conf["input_images_run"]
+        self._val_img_path = train_conf["input_images_val"]
 
-        self._tasks = train_conf["tasks"]
-        self._task_cnt = model_conf["hnet"]["task_cnt"]
-        self._batches_per_task_train = imgs_per_task_train // batch_size
-        self._batches_per_task_val = imgs_per_task_val // batch_size
+        self._tasks = conf["tasks"]
+        self._task_cnt = conf["model"]["hnet"]["task_cnt"]
+        self._batches_per_task_train = self._imgs_per_task_train // self._batch_size
+        self._batches_per_task_val = self._imgs_per_task_val // self._batch_size
 
         self._loss_fn = train_conf["loss"]
         self._epochs = train_conf["epochs"]
@@ -48,40 +53,19 @@ class HyperTrainer(object):
         self._freeze_encoder_steps = train_conf["freeze_encoder_steps"]
         self._decay_epochs = train_conf["decay_epochs"]
 
+
+        wandb_conf = train_conf["wandb"]
         self.wandb_watch_log = wandb_conf["watch"]["log"]
         self.wandb_watch_log_freq = wandb_conf["watch"]["log_freq"]
+        self.save_checkpoints_to_wandb = wandb_conf["save_checkpoints_to_wandb"]
 
-        # convert to preprocess params
-        preprocess_parameter_map = ParameterMap()
-        preprocess_parameter_map.set_from_dict(preprocess_conf)
-
-        self._postprocess_parameter_map = ParameterMap()
-        self._postprocess_parameter_map.set_from_dict(postprocess_conf)
-
-        # data loading
-        input_saliencies = train_conf["input_saliencies"]
-        train_img_path = train_conf["input_images_train"]
-        val_img_path = train_conf["input_images_val"]
-        sal_folders = [os.path.join(input_saliencies, task) for task in self._tasks] # path to saliency folder for all models
-
-        train_datasets = [TrainDataManager(train_img_path, sal_path, self._verbose, preprocess_parameter_map) for sal_path in sal_folders]
-        val_datasets = [TrainDataManager(val_img_path, sal_path, self._verbose, preprocess_parameter_map) for sal_path in sal_folders]
-
-        self._dataloaders = {
-            "train": {task:DataLoader(ds, batch_size=batch_size, shuffle=True, num_workers=4) for (task,ds) in zip(self._tasks, train_datasets)},
-            "val": {task:DataLoader(ds, batch_size=batch_size, shuffle=True, num_workers=4) for (task,ds) in zip(self._tasks, val_datasets)},
-        }
-
-        self._run_dataloader = DataLoader(RunDataManager(train_conf["input_images_run"], "", verbose=False, recursive=False), batch_size=1)
-
-        # sanity checks
-        assert self._task_cnt == len(self._tasks)
-        assert train_conf["imgs_per_task_train"] <= min([len(ds) for ds in train_datasets])
-        assert train_conf["imgs_per_task_val"] <= min([len(ds) for ds in val_datasets])
+        # convert parameter dicts to parametermap such that it can be used in process()
+        self._preprocess_parameter_map = ParameterMap().set_from_dict(conf["preprocess"])
+        self._postprocess_parameter_map = ParameterMap().set_from_dict(conf["postprocess"])
     
     # train or evaluate one epoch for all models (mode in [train, val])
     # return loss, model
-    def train_one(self, model, dataloaders, criterion, optimizer, mode):
+    def _train_one_epoch(self, model, dataloaders, criterion, optimizer, mode):
         if mode == "train": model.train()
         elif mode == "val": model.eval()
 
@@ -134,26 +118,67 @@ class HyperTrainer(object):
                 
         return np.mean(all_loss)
 
-    # run the entire training
-    def start_train(self):
-        # build folder structure
-        export_dir = os.path.join(self._logging_dir, self._export_path)
-        export_path_best = os.path.join(export_dir, "best.pth")
-        export_path_final = os.path.join(export_dir, "final.pth")
-        os.makedirs(self._logging_dir, exist_ok=True)
-        os.makedirs(export_dir, exist_ok=True)
+    # tracks and reports some metrics of the model that is being trained
+    def track_progress(self, epoch : int, model : HyperModel):
+        cols = ["Model"]
+        cols.extend([os.path.basename(output_path[0]) for (_, _, output_path) in self._run_dataloader])
+        data = []
+        for task in self._tasks:
+            row = [task]
+            task_id = model.task_to_id(task)
+            for (image, _, _) in self._run_dataloader:
+                image = image.to(self._device)
+                saliency_map = model.compute_saliency(image, task_id)
+                post_processed_image = np.clip((process(saliency_map.cpu().detach().numpy()[0, 0], self._postprocess_parameter_map)*255).astype(np.uint8), 0, 255)
+                img = wandb.Image(post_processed_image)
+                row.append(img)
+            data.append(row)
 
-        # initialize networks
-        model = self._hyper_model
+        table = wandb.Table(data=data, columns=cols)
+        wandb.log({f"Progress Epoch {epoch}": table})
+
+    def setup(self, work_dir_path: str = None, input=None):
+        super().setup(work_dir_path, input)
+        assert input is not None and isinstance(input, HyperModel), "Trainer expects a HyperModel to be passed as an input."
+        assert work_dir_path is not None, "Working directory path cannot be None."
+
+        self._model = input
+        self._logging_dir = work_dir_path
+
+        # setup logging
+        self._export_dir = os.path.join(self._logging_dir, self._export_path)
+        os.makedirs(self._logging_dir, exist_ok=True)
+        os.makedirs(self._export_dir, exist_ok=True)
+
+        # data loading
+        sal_folders = [os.path.join(self._input_saliencies, task) for task in self._tasks] # path to saliency folder for all models
+
+        train_datasets = [TrainDataManager(self._train_img_path, sal_path, self._verbose, self._preprocess_parameter_map) for sal_path in sal_folders]
+        val_datasets = [TrainDataManager(self._val_img_path, sal_path, self._verbose, self._preprocess_parameter_map) for sal_path in sal_folders]
+
+        self._dataloaders = {
+            "train": {task:DataLoader(ds, batch_size=self._batch_size, shuffle=True, num_workers=4) for (task,ds) in zip(self._tasks, train_datasets)},
+            "val": {task:DataLoader(ds, batch_size=self._batch_size, shuffle=True, num_workers=4) for (task,ds) in zip(self._tasks, val_datasets)},
+        }
+
+        self._run_dataloader = DataLoader(RunDataManager(self._input_images_run, "", verbose=False, recursive=False), batch_size=1)
+
+        # sanity checks
+        assert self._task_cnt == len(self._tasks)
+        assert self._imgs_per_task_train <= min([len(ds) for ds in train_datasets])
+        assert self._imgs_per_task_val <= min([len(ds) for ds in val_datasets])
+
+
+    def execute(self):
+        super().execute()
+
+        export_path_best = os.path.join(self._export_dir, "best.pth")
+        export_path_final = os.path.join(self._export_dir, "final.pth")
+
+        model = self._model
         model.build()
-        if os.path.exists(self._pretrained_model_path):
-            print(f"Load pretrained model from {self._pretrained_model_path}")
-            model.load(self._pretrained_model_path, self._device)
-        else:
-            print(f"Not using a pretrained model")
         model.to(self._device)
 
-        epochs = self._epochs
         lr = self._lr
         lr_decay = self._lr_decay
         optimizer = torch.optim.Adam(model.parameters(), lr=lr)
@@ -177,7 +202,7 @@ class HyperTrainer(object):
         self.track_progress(-1, model)
 
         # training loop
-        for epoch in range(0, epochs):
+        for epoch in range(0, self._epochs):
             # decrease learning rate over time
             if epoch in self._decay_epochs:
                 for param_group in optimizer.param_groups:
@@ -190,11 +215,11 @@ class HyperTrainer(object):
                 model.mnet.unfreeze_encoder()
 
             # train the networks
-            loss_train = self.train_one(model, self._dataloaders, loss, optimizer, "train")
+            loss_train = self._train_one_epoch(model, self._dataloaders, loss, optimizer, "train")
             if self._verbose: self.pretty_print_epoch(epoch, "train", loss_train, lr)
 
             # validate the networks
-            loss_val = self.train_one(model, self._dataloaders, loss, optimizer, "val")
+            loss_val = self._train_one_epoch(model, self._dataloaders, loss, optimizer, "val")
             if self._verbose: self.pretty_print_epoch(epoch, "val", loss_val, lr)
 
             ### REPORTING / STATS ###
@@ -207,12 +232,12 @@ class HyperTrainer(object):
                 os.makedirs(checkpoint_dir, exist_ok=True)
                 path = f"{checkpoint_dir}/{epoch}_{loss_val:f}.pth"
 
-                self.save(path, model)
+                self.save(path, model, self.save_checkpoints_to_wandb)
                 
                 # overwrite the best model
                 if is_best_model:
                     smallest_loss = loss_val
-                    self.save(export_path_best, model)
+                    self.save(export_path_best, model, self.save_checkpoints_to_wandb)
                 
                 self.track_progress(epoch, model)
             
@@ -229,45 +254,23 @@ class HyperTrainer(object):
                 })
         
         # save the final model
-        self.save(export_path_final, model)
+        self.save(export_path_final, model, save_to_wandb=True)
 
-    # tracks and reports some metrics of the model that is being trained
-    def track_progress(self, epoch, model):
-        cols = ["Model"]
-        cols.extend([os.path.basename(output_path[0]) for (_, _, output_path) in self._run_dataloader])
-        data = []
-        for task in self._tasks:
-            row = [task]
-            task_id = model.task_to_id(task)
-            for (image, _, _) in self._run_dataloader:
-                image = image.to(self._device)
-                saliency_map = model.compute_saliency(image, task_id)
-                post_processed_image = np.clip((process(saliency_map.cpu().detach().numpy()[0, 0], self._postprocess_parameter_map)*255).astype(np.uint8), 0, 255)
-                img = wandb.Image(post_processed_image)
-                row.append(img)
-            data.append(row)
-
-        table = wandb.Table(data=data, columns=cols)
-        wandb.log({f"Progress Epoch {epoch}": table})
-
-    # setup & run the entire training
-    def execute(self):
-        if self._verbose: print_pretty_header("TRAINING")
-        if self._verbose: print("Trainer started...")
-
-        self.start_train()
+        return model
     
-        if self._verbose: print("Done with training!")
+    def cleanup(self):
+        super().cleanup()
+
+        del self._dataloaders
 
     # saves the model to disk & wandb
-    def save(self, path, model):
+    def save(self, path : str, model : HyperModel, save_to_wandb : bool = True):
         model.save(path)
-        wandb.save(path, base_path=wandb.run.dir)
+
+        if save_to_wandb:
+            wandb.save(path, base_path=wandb.run.dir)
 
     def pretty_print_epoch(self, epoch, mode, loss, lr):
         print("--------------------------------------------->>>>>>")
         print(f"Epoch {epoch}: loss {mode} {loss}, lr {lr}", flush=True)
         print("--------------------------------------------->>>>>>")
-
-    def delete(self):
-        del self._dataloaders

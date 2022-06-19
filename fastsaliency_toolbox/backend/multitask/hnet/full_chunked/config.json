@@ -2,6 +2,14 @@
     "type": "full_chunked",
     "gpu": 0,
 
+    "tasks": ["AIM", "SUN", "IKN", "GBVS"], 
+    "skip": [],
+
+    "name": "Full Chunked - Only one",
+    "description": "Goal: Figure out the best embedding size for the smaller hnet_chunk_size=65536. This will let us use a larger second last layer of the HNET without it exploding.",
+
+    "verbose": true,
+
     "model": {
         "hnet": {
             "task_cnt": 4,
@@ -17,35 +25,20 @@
         }
     },
 
-    "experiment": {
-        "skip": [],
-
-        "name": "Full Chunked - Only one",
-        "description": "Goal: Figure out the best embedding size for the smaller hnet_chunk_size=65536. This will let us use a larger second last layer of the HNET without it exploding.",
-
-        "logging_dir": "logs/experiment_logs/",
-        "verbose": true
-    },
-
     "pretrain": {
-        "tasks": ["AIM", "SUN", "IKN", "GBVS"],
-
         "target_model_weights": "./models/",
 
         "loss": "MSELoss",
         "batch_size": 4,
-        "epochs": 1000,
+        "epochs": 1,
         "lr": 0.001,
         "lr_decay": 0.1,
         "decay_epochs": [],
         
-        "export_path": "exported/pretrained/",
-        "auto_checkpoint_steps": 25,
-        
-        "logging_dir": "./logs/pretrain_logs/",
-        "verbose": true,
+        "auto_checkpoint_steps": 250,
 
         "wandb": {
+            "save_checkpoints_to_wandb": false,
             "watch": {
                 "log": null,
                 "log_freq": 100
@@ -54,33 +47,26 @@
     },
 
     "train": {
-        "tasks": ["AIM", "SUN", "IKN", "GBVS"],
-
-        "input_images_train": "./dataset/dummy_images/train/",
-        "imgs_per_task_train": 2500,
-        "input_images_val": "./dataset/dummy_images/val/",
-        "imgs_per_task_val": 1250,
-        "input_images_run": "./dataset/dummy_images/run/",
         "input_saliencies": "./dataset/dummy_saliency/",
-        "recursive": false,
+        "input_images_train": "./dataset/dummy_images/train/",
+        "imgs_per_task_train": 4,
+        "input_images_val": "./dataset/dummy_images/val/",
+        "imgs_per_task_val": 4,
+        "input_images_run": "./dataset/dummy_images/run/",
         
         "loss": "BCELoss",
         "batch_size": 4,
-        "consecutive_batches_per_task": 8,
-        "epochs": 10,
+        "consecutive_batches_per_task": 1,
+        "epochs": 1,
         "lr": 0.001,
         "lr_decay": 0.1,
         "freeze_encoder_steps": 3,
         "decay_epochs": [],
         
-        "pretrained_model_path": "exported/pretrained/",
-        "export_path": "exported/",
         "auto_checkpoint_steps": 7,
-        
-        "logging_dir": "./logs/train_logs/",
-        "verbose": true,
 
         "wandb": {
+            "save_checkpoints_to_wandb": false,
             "watch": {
                 "log": null,
                 "log_freq": 100
@@ -89,33 +75,16 @@
     },
 
     "test": {
-        "tasks": ["AIM", "SUN", "IKN", "GBVS"],
-
         "input_images_test": "./dataset/dummy_images/train/",
-        "imgs_per_task_test": 1250,
+        "imgs_per_task_test": 1,
         "input_saliencies": "./dataset/dummy_saliency/",
-        "recursive": false,
-
-        "model_path": "models/example.pth",
         
-        "batch_size": 1,
-        "per_image_statistics": true,
-        
-        "logging_dir": "./logs/test_logs/",
-        "verbose": true
+        "per_image_statistics": true        
     },
 
     "run": {
-        "tasks": ["AIM", "SUN", "IKN", "GBVS"],
-
         "input_images_run": "./dataset/dummy_images/train/",
-        "recursive": false,
-        "overwrite": false,
-        
-        "model_path": "models/example.pth",
-        
-        "logging_dir": "./logs/run_logs/",
-        "verbose": true
+        "overwrite": false
     },
 
     "preprocess": {

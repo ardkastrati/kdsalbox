@@ -1,10 +1,8 @@
 import torch.nn as nn
-from torchvision.models import mobilenet_v2
-
 from hypnettorch.hnets.chunked_mlp_hnet import ChunkedHMLP
 
-import backend.multimodel.custom_weight_layers as cwl
-from backend.multimodel.mobilenetv2_wrapper import mobilenet_v2_pretrained
+import backend.multitask.custom_weight_layers as cwl
+from backend.multitask.mobilenetv2_wrapper import mobilenet_v2_pretrained
 
 class Decoder(cwl.CustomWeightsLayer):
     def __init__(self, mnet_conf):

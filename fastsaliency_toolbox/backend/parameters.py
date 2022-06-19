@@ -25,6 +25,7 @@ class ParameterMap(object):
                 properties['default'],
                 description=properties.get('description'),
                 valid_values=properties.get('valid_values'))
+        return self
 
     def set(self, name : str, value : Any, description : str = None, valid_values : List[Any] = None):
         if name in self._parameters:

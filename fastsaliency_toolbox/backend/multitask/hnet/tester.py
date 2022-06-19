@@ -1,68 +1,53 @@
+"""
+Tester
+------
+
+Computes a few metrics for all images in a folder and their corresponding saliency maps and reports them.
+By setting conf["test"]["per_image_statistics"], the stats will be produced per image additionally.
+
+"""
+
 import os
 import numpy as np
 import torch
 from torch.nn import KLDivLoss
 from torch.utils.data import DataLoader
-
 import wandb
 
-from backend.utils import print_pretty_header
 from backend.datasets import TestDataManager
 from backend.metrics import NSS, CC, SIM, KL as KL_c
 from backend.image_processing import process
 from backend.parameters import ParameterMap
+from backend.multitask.pipeline.pipeline import AStage
+from backend.multitask.hnet.hyper_model import HyperModel
 
 
-class HyperTester(object):
-    def __init__(self, conf, hyper_model):
-        self._hyper_model = hyper_model
+class Tester(AStage):
+    def __init__(self, conf, name, verbose):
+        super().__init__(name=name, verbose=verbose)
+        self._model : HyperModel = None
 
         test_conf = conf["test"]
-        preprocess_conf = conf["preprocess"]
-        postprocess_conf = conf["postprocess"]
 
-        # params
-        batch_size = test_conf["batch_size"]
-        imgs_per_task_test = test_conf["imgs_per_task_test"]
-        tasks = test_conf["tasks"]
+        self._batch_size = 1 # TODO: add support for batch_size > 1 (make sure per_image_statistics still works!)
+        self._imgs_per_task_test = test_conf["imgs_per_task_test"]
+        self._tasks = conf["tasks"]
+        self._input_saliencies = test_conf["input_saliencies"]
+        self._input_images_test = test_conf["input_images_test"]
 
         self._device = f"cuda:{conf['gpu']}" if torch.cuda.is_available() else "cpu"
-        self._recursive = test_conf["recursive"]
         self._per_image_statistics = test_conf["per_image_statistics"]
-        self._batches_per_task_test = imgs_per_task_test // batch_size
-        self._model_path = test_conf["model_path"]
-        self._logging_dir = test_conf["logging_dir"]
-        self._verbose = test_conf["verbose"]
+        self._batches_per_task_test = self._imgs_per_task_test // self._batch_size
 
         # convert to pre-/postprocess params
-        self._preprocess_parameter_map = ParameterMap()
-        self._preprocess_parameter_map.set_from_dict(preprocess_conf)
-        self._postprocess_parameter_map = ParameterMap()
-        self._postprocess_parameter_map.set_from_dict(postprocess_conf)
-
-        # data loading
-        input_saliencies = test_conf["input_saliencies"]
-        test_img_path = test_conf["input_images_test"]
-        sal_folders = [os.path.join(input_saliencies, task) for task in tasks] # path to saliency folder for all models
-
-        test_datasets = [TestDataManager(test_img_path, sal_path, self._verbose, self._preprocess_parameter_map) for sal_path in sal_folders]
-
-        min_ds_len = min([len(ds) for ds in test_datasets])
-        self._data_offset = 0 if min_ds_len - imgs_per_task_test == 0 else np.random.randint(0, (min_ds_len - imgs_per_task_test) // batch_size)
-        self._dataloaders = {task:DataLoader(ds, batch_size=batch_size, shuffle=False, num_workers=4) for (task,ds) in zip(tasks,test_datasets)}
-
-        self.KL = KLDivLoss(reduce="batchmean")
-
-        # sanity checks
-        assert imgs_per_task_test <= min_ds_len
-
-    def pretty_print(self, epoch, mode, loss, lr):
-        print("--------------------------------------------->>>>>>")
-        print(f"Epoch {epoch}: loss {mode} {loss}, lr {lr}", flush=True)
-        print("--------------------------------------------->>>>>>")
+        self._preprocess_parameter_map = ParameterMap().set_from_dict(conf["preprocess"])
+        self._postprocess_parameter_map = ParameterMap().set_from_dict(conf["postprocess"])
     
     # runs the test for one task/model
-    def test_one(self, model, task, dataloader):
+    def _test_one_task(self, task, dataloader):
+
+        model = self._model
+        model.eval()
         task_id = model.task_to_id(task)
 
         if self._verbose: print(f"Testing {task}...")
@@ -120,20 +105,42 @@ class HyperTester(object):
             wandb.run.log({stats_file:table})
             
         return np.mean(all_loss), np.nanmean(np.asarray(all_NSS)), np.nanmean(np.asarray(all_CC)), np.nanmean(np.asarray(all_SIM)), np.nanmean(np.asarray(all_KL)), np.nanmean(np.asarray(all_KL_c))
+        
+        
+    def setup(self, work_dir_path: str = None, input=None):
+        super().setup(work_dir_path, input)
+        assert input is not None and isinstance(input, HyperModel), "Tester expects a HyperModel to be passed as an input."
+        assert work_dir_path is not None, "Working directory path cannot be None."
 
-    def start_test(self):
+        self._model = input
+        self._logging_dir = work_dir_path
+
+        # prepare logging
         os.makedirs(self._logging_dir, exist_ok=True)
 
-        model = self._hyper_model
-        model.build()
-        model.load(self._model_path, self._device)
-        model.to(self._device)
-        model.eval()
+        # data loading
+        input_saliencies = self._input_saliencies
+        test_img_path = self._input_images_test
+        sal_folders = [os.path.join(input_saliencies, task) for task in self._tasks] # path to saliency folder for all models
 
+        test_datasets = [TestDataManager(test_img_path, sal_path, self._verbose, self._preprocess_parameter_map) for sal_path in sal_folders]
+
+        min_ds_len = min([len(ds) for ds in test_datasets])
+        self._data_offset = 0 if min_ds_len - self._imgs_per_task_test == 0 else np.random.randint(0, (min_ds_len - self._imgs_per_task_test) // self._batch_size)
+        self._dataloaders = {task:DataLoader(ds, batch_size=self._batch_size, shuffle=False, num_workers=4) for (task,ds) in zip(self._tasks, test_datasets)}
+
+        self.KL = KLDivLoss(reduce="batchmean")
+
+        # sanity checks
+        assert self._imgs_per_task_test <= min_ds_len
+
+    def execute(self):
+        super().execute()
+        
         # foreach task
         all_names, all_loss, all_NSS, all_CC, all_SIM, all_KL, all_KL_c = [], [], [], [], [], [], []
         for task,dataloader in self._dataloaders.items():
-            loss, NSS, CC, SIM, KL, KL_c = self.test_one(model, task, dataloader)
+            loss, NSS, CC, SIM, KL, KL_c = self._test_one_task(task, dataloader)
 
             all_names.append(task)
             all_loss.append(loss)
@@ -158,13 +165,10 @@ class HyperTester(object):
         data = np.array([all_names, all_loss, all_NSS, all_CC, all_SIM, all_KL, all_KL_c]).transpose().tolist()
         table = wandb.Table(data=data, columns=["Task", "Loss", "NSS", "CC", "SIM", "KL", "KL custom"])
         wandb.run.log({stats_file:table})
-        
 
-    def execute(self):
-        if self._verbose: print_pretty_header("TESTING " + self._model_path)
-        if self._verbose: print("Tester started...")
-        self.start_test()
-        if self._verbose: print(f"Done with {self._model_path}!")
+        return self._model
 
-    def delete(self):
+    def cleanup(self):
+        super().cleanup()
+
         del self._dataloaders

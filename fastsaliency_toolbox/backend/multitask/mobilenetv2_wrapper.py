@@ -2,7 +2,7 @@ from typing import Callable, List, Optional
 import torch
 import torch.nn as nn
 from torchvision.models import mobilenet_v2
-import backend.multimodel.custom_weight_layers as cwl
+import backend.multitask.custom_weight_layers as cwl
 
 def mobilenet_v2_pretrained(cutoff=0):
     mv2 = mobilenet_v2(pretrained=True, progress=False)
