@@ -75,9 +75,9 @@
     "train": {
         "input_saliencies": "./dataset/dummy_saliency/",
         "input_images_train": "./dataset/dummy_images/train/",
-        "imgs_per_task_train": 4,
+        "imgs_per_task_train": 2500,
         "input_images_val": "./dataset/dummy_images/val/",
-        "imgs_per_task_val": 4,
+        "imgs_per_task_val": 1250,
         "input_images_run": "./dataset/dummy_images/run/",
         
         "loss": "BCELoss",
