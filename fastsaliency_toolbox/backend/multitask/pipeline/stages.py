@@ -8,6 +8,8 @@ A collection of useful pipeline stages such as
 """
 
 import wandb
+import os
+
 from backend.multitask.pipeline.pipeline import AStage
 from backend.multitask.hnet.hyper_model import HyperModel
 
@@ -24,6 +26,8 @@ class ExportStage(AStage):
         self._model = input
 
     def execute(self):
+        print()
+        os.makedirs(os.path.dirname(self._path), exist_ok=True)
         self._model.save(self._path)
         wandb.save(self._path, base_path=wandb.run.dir)
 
