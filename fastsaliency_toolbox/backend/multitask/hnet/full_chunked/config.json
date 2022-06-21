@@ -3,7 +3,7 @@
     "gpu": 0,
 
     "tasks": ["AIM", "SUN", "IKN", "GBVS"], 
-    "skip": [],
+    "skip": ["pretrain_weights"],
 
     "name": "Full Chunked - Only one",
     "description": "Goal: Figure out the best embedding size for the smaller hnet_chunk_size=65536. This will let us use a larger second last layer of the HNET without it exploding.",
@@ -21,7 +21,7 @@
         },
         "mnet": {
             "decoder_non_linearity": "ReLU6",
-            "mobilenet_cutoff": 19
+            "mobilenet_cutoff": 0
         }
     },
 

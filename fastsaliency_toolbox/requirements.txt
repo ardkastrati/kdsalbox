@@ -8,3 +8,6 @@ click
 scikit-image
 streamlit
 scikit-learn
+learn2learn
+hypnettorch
+wandb

@@ -61,6 +61,7 @@ class PreTrainerOneTask(AStage):
     # train or evaluate one epoch for all models (mode in [train, val])
     # return loss, model
     def _train_one_epoch(self, model, dataloaders, criterion, optimizer, mode):
+        print(f"train_one_epoch {mode}")
         if mode == "train": model.train()
         elif mode == "val": model.eval()
 
@@ -102,6 +103,7 @@ class PreTrainerOneTask(AStage):
 
     # tracks and reports some metrics of the model that is being trained
     def track_progress(self, epoch : int, model : HyperModel):
+        print(f"track epoch {epoch}")
         with torch.no_grad():
             cols = ["Model"]
             cols.extend([os.path.basename(output_path[0]) for (_, _, output_path) in self._run_dataloader])
@@ -188,6 +190,7 @@ class PreTrainerOneTask(AStage):
         # evaluate how the model performs initially
         self.track_progress(-1, model)
 
+        print("training loop")
         # training loop
         for epoch in range(0, self._epochs):
             # decrease learning rate over time
