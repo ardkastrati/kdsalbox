@@ -1,8 +1,7 @@
 [
-    ["model/hnet/hidden_layers", 
+    ["train/epochs", 
         [
-            [128, 128, 128], 
-            [512, 512, 512, 512]
+            100
         ]
     ]
 ]

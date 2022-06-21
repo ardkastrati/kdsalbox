@@ -29,6 +29,18 @@ def cli():
     pass
 
 @cli.command()
+def foo():
+    from backend.multitask.hnet.full.model import hnet_mnet_from_config
+
+    with open("C:/Users/yanic/dev/ethz/ba/kdsalbox-generalization/fastsaliency_toolbox/backend/multitask/hnet/full/config.json") as f:
+        conf = json.load(f)
+        hnet,mnet = hnet_mnet_from_config(conf)
+
+        hnet(2)
+
+    
+
+@cli.command()
 def version():
     """Displays version information."""
     click.echo("Fast Saliency Toolbox: Generalization Implementation")
@@ -60,11 +72,13 @@ def run_with_conf(conf, group=None):
     try:
         from backend.multitask.hnet.contextmod.model import hnet_mnet_from_config as hmfc_contextmod
         from backend.multitask.hnet.full_chunked.model import hnet_mnet_from_config as hmfc_full_chunked
-        hnet_mnet_from_config = None
-        if conf["type"] == "contextmod":
-            hnet_mnet_from_config = hmfc_contextmod
-        elif conf["type"] == "full_chunked":
-            hnet_mnet_from_config = hmfc_full_chunked
+        from backend.multitask.hnet.full.model import hnet_mnet_from_config as hmfc_full
+        net_factory = {
+            "contextmod": hmfc_contextmod,
+            "full_chunked": hmfc_full_chunked,
+            "full": hmfc_full,
+        }
+        hnet_mnet_from_config = net_factory[conf["type"]]
 
         verbose = conf["verbose"]
         print(f"Running {conf['type']}")
