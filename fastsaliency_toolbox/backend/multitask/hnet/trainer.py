@@ -121,22 +121,29 @@ class Trainer(AStage):
 
     # tracks and reports some metrics of the model that is being trained
     def track_progress(self, epoch : int, model : HyperModel):
-        cols = ["Model"]
-        cols.extend([os.path.basename(output_path[0]) for (_, _, output_path) in self._run_dataloader])
-        data = []
-        for task in self._tasks:
-            row = [task]
-            task_id = model.task_to_id(task)
-            for (image, _, _) in self._run_dataloader:
-                image = image.to(self._device)
-                saliency_map = model.compute_saliency(image, task_id)
-                post_processed_image = np.clip((process(saliency_map.cpu().detach().numpy()[0, 0], self._postprocess_parameter_map)*255).astype(np.uint8), 0, 255)
-                img = wandb.Image(post_processed_image)
-                row.append(img)
-            data.append(row)
+        with torch.no_grad():
+            cols = ["Model"]
+            cols.extend([os.path.basename(output_path[0]) for (_, _, output_path) in self._run_dataloader])
+            data = []
+            for task in self._tasks:
+                row = [task]
+                task_id = model.task_to_id(task)
+                for (image, _, _) in self._run_dataloader:
+                    image = image.to(self._device)
+                    saliency_map = model.compute_saliency(image, task_id)
+                    post_processed_image = np.clip((process(saliency_map.cpu().detach().numpy()[0, 0], self._postprocess_parameter_map)*255).astype(np.uint8), 0, 255)
+                    img = wandb.Image(post_processed_image)
+                    row.append(img)
 
-        table = wandb.Table(data=data, columns=cols)
-        wandb.log({f"Progress Epoch {epoch}": table})
+                    if torch.cuda.is_available(): # avoid GPU out of mem
+                        del image
+                        del saliency_map
+                        torch.cuda.empty_cache()
+                
+                data.append(row)
+
+            table = wandb.Table(data=data, columns=cols)
+            wandb.log({f"Progress Epoch {epoch}": table})
 
     def setup(self, work_dir_path: str = None, input=None):
         super().setup(work_dir_path, input)

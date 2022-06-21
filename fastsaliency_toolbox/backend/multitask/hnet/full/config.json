@@ -60,7 +60,7 @@
         
         "auto_checkpoint_steps": 15,
 
-        "log_freq": 10,
+        "log_freq": 100,
         "wandb": {
             "save_checkpoints_to_wandb": false,
             "watch": {
