@@ -2,10 +2,8 @@
 Trainer
 -------
 
-Trains a hypernetwork and mainnetwork on multiple tasks at the same time
+Trains a hypernetwork and mainnetwork on just one task
 and reports the progress and metrics to wandb.
-
-TODO: add a lot more documentation here about all the parameters
 
 """
 
@@ -21,16 +19,14 @@ from backend.image_processing import process
 from backend.multitask.pipeline.pipeline import AStage
 from backend.multitask.hnet.hyper_model import HyperModel
 
-class Trainer(AStage):
+class PreTrainerOneTask(AStage):
     def __init__(self, conf, name, verbose):
         super().__init__(name=name, verbose=verbose)
         self._model : HyperModel = None
 
-        train_conf = conf["train"]
+        train_conf = conf["pretrain_one_task"]
 
         self._batch_size = train_conf["batch_size"]
-        self._imgs_per_task_train = train_conf["imgs_per_task_train"]
-        self._imgs_per_task_val = train_conf["imgs_per_task_val"]
 
         self._export_path = "export/"
         self._device = f"cuda:{conf['gpu']}" if torch.cuda.is_available() else "cpu"
@@ -42,12 +38,10 @@ class Trainer(AStage):
 
         self._tasks = conf["tasks"]
         self._task_cnt = conf["model"]["hnet"]["task_cnt"]
-        self._batches_per_task_train = self._imgs_per_task_train // self._batch_size
-        self._batches_per_task_val = self._imgs_per_task_val // self._batch_size
+        self._selected_task = self._tasks[0]
 
         self._loss_fn = train_conf["loss"]
         self._epochs = train_conf["epochs"]
-        self._consecutive_batches_per_task = train_conf["consecutive_batches_per_task"]
         self._lr = train_conf["lr"]
         self._lr_decay = train_conf["lr_decay"]
         self._freeze_encoder_steps = train_conf["freeze_encoder_steps"]
@@ -72,27 +66,16 @@ class Trainer(AStage):
 
         all_loss = []
 
-        # defines which batch will be loaded from which task/model
-        if mode == "train":
-            limit = self._batches_per_task_train // self._consecutive_batches_per_task
-            all_batches = np.concatenate([np.repeat(model.task_to_id(task), limit) for task in self._tasks])
-            np.random.shuffle(all_batches)
-            all_batches = np.repeat(all_batches, self._consecutive_batches_per_task)
-        else:
-            all_batches = np.concatenate([np.repeat(model.task_to_id(task), self._batches_per_task_val) for task in self._tasks])
-
-        # for each model
-        data_iters = [iter(d) for d in dataloaders[mode].values()] # Note: DataLoader shuffles when iterator is created
-        for (i,task_id) in enumerate(all_batches):
-            X,y = next(data_iters[task_id])
-
+        task_id = model.task_to_id(self._selected_task)
+        dataloader = dataloaders[mode]
+        for i,(X,y) in enumerate(dataloader):
             optimizer.zero_grad()
 
             # put data on GPU (if cuda)
             X = X.to(self._device)
             y = y.to(self._device)
 
-            pred = model(task_id.item(), X)
+            pred = model(task_id, X)
             loss = criterion(pred, y)
 
             # training
@@ -109,7 +92,7 @@ class Trainer(AStage):
 
             # logging
             if i%self._log_freq == 0:
-                print(f"Batch {i}/{len(all_batches)}: current accumulated loss {np.mean(all_loss)}", flush=True)
+                print(f"Batch {i}/{len(dataloader)}: current accumulated loss {np.mean(all_loss)}", flush=True)
             
             # remove batch from gpu (if cuda)
             if torch.cuda.is_available():
@@ -159,22 +142,20 @@ class Trainer(AStage):
         os.makedirs(self._export_dir, exist_ok=True)
 
         # data loading
-        sal_folders = [os.path.join(self._input_saliencies, task) for task in self._tasks] # path to saliency folder for all models
+        sal_path = os.path.join(self._input_saliencies, self._selected_task)
 
-        train_datasets = [TrainDataManager(self._train_img_path, sal_path, self._verbose, self._preprocess_parameter_map) for sal_path in sal_folders]
-        val_datasets = [TrainDataManager(self._val_img_path, sal_path, self._verbose, self._preprocess_parameter_map) for sal_path in sal_folders]
+        train_dataset = TrainDataManager(self._train_img_path, sal_path, self._verbose, self._preprocess_parameter_map)
+        val_dataset = TrainDataManager(self._val_img_path, sal_path, self._verbose, self._preprocess_parameter_map)
 
         self._dataloaders = {
-            "train": {task:DataLoader(ds, batch_size=self._batch_size, shuffle=True, num_workers=4) for (task,ds) in zip(self._tasks, train_datasets)},
-            "val": {task:DataLoader(ds, batch_size=self._batch_size, shuffle=True, num_workers=4) for (task,ds) in zip(self._tasks, val_datasets)},
+            "train": DataLoader(train_dataset, batch_size=self._batch_size, shuffle=True, num_workers=4),
+            "val": DataLoader(val_dataset, batch_size=self._batch_size, shuffle=True, num_workers=4),
         }
 
         self._run_dataloader = DataLoader(RunDataManager(self._input_images_run, "", verbose=False, recursive=False), batch_size=1)
 
         # sanity checks
         assert self._task_cnt == len(self._tasks)
-        assert self._imgs_per_task_train <= min([len(ds) for ds in train_datasets])
-        assert self._imgs_per_task_val <= min([len(ds) for ds in val_datasets])
 
 
     def execute(self):
@@ -253,10 +234,10 @@ class Trainer(AStage):
             stats_file = os.path.join(os.path.relpath(self._logging_dir, wandb.run.dir), "all_results").replace("\\", "/")
             table = wandb.Table(data=all_epochs, columns=["Epoch", "Loss-Train", "Loss-Val"])
             wandb.log({
-                    f"{self.name} - epoch": epoch,
-                    f"{self.name} - loss train": loss_train,
-                    f"{self.name} - loss val": loss_val,
-                    f"{self.name} - learning rate": lr,
+                    f"{self.name} epoch": epoch,
+                    f"{self.name} loss train": loss_train,
+                    f"{self.name} loss val": loss_val,
+                    f"{self.name} learning rate": lr,
                     stats_file:table
                 })
         

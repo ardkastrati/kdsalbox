@@ -17,12 +17,12 @@ from backend.multitask.hnet.hyper_model import HyperModel
 from backend.multitask.pipeline.pipeline import AStage
 from backend.multitask.hnet.datasets import WeightDataset
 
-class PreTrainer(AStage):
+class PreTrainerWeights(AStage):
     def __init__(self, conf, name, verbose):
         super().__init__(name=name, verbose=verbose)
         self._model : HyperModel = None
 
-        pretrain_conf = conf["pretrain"]
+        pretrain_conf = conf["pretrain_weights"]
 
         self._export_path = "export/"
         self._device = f"cuda:{conf['gpu']}" if torch.cuda.is_available() else "cpu"
@@ -270,10 +270,10 @@ class PreTrainer(AStage):
                 stats_file = os.path.join(os.path.relpath(self._logging_dir, wandb.run.dir), "pretrain_all_results").replace("\\", "/")
                 table = wandb.Table(data=all_epochs, columns=["Epoch", "Loss-Train", "Loss-Val"])
                 wandb.log({
-                        "pretrain - epoch": epoch,
-                        "pretrain - loss train": loss_train,
-                        "pretrain - loss val": loss_val,
-                        "pretrain - learning rate": lr,
+                        f"{self.name} - pretrain - epoch": epoch,
+                        f"{self.name} - pretrain - loss train": loss_train,
+                        f"{self.name} - pretrain - loss val": loss_val,
+                        f"{self.name} - pretrain - learning rate": lr,
                         stats_file:table
                     })
         

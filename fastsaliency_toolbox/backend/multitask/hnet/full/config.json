@@ -3,7 +3,7 @@
     "gpu": 0,
 
     "tasks": ["AIM", "SUN", "IKN", "GBVS", "BMS", "IMSIG", "RARE2012"], 
-    "skip": ["pretrain"],
+    "skip": ["pretrain_weights"],
 
     "name": "Full - One hot to full",
     "description": "Goal: Learn all 7 networks in one",
@@ -20,7 +20,7 @@
         }
     },
 
-    "pretrain": {
+    "pretrain_weights": {
         "target_model_weights": "./models/",
 
         "loss": "MSELoss",
@@ -32,6 +32,32 @@
         
         "auto_checkpoint_steps": 250,
 
+        "wandb": {
+            "save_checkpoints_to_wandb": false,
+            "watch": {
+                "log": null,
+                "log_freq": 100
+            }
+        }
+    },
+
+    "pretrain_one_task": {
+        "input_saliencies": "./dataset/dummy_saliency/",
+        "input_images_train": "./dataset/dummy_images/train/",
+        "input_images_val": "./dataset/dummy_images/val/",
+        "input_images_run": "./dataset/dummy_images/run/",
+        
+        "loss": "BCELoss",
+        "batch_size": 4,
+        "epochs": 15,
+        "lr": 0.001,
+        "lr_decay": 0.1,
+        "freeze_encoder_steps": 0,
+        "decay_epochs": [],
+        
+        "auto_checkpoint_steps": 7,
+
+        "log_freq": 100,
         "wandb": {
             "save_checkpoints_to_wandb": false,
             "watch": {
