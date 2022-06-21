@@ -67,7 +67,8 @@ class HyperModel():
     def compute_saliency(self, img : torch.Tensor, task_id : int) -> torch.Tensor:
         """ Runs and returns the hypernetwork and mainnetwork on an image for a given task and returns the computed saliency map. """
         self.eval()
-        sal = self(task_id, img)
+        with torch.no_grad():
+            sal = self(task_id, img)
         return sal
 
     def task_to_id(self, task):

@@ -100,19 +100,17 @@ class Trainer(AStage):
                 loss.backward()
                 optimizer.step()
 
+            with torch.no_grad():
                 all_loss.append(loss.item())
 
-            # validation
-            elif mode == "val":
-                with torch.no_grad():
-                    all_loss.append(loss.item())
-
-            # logging
-            if i%self._log_freq == 0:
-                print(f"Batch {i}/{len(all_batches)}: current accumulated loss {np.mean(all_loss)}", flush=True)
+                # logging
+                if i%self._log_freq == 0:
+                    print(f"Batch {i}/{len(all_batches)}: current accumulated loss {np.mean(all_loss)}", flush=True)
             
             # remove batch from gpu (if cuda)
             if torch.cuda.is_available():
+                del pred
+                del loss
                 del X
                 del y
                 torch.cuda.empty_cache()
