@@ -1,4 +1,3 @@
-from turtle import forward
 from typing import List
 import torch
 import torch.nn as nn
@@ -20,7 +19,8 @@ class HNET(nn.Module):
         self._l1 = nn.Linear(task_cnt, total_weights)
 
     def forward(self, cond_id : int):
-        x = F.one_hot(torch.LongTensor(np.array([cond_id])), self._task_cnt)[0].float() # one hot encoding of cond_id/task_id
+        device = list(self.parameters())[0].device
+        x = F.one_hot(torch.LongTensor(np.array([cond_id])), self._task_cnt)[0].float().to(device) # one hot encoding of cond_id/task_id
         x = self._l1(x)
 
         # make the HNET output the specified target shapes

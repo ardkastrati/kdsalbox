@@ -49,6 +49,7 @@
         "logging_dir": "./logs/train_logs/",
         "verbose": true,
 
+        "log_freq": 100,
         "wandb": {
             "watch": {
                 "log": null,

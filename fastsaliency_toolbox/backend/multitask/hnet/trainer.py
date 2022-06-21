@@ -53,11 +53,12 @@ class Trainer(AStage):
         self._freeze_encoder_steps = train_conf["freeze_encoder_steps"]
         self._decay_epochs = train_conf["decay_epochs"]
 
+        self._log_freq = train_conf["log_freq"]
 
         wandb_conf = train_conf["wandb"]
-        self.wandb_watch_log = wandb_conf["watch"]["log"]
-        self.wandb_watch_log_freq = wandb_conf["watch"]["log_freq"]
-        self.save_checkpoints_to_wandb = wandb_conf["save_checkpoints_to_wandb"]
+        self._wandb_watch_log = wandb_conf["watch"]["log"]
+        self._wandb_watch_log_freq = wandb_conf["watch"]["log_freq"]
+        self._save_checkpoints_to_wandb = wandb_conf["save_checkpoints_to_wandb"]
 
         # convert parameter dicts to parametermap such that it can be used in process()
         self._preprocess_parameter_map = ParameterMap().set_from_dict(conf["preprocess"])
@@ -107,7 +108,7 @@ class Trainer(AStage):
                     all_loss.append(loss.item())
 
             # logging
-            if i%100 == 0:
+            if i%self._log_freq == 0:
                 print(f"Batch {i}/{len(all_batches)}: current accumulated loss {np.mean(all_loss)}", flush=True)
             
             # remove batch from gpu (if cuda)
@@ -190,7 +191,7 @@ class Trainer(AStage):
         loss = losses[self._loss_fn]
         
         # report to wandb
-        wandb.watch((model.hnet, model.mnet), loss, log=self.wandb_watch_log, log_freq=self.wandb_watch_log_freq)
+        wandb.watch((model.hnet, model.mnet), loss, log=self._wandb_watch_log, log_freq=self._wandb_watch_log_freq)
         
         all_epochs = []
         smallest_loss = None
@@ -232,12 +233,12 @@ class Trainer(AStage):
                 os.makedirs(checkpoint_dir, exist_ok=True)
                 path = f"{checkpoint_dir}/{epoch}_{loss_val:f}.pth"
 
-                self.save(path, model, self.save_checkpoints_to_wandb)
+                self.save(path, model, self._save_checkpoints_to_wandb)
                 
                 # overwrite the best model
                 if is_best_model:
                     smallest_loss = loss_val
-                    self.save(export_path_best, model, self.save_checkpoints_to_wandb)
+                    self.save(export_path_best, model, self._save_checkpoints_to_wandb)
                 
                 self.track_progress(epoch, model)
             
