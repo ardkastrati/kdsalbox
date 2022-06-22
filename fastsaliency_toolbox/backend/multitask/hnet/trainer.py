@@ -10,23 +10,25 @@ TODO: add a lot more documentation here about all the parameters
 """
 
 import os
-import numpy as np
 import torch
 from torch.utils.data import DataLoader
 import wandb
 
 from backend.datasets import TrainDataManager, RunDataManager
 from backend.parameters import ParameterMap
-from backend.image_processing import process
 from backend.multitask.pipeline.pipeline import AStage
 from backend.multitask.hnet.hyper_model import HyperModel
+from backend.multitask.hnet.trainer_utils import run_model_on_images_and_report_to_wandb as track_progress
+from backend.multitask.hnet.trainer_utils import train_one_epoch_multitask as train_one_epoch
+from backend.multitask.hnet.trainer_utils import train_val_one_epoch_and_report_to_wandb as train_and_val
+from backend.multitask.hnet.trainer_utils import save
 
 class Trainer(AStage):
     def __init__(self, conf, name, verbose):
         super().__init__(name=name, verbose=verbose)
         self._model : HyperModel = None
 
-        train_conf = conf["train"]
+        train_conf = conf[name]
 
         self._batch_size = train_conf["batch_size"]
         self._imgs_per_task_train = train_conf["imgs_per_task_train"]
@@ -63,85 +65,6 @@ class Trainer(AStage):
         # convert parameter dicts to parametermap such that it can be used in process()
         self._preprocess_parameter_map = ParameterMap().set_from_dict(conf["preprocess"])
         self._postprocess_parameter_map = ParameterMap().set_from_dict(conf["postprocess"])
-    
-    # train or evaluate one epoch for all models (mode in [train, val])
-    # return loss, model
-    def _train_one_epoch(self, model, dataloaders, criterion, optimizer, mode):
-        if mode == "train": model.train()
-        elif mode == "val": model.eval()
-
-        all_loss = []
-
-        # defines which batch will be loaded from which task/model
-        if mode == "train":
-            limit = self._batches_per_task_train // self._consecutive_batches_per_task
-            all_batches = np.concatenate([np.repeat(model.task_to_id(task), limit) for task in self._tasks])
-            np.random.shuffle(all_batches)
-            all_batches = np.repeat(all_batches, self._consecutive_batches_per_task)
-        else:
-            all_batches = np.concatenate([np.repeat(model.task_to_id(task), self._batches_per_task_val) for task in self._tasks])
-
-        # for each model
-        data_iters = [iter(d) for d in dataloaders[mode].values()] # Note: DataLoader shuffles when iterator is created
-        for (i,task_id) in enumerate(all_batches):
-            X,y = next(data_iters[task_id])
-
-            optimizer.zero_grad()
-
-            # put data on GPU (if cuda)
-            X = X.to(self._device)
-            y = y.to(self._device)
-
-            pred = model(task_id.item(), X)
-            loss = criterion(pred, y)
-
-            # training
-            if mode == "train":
-                loss.backward()
-                optimizer.step()
-
-            with torch.no_grad():
-                all_loss.append(loss.item())
-
-                # logging
-                if i%self._log_freq == 0:
-                    print(f"Batch {i}/{len(all_batches)}: current accumulated loss {np.mean(all_loss)}", flush=True)
-            
-            # remove batch from gpu (if cuda)
-            if torch.cuda.is_available():
-                del pred
-                del loss
-                del X
-                del y
-                torch.cuda.empty_cache()
-                
-        return np.mean(all_loss)
-
-    # tracks and reports some metrics of the model that is being trained
-    def track_progress(self, epoch : int, model : HyperModel):
-        with torch.no_grad():
-            cols = ["Model"]
-            cols.extend([os.path.basename(output_path[0]) for (_, _, output_path) in self._run_dataloader])
-            data = []
-            for task in self._tasks:
-                row = [task]
-                task_id = model.task_to_id(task)
-                for (image, _, _) in self._run_dataloader:
-                    image = image.to(self._device)
-                    saliency_map = model.compute_saliency(image, task_id)
-                    post_processed_image = np.clip((process(saliency_map.cpu().detach().numpy()[0, 0], self._postprocess_parameter_map)*255).astype(np.uint8), 0, 255)
-                    img = wandb.Image(post_processed_image)
-                    row.append(img)
-
-                    if torch.cuda.is_available(): # avoid GPU out of mem
-                        del image
-                        del saliency_map
-                        torch.cuda.empty_cache()
-                
-                data.append(row)
-
-            table = wandb.Table(data=data, columns=cols)
-            wandb.log({f"{self.name} - Progress Epoch {epoch}": table})
 
     def setup(self, work_dir_path: str = None, input=None):
         super().setup(work_dir_path, input)
@@ -205,7 +128,8 @@ class Trainer(AStage):
         if self._verbose: print("Encoder frozen...")
 
         # evaluate how the model performs initially
-        self.track_progress(-1, model)
+        track_progress(f"{self.name} - Initialization", self._tasks, model, self._run_dataloader, 
+                    self._postprocess_parameter_map, self._device)
 
         # training loop
         for epoch in range(0, self._epochs):
@@ -220,62 +144,26 @@ class Trainer(AStage):
                 if self._verbose: print("Encoder unfrozen")
                 model.mnet.unfreeze_encoder()
 
-            # train the networks
-            loss_train = self._train_one_epoch(model, self._dataloaders, loss, optimizer, "train")
-            if self._verbose: self.pretty_print_epoch(epoch, "train", loss_train, lr)
-
-            # validate the networks
-            loss_val = self._train_one_epoch(model, self._dataloaders, loss, optimizer, "val")
-            if self._verbose: self.pretty_print_epoch(epoch, "val", loss_val, lr)
-
-            ### REPORTING / STATS ###
-            all_epochs.append([epoch, loss_train, loss_val]) 
-
-            # if better performance than all previous => save weights as checkpoint
-            is_best_model = smallest_loss is None or loss_val < smallest_loss
-            if epoch % self._auto_checkpoint_steps == 0 or is_best_model:
-                checkpoint_dir = os.path.join(self._logging_dir, f"checkpoint_in_epoch_{epoch}/")
-                os.makedirs(checkpoint_dir, exist_ok=True)
-                path = f"{checkpoint_dir}/{epoch}_{loss_val:f}.pth"
-
-                self.save(path, model, self._save_checkpoints_to_wandb)
-                
-                # overwrite the best model
-                if is_best_model:
-                    smallest_loss = loss_val
-                    self.save(export_path_best, model, self._save_checkpoints_to_wandb)
-                
-                self.track_progress(epoch, model)
+            # runs one epoch
+            train_one = lambda mode : train_one_epoch(self._tasks, model, self._dataloaders, loss, optimizer,
+                mode, self._device, self._batches_per_task_train, self._batches_per_task_val,
+                self._consecutive_batches_per_task, self._log_freq)
             
-            # save/overwrite results at the end of each epoch
-            stats_file = os.path.join(os.path.relpath(self._logging_dir, wandb.run.dir), "all_results").replace("\\", "/")
-            table = wandb.Table(data=all_epochs, columns=["Epoch", "Loss-Train", "Loss-Val"])
-            wandb.log({
-                    f"{self.name} - epoch": epoch,
-                    f"{self.name} - loss train": loss_train,
-                    f"{self.name} - loss val": loss_val,
-                    f"{self.name} - learning rate": lr,
-                    stats_file:table
-                })
+            # generates some images to see how good the model works this stage
+            run_one = lambda is_best_model : track_progress(f"{self.name} - Progress Epoch {epoch}", self._tasks, model, 
+                self._run_dataloader, self._postprocess_parameter_map, self._device)
+
+            # trains and validates & does checkpointing as well as reporting to wandb
+            smallest_loss = train_and_val(model, train_one, epoch, lr, smallest_loss, all_epochs, 
+                self._auto_checkpoint_steps, self._save_checkpoints_to_wandb, 
+                self._logging_dir, self._verbose, export_path_best, self._name, 
+                run_one)
         
         # save the final model
-        self.save(export_path_final, model, save_to_wandb=True)
+        save(export_path_final, model, save_to_wandb=True)
 
         return model
     
     def cleanup(self):
         super().cleanup()
-
         del self._dataloaders
-
-    # saves the model to disk & wandb
-    def save(self, path : str, model : HyperModel, save_to_wandb : bool = True):
-        model.save(path)
-
-        if save_to_wandb:
-            wandb.save(path, base_path=wandb.run.dir)
-
-    def pretty_print_epoch(self, epoch, mode, loss, lr):
-        print("--------------------------------------------->>>>>>")
-        print(f"Epoch {epoch}: loss {mode} {loss}, lr {lr}", flush=True)
-        print("--------------------------------------------->>>>>>")

@@ -24,6 +24,7 @@ from backend.multitask.hnet.pretrainer_weights import PreTrainerWeights
 from backend.multitask.hnet.pretrainer_one_task import PreTrainerOneTask
 from backend.multitask.pipeline.pipeline import Pipeline
 from backend.multitask.pipeline.stages import ExportStage
+from backend.multitask.hnet.trainer_catchup import TrainerCatchup
 
 @click.group()
 def cli():
@@ -60,12 +61,20 @@ def run_with_conf(conf, group=None):
     # construct and run the experiment pipeline
     try:
         from backend.multitask.hnet.contextmod.model import hnet_mnet_from_config as hmfc_contextmod
-        from backend.multitask.hnet.full_chunked.model import hnet_mnet_from_config as hmfc_full_chunked
-        from backend.multitask.hnet.full.model import hnet_mnet_from_config as hmfc_full
+        from backend.multitask.hnet.full_chunked.mnet import MNET as MFC
+        from backend.multitask.hnet.full_chunked.hnet import HNET as HFC
+        from backend.multitask.hnet.full.mnet import MNET as MF
+        from backend.multitask.hnet.full.hnet import HNET as HF
+        def hnet_mnet_from_ctors(hnet_ctor, mnet_ctor, conf):
+            model_conf = conf["model"]
+            mnet = mnet_ctor(model_conf["mnet"])
+            hnet = hnet_ctor(mnet.get_cw_param_shapes(), model_conf["hnet"])
+            return hnet, mnet
+
         net_factory = {
             "contextmod": hmfc_contextmod,
-            "full_chunked": hmfc_full_chunked,
-            "full": hmfc_full,
+            "full_chunked": lambda conf : hnet_mnet_from_ctors(HFC, MFC, conf), 
+            "full": lambda conf : hnet_mnet_from_ctors(HF, MF, conf),
         }
         hnet_mnet_from_config = net_factory[conf["type"]]
 
@@ -79,6 +88,9 @@ def run_with_conf(conf, group=None):
         if "pretrain_one_task" in conf.keys():
             stages.append(PreTrainerOneTask(conf, "pretrain_one_task", verbose=verbose))
             stages.append(ExportStage("export - pretrain_one_task", path=f"{os.path.join(run_dir, 'pretrain_one_task', 'best.pth')}", verbose=verbose))
+        if "train_catchup" in conf.keys():
+            stages.append(TrainerCatchup(conf, "train_catchup", verbose=verbose))
+            stages.append(ExportStage("export - train_catchup", path=f"{os.path.join(run_dir, 'train_catchup', 'best.pth')}", verbose=verbose))
         if "train" in conf.keys():
             stages.append(Trainer(conf, "train", verbose=verbose))
             stages.append(ExportStage("export - train", path=f"{os.path.join(run_dir, 'train', 'best.pth')}", verbose=verbose))
@@ -116,13 +128,17 @@ def run_with_conf(conf, group=None):
 
 @click.option("--description", help="A description of what makes this run special")
 def gridsearch(skip, name, conf_file, param_grid_file, input_images, input_saliencies, wdb, description):
+    def set_value_if_exists(dict : dict, key, value):
+        if key in dict.keys():
+            dict[key] = value
+
     # load param_grid
     with open(param_grid_file) as f:
         param_grid = json.load(f)
     
     # load config file
     with open(conf_file) as f:
-        conf = json.load(f)
+        conf : dict = json.load(f)
 
     # overwrite params given as args
     if skip:
@@ -132,29 +148,17 @@ def gridsearch(skip, name, conf_file, param_grid_file, input_images, input_salie
     if description:
         conf["description"] = description
     if input_images:
-        if "pretrain_one_task" in conf.keys():
-            pretrain_one_task_conf = conf["pretrain_one_task"]
-            pretrain_one_task_conf["input_images_train"] = os.path.join(input_images, "train")
-            pretrain_one_task_conf["input_images_val"] = os.path.join(input_images, "val")
-            pretrain_one_task_conf["input_images_run"] = os.path.join(input_images, "run")
-        if "train" in conf.keys():
-            train_conf = conf["train"]
-            train_conf["input_images_train"] = os.path.join(input_images, "train")
-            train_conf["input_images_val"] = os.path.join(input_images, "val")
-            train_conf["input_images_run"] = os.path.join(input_images, "run")
-        if "test" in conf.keys():
-            test_conf = conf["test"]
-            test_conf["input_images_test"] = os.path.join(input_images, "val") # TODO: change to /test once testdata available
-        if "run" in conf.keys():
-            run_conf = conf["run"]
-            run_conf["input_images_run"] = os.path.join(input_images, "run")
+        # replace all occurrences of input_images with the updated path
+        for stage_conf in [v for v in conf.values() if isinstance(v, dict)]:
+            set_value_if_exists(stage_conf, "input_images_train", os.path.join(input_images, "train"))
+            set_value_if_exists(stage_conf, "input_images_val", os.path.join(input_images, "val"))
+            set_value_if_exists(stage_conf, "input_images_test", os.path.join(input_images, "val")) # TODO: change to /test once test saliency data available
+            set_value_if_exists(stage_conf, "input_images_run", os.path.join(input_images, "run"))
+
     if input_saliencies:
-        if "pretrain_one_task" in conf.keys():
-            conf["pretrain_one_task"]["input_saliencies"] = input_saliencies
-        if "train" in conf.keys():
-            conf["train"]["input_saliencies"] = input_saliencies
-        if "test" in conf.keys():
-            conf["test"]["input_saliencies"] = input_saliencies
+        # replace all occurrences of input_saliencies with the updated path
+        for stage_conf in [v for v in conf.values() if isinstance(v, dict)]:
+            set_value_if_exists(stage_conf, "input_saliencies", input_saliencies)
     
     os.environ["WANDB_MODE"] = "online" if wdb else "offline"
 

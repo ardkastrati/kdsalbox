@@ -25,7 +25,7 @@ class Runner(AStage):
         super().__init__(name=name, verbose=verbose)
         self._model : HyperModel = None
 
-        run_conf = conf["run"]
+        run_conf = conf[name]
         self._tasks = conf["tasks"]
         self._device = f"cuda:{conf['gpu']}" if torch.cuda.is_available() else "cpu"
         self._input_dir = run_conf["input_images_run"]

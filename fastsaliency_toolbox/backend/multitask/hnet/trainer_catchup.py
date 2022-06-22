@@ -1,10 +1,11 @@
 """
-PreTrainerOneTask
------------------
+Trainer
+-------
 
-Pretrains a hypernetwork and mainnetwork on just one task 
-(but the architecture can be later used to train multiple tasks)
+Trains a hypernetwork and mainnetwork on multiple tasks at the same time
 and reports the progress and metrics to wandb.
+
+TODO: add a lot more documentation here about all the parameters
 
 """
 
@@ -15,22 +16,23 @@ import wandb
 
 from backend.datasets import TrainDataManager, RunDataManager
 from backend.parameters import ParameterMap
-from backend.image_processing import process
 from backend.multitask.pipeline.pipeline import AStage
 from backend.multitask.hnet.hyper_model import HyperModel
 from backend.multitask.hnet.trainer_utils import run_model_on_images_and_report_to_wandb as track_progress
-from backend.multitask.hnet.trainer_utils import train_one_epoch_just_one_task as train_one_epoch
+from backend.multitask.hnet.trainer_utils import train_one_epoch_multitask as train_one_epoch
 from backend.multitask.hnet.trainer_utils import train_val_one_epoch_and_report_to_wandb as train_and_val
 from backend.multitask.hnet.trainer_utils import save
 
-class PreTrainerOneTask(AStage):
+class TrainerCatchup(AStage):
     def __init__(self, conf, name, verbose):
         super().__init__(name=name, verbose=verbose)
         self._model : HyperModel = None
 
-        train_conf = conf["pretrain_one_task"]
+        train_conf = conf[name]
 
         self._batch_size = train_conf["batch_size"]
+        self._imgs_per_task_train = train_conf["imgs_per_task_train"]
+        self._imgs_per_task_val = train_conf["imgs_per_task_val"]
 
         self._export_path = "export/"
         self._device = f"cuda:{conf['gpu']}" if torch.cuda.is_available() else "cpu"
@@ -42,10 +44,12 @@ class PreTrainerOneTask(AStage):
 
         self._tasks = conf["tasks"]
         self._task_cnt = conf["model"]["hnet"]["task_cnt"]
-        self._selected_task = self._tasks[0]
+        self._batches_per_task_train = self._imgs_per_task_train // self._batch_size
+        self._batches_per_task_val = self._imgs_per_task_val // self._batch_size
 
         self._loss_fn = train_conf["loss"]
         self._epochs = train_conf["epochs"]
+        self._consecutive_batches_per_task = train_conf["consecutive_batches_per_task"]
         self._lr = train_conf["lr"]
         self._lr_decay = train_conf["lr_decay"]
         self._freeze_encoder_steps = train_conf["freeze_encoder_steps"]
@@ -76,20 +80,22 @@ class PreTrainerOneTask(AStage):
         os.makedirs(self._export_dir, exist_ok=True)
 
         # data loading
-        sal_path = os.path.join(self._input_saliencies, self._selected_task)
+        sal_folders = [os.path.join(self._input_saliencies, task) for task in self._tasks] # path to saliency folder for all models
 
-        train_dataset = TrainDataManager(self._train_img_path, sal_path, self._verbose, self._preprocess_parameter_map)
-        val_dataset = TrainDataManager(self._val_img_path, sal_path, self._verbose, self._preprocess_parameter_map)
+        train_datasets = [TrainDataManager(self._train_img_path, sal_path, self._verbose, self._preprocess_parameter_map) for sal_path in sal_folders]
+        val_datasets = [TrainDataManager(self._val_img_path, sal_path, self._verbose, self._preprocess_parameter_map) for sal_path in sal_folders]
 
         self._dataloaders = {
-            "train": DataLoader(train_dataset, batch_size=self._batch_size, shuffle=True, num_workers=4),
-            "val": DataLoader(val_dataset, batch_size=self._batch_size, shuffle=True, num_workers=4),
+            "train": {task:DataLoader(ds, batch_size=self._batch_size, shuffle=True, num_workers=4) for (task,ds) in zip(self._tasks, train_datasets)},
+            "val": {task:DataLoader(ds, batch_size=self._batch_size, shuffle=True, num_workers=4) for (task,ds) in zip(self._tasks, val_datasets)},
         }
 
         self._run_dataloader = DataLoader(RunDataManager(self._input_images_run, "", verbose=False, recursive=False), batch_size=1)
 
         # sanity checks
         assert self._task_cnt == len(self._tasks)
+        assert self._imgs_per_task_train <= min([len(ds) for ds in train_datasets])
+        assert self._imgs_per_task_val <= min([len(ds) for ds in val_datasets])
 
 
     def execute(self):
@@ -101,8 +107,6 @@ class PreTrainerOneTask(AStage):
         model = self._model
         model.build()
         model.to(self._device)
-
-        selected_task_id = model.task_to_id(self._selected_task)
 
         lr = self._lr
         lr_decay = self._lr_decay
@@ -125,7 +129,7 @@ class PreTrainerOneTask(AStage):
 
         # evaluate how the model performs initially
         track_progress(f"{self.name} - Initialization", self._tasks, model, self._run_dataloader, 
-            self._postprocess_parameter_map, self._device)
+                    self._postprocess_parameter_map, self._device)
 
         # training loop
         for epoch in range(0, self._epochs):
@@ -141,8 +145,9 @@ class PreTrainerOneTask(AStage):
                 model.mnet.unfreeze_encoder()
 
             # runs one epoch
-            train_one = lambda mode : train_one_epoch(model, self._dataloaders, loss,
-                optimizer, mode, self._device, selected_task_id, self._log_freq)
+            train_one = lambda mode : train_one_epoch(self._tasks, model, self._dataloaders, loss, optimizer,
+                mode, self._device, self._batches_per_task_train, self._batches_per_task_val,
+                self._consecutive_batches_per_task, self._log_freq)
             
             # generates some images to see how good the model works this stage
             run_one = lambda is_best_model : track_progress(f"{self.name} - Progress Epoch {epoch}", self._tasks, model, 
@@ -161,4 +166,5 @@ class PreTrainerOneTask(AStage):
     
     def cleanup(self):
         super().cleanup()
+
         del self._dataloaders

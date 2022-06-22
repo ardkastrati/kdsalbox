@@ -1,5 +1,4 @@
 import torch.nn as nn
-from hypnettorch.hnets.chunked_mlp_hnet import ChunkedHMLP
 
 import backend.multitask.custom_weight_layers as cwl
 from backend.multitask.mobilenetv2_wrapper import mobilenet_v2_pretrained
@@ -28,9 +27,9 @@ class Decoder(cwl.CustomWeightsLayer):
         self.compute_cw_param_shapes()
 
 
-class Student(cwl.CustomWeightsLayer):
+class MNET(cwl.CustomWeightsLayer):
     def __init__(self, mnet_conf):
-        super(Student, self).__init__()
+        super(MNET, self).__init__()
 
         self.mobilenet_cutoff = mnet_conf["mobilenet_cutoff"]
 
@@ -47,27 +46,3 @@ class Student(cwl.CustomWeightsLayer):
     def unfreeze_encoder(self):
         for param in self.get_layer("encoder").parameters():
             param.requires_grad_(True)
-
-
-######################
-#  LOAD & SAVE MODEL #
-######################
-
-# builds a hypernetwork and mainnetwork
-def hnet_mnet_from_config(conf):
-    model_conf = conf["model"]
-    hnet_conf = model_conf["hnet"]
-    mnet_conf = model_conf["mnet"]
-
-    mnet = Student(mnet_conf)
-    hnet = ChunkedHMLP(
-        target_shapes=mnet.get_cw_param_shapes(), 
-        chunk_size=hnet_conf["chunk_size"],
-        layers=hnet_conf["hidden_layers"], # the sizes of the hidden layers (excluding the last layer that generates the weights)
-        cond_in_size=hnet_conf["embedding_size"], # the size of the embeddings
-        num_cond_embs=hnet_conf["task_cnt"], # the number of embeddings we want to learn
-        cond_chunk_embs = hnet_conf["chunk_emb_per_task"], # chunk embeddings depend on task id
-        chunk_emb_size=hnet_conf["chunk_emb_size"] # size of the chunk embeddings
-    )
-
-    return hnet,mnet

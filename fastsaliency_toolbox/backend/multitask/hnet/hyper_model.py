@@ -50,7 +50,7 @@ class HyperModel():
         if (self.hnet is None or self.mnet is None): 
             self.build()
 
-        weights = self.hnet(cond_id=task_id)
+        weights = self.hnet(task_id=task_id)
         Y = self.mnet.forward(X, weights=weights)
         return Y
 

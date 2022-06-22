@@ -16,6 +16,7 @@ import backend.student as stud
 from backend.multitask.hnet.hyper_model import HyperModel
 from backend.multitask.pipeline.pipeline import AStage
 from backend.multitask.hnet.datasets import WeightDataset
+from backend.multitask.hnet.trainer_utils import save, pretty_print_epoch
 
 class PreTrainerWeights(AStage):
     def __init__(self, conf, name, verbose):
@@ -242,11 +243,11 @@ class PreTrainerWeights(AStage):
 
             # train the networks
             loss_train = self._train_one_epoch(hnet, self._dataloaders, loss, optimizer, "train")
-            if epoch % 25 == 0 and self._verbose: self.pretty_print_epoch(epoch, "train", loss_train, lr)
+            if epoch % 25 == 0 and self._verbose: pretty_print_epoch(epoch, "train", loss_train, lr)
 
             # validate the networks
             loss_val = self._train_one_epoch(hnet, self._dataloaders, loss, optimizer, "val")
-            if epoch % 25 == 0 and self._verbose: self.pretty_print_epoch(epoch, "val", loss_val, lr)
+            if epoch % 25 == 0 and self._verbose: pretty_print_epoch(epoch, "val", loss_val, lr)
 
             ### REPORTING / STATS ###
             if epoch % 25 == 0:
@@ -259,12 +260,12 @@ class PreTrainerWeights(AStage):
                     os.makedirs(checkpoint_dir, exist_ok=True)
                     path = f"{checkpoint_dir}/{epoch}_{loss_val:f}.pth"
 
-                    self.save(path, model, self._save_checkpoints_to_wandb)
+                    save(path, model, self._save_checkpoints_to_wandb)
                     
                     # overwrite the best model
                     if is_best_model:
                         smallest_loss = loss_val
-                        self.save(export_path_best, model, self._save_checkpoints_to_wandb)
+                        save(export_path_best, model, self._save_checkpoints_to_wandb)
                 
                 # save/overwrite results at the end of each epoch
                 stats_file = os.path.join(os.path.relpath(self._logging_dir, wandb.run.dir), "pretrain_all_results").replace("\\", "/")
@@ -278,23 +279,10 @@ class PreTrainerWeights(AStage):
                     })
         
         # save the final hypernetwork
-        self.save(export_path_final, model, save_to_wandb=True)
+        save(export_path_final, model, save_to_wandb=True)
 
         return model
 
-    # saves the hnet to disk & wandb
-    def save(self, path : str, model : HyperModel, save_to_wandb : bool = True):
-        model.save(path)
-
-        if save_to_wandb:
-            wandb.save(path, base_path=wandb.run.dir)
-
-    def pretty_print_epoch(self, epoch, mode, loss, lr):
-        print("--------------------------------------------->>>>>>")
-        print(f"Epoch {epoch}: loss {mode} {loss}, lr {lr}", flush=True)
-        print("--------------------------------------------->>>>>>")
-
     def cleanup(self):
         super().cleanup()
-
         del self._dataloaders

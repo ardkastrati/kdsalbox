@@ -27,7 +27,7 @@ class Tester(AStage):
         super().__init__(name=name, verbose=verbose)
         self._model : HyperModel = None
 
-        test_conf = conf["test"]
+        test_conf = conf[name]
 
         self._batch_size = 1 # TODO: add support for batch_size > 1 (make sure per_image_statistics still works!)
         self._imgs_per_task_test = test_conf["imgs_per_task_test"]

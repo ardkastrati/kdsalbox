@@ -1,9 +1,7 @@
 import torch.nn as nn
-from hypnettorch.hnets.chunked_mlp_hnet import ChunkedHMLP
 
 import backend.multitask.custom_weight_layers as cwl
 from backend.multitask.mobilenetv2_wrapper import mobilenet_v2_pretrained
-from backend.multitask.hnet.full.hnet import HNET
 
 class Decoder(cwl.CustomWeightsLayer):
     def __init__(self, mnet_conf):
@@ -29,9 +27,9 @@ class Decoder(cwl.CustomWeightsLayer):
         self.compute_cw_param_shapes()
 
 
-class Student(cwl.CustomWeightsLayer):
+class MNET(cwl.CustomWeightsLayer):
     def __init__(self, mnet_conf):
-        super(Student, self).__init__()
+        super(MNET, self).__init__()
 
         self.mobilenet_cutoff = mnet_conf["mobilenet_cutoff"]
 
@@ -48,22 +46,3 @@ class Student(cwl.CustomWeightsLayer):
     def unfreeze_encoder(self):
         for param in self.get_layer("encoder").parameters():
             param.requires_grad_(True)
-
-
-######################
-#  LOAD & SAVE MODEL #
-######################
-
-# builds a hypernetwork and mainnetwork
-def hnet_mnet_from_config(conf):
-    model_conf = conf["model"]
-    hnet_conf = model_conf["hnet"]
-    mnet_conf = model_conf["mnet"]
-
-    mnet = Student(mnet_conf)
-    hnet = HNET(
-        task_cnt=hnet_conf["task_cnt"],
-        target_shapes=mnet.get_cw_param_shapes(), 
-    )
-
-    return hnet,mnet
