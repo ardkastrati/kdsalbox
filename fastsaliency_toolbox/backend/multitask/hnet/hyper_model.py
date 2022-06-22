@@ -10,6 +10,8 @@ from typing import Callable, Dict, List, Tuple
 import torch
 import torch.nn as nn
 
+from backend.multitask.hnet.hnet_interface import AHNET
+
 class HyperModel():
     def __init__(self, 
         hnet_mnet_fn : Callable[[Dict], Tuple[nn.Module, nn.Module]], 
@@ -20,8 +22,10 @@ class HyperModel():
             tasks (List[str]): The names of the tasks the network will be learning. Used to create a internal mapping of task-name
                 to task-id such that when the model is loaded with a different ordering of tasks it will still work.
         """
+        self._tasks = tasks
+        self._device = None
         self._hnet_mnet_fn = hnet_mnet_fn
-        self.hnet : nn.Module = None
+        self.hnet : AHNET = None
         self.mnet : nn.Module = None
         self._task_id_map = {t:i for i,t in enumerate(tasks)}
 
@@ -39,6 +43,8 @@ class HyperModel():
         """ Moves the hypernetwork and mainnetwork to a device """
         self.hnet.to(device)
         self.mnet.to(device)
+
+        self._device = device
 
     def parameters(self):
         """ Gets all the parameters of the model
@@ -74,6 +80,11 @@ class HyperModel():
             sal = self(task_id, img)
         return sal
 
+    @property
+    def tasks(self):
+        """ All the tasks that this model supports """
+        return self._tasks
+
     def task_to_id(self, task):
         """ Maps a task name to a task id. """
         return self._task_id_map[task]
@@ -97,3 +108,7 @@ class HyperModel():
         d["mnet_model"] = self.mnet.state_dict()
 
         torch.save(d, path)
+
+    @property
+    def device(self):
+        return self._device

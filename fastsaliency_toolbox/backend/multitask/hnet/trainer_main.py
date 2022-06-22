@@ -1,9 +1,9 @@
 """
-Trainer
+MainTrainer
 -------
 
 Trains a hypernetwork and mainnetwork on multiple tasks at the same time
-but freezes all the parameters of the HNET that are shared between tasks
+and reports the progress and metrics to wandb.
 
 TODO: add a lot more documentation here about all the parameters
 
@@ -14,12 +14,11 @@ from typing import Dict
 from torch.utils.data import DataLoader
 
 from backend.datasets import TrainDataManager
-from backend.multitask.hnet.train_impl.data import MultitaskBatchProvider
 from backend.multitask.hnet.trainer import ASaliencyTrainer
+from backend.multitask.hnet.train_impl.data import MultitaskBatchProvider
 from backend.multitask.hnet.train_api.data import DataProvider
-from backend.multitask.hnet.train_impl.actions import FreezeHNETForCatchup
 
-class TrainerCatchup(ASaliencyTrainer):
+class MainTrainer(ASaliencyTrainer):
     def __init__(self, conf, name, verbose):
         super().__init__(conf, name=name, verbose=verbose)
 
@@ -52,9 +51,8 @@ class TrainerCatchup(ASaliencyTrainer):
             "val": MultitaskBatchProvider(self._batches_per_task_val, self._consecutive_batches_per_task, val_dataloaders)
         }
 
-        return dataproviders
+        # sanity checks
+        assert self._imgs_per_task_train <= min([len(ds) for ds in train_datasets])
+        assert self._imgs_per_task_val <= min([len(ds) for ds in val_datasets])
 
-    def setup(self, work_dir_path: str = None, input=None):
-        super().setup(work_dir_path, input)
-        
-        self._trainer.add_epoch_start_action(FreezeHNETForCatchup(self._epochs - 1))
+        return dataproviders

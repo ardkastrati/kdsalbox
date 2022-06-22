@@ -32,6 +32,7 @@
         
         "auto_checkpoint_steps": 250,
 
+        "log_freq": 100,
         "wandb": {
             "save_checkpoints_to_wandb": false,
             "watch": {
@@ -57,7 +58,7 @@
         
         "auto_checkpoint_steps": 7,
 
-        "log_freq": 100,
+        "batch_log_freq": 100,
         "wandb": {
             "save_checkpoints_to_wandb": false,
             "watch": {
@@ -86,7 +87,7 @@
         
         "auto_checkpoint_steps": 15,
 
-        "log_freq": 100,
+        "batch_log_freq": 100,
         "wandb": {
             "save_checkpoints_to_wandb": false,
             "watch": {

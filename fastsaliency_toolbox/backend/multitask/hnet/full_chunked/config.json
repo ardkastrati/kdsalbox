@@ -28,15 +28,18 @@
     "pretrain_weights": {
         "target_model_weights": "./models/",
 
+        "input_images_run": "./dataset/dummy_images/run/",
+
         "loss": "MSELoss",
         "batch_size": 4,
-        "epochs": 1,
+        "epochs": 1000,
         "lr": 0.001,
         "lr_decay": 0.1,
         "decay_epochs": [],
         
         "auto_checkpoint_steps": 250,
 
+        "log_freq": 100,
         "wandb": {
             "save_checkpoints_to_wandb": false,
             "watch": {
@@ -54,7 +57,7 @@
         
         "loss": "BCELoss",
         "batch_size": 4,
-        "epochs": 15,
+        "epochs": 1,
         "lr": 0.001,
         "lr_decay": 0.1,
         "freeze_encoder_steps": 0,
@@ -62,7 +65,7 @@
         
         "auto_checkpoint_steps": 7,
 
-        "log_freq": 100,
+        "batch_log_freq": 100,
         "wandb": {
             "save_checkpoints_to_wandb": false,
             "watch": {
@@ -91,7 +94,7 @@
         
         "auto_checkpoint_steps": 7,
 
-        "log_freq": 100,
+        "batch_log_freq": 100,
         "wandb": {
             "save_checkpoints_to_wandb": false,
             "watch": {
@@ -120,7 +123,7 @@
         
         "auto_checkpoint_steps": 7,
 
-        "log_freq": 100,
+        "batch_log_freq": 100,
         "wandb": {
             "save_checkpoints_to_wandb": false,
             "watch": {

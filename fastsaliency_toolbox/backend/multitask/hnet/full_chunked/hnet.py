@@ -1,5 +1,5 @@
 import torch
-from typing import List
+from typing import List, Union
 from hypnettorch.hnets.chunked_mlp_hnet import ChunkedHMLP
 
 from backend.multitask.hnet.hnet_interface import AHNET
@@ -18,7 +18,7 @@ class HNET(AHNET):
             chunk_emb_size=hnet_conf["chunk_emb_size"] # size of the chunk embeddings
         )
 
-    def forward(self, task_id : int):
+    def forward(self, task_id : Union[int, List[int]]):
         return self.hnet.forward(cond_id = task_id)
 
     def freeze_hnet_for_catchup(self):

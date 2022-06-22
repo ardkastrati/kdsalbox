@@ -19,7 +19,7 @@ import wandb
 from backend.multitask.hnet.hyper_model import HyperModel
 from backend.multitask.hnet.runner import Runner
 from backend.multitask.hnet.tester import Tester
-from backend.multitask.hnet.trainer import Trainer
+from backend.multitask.hnet.trainer_main import MainTrainer
 from backend.multitask.hnet.pretrainer_weights import PreTrainerWeights
 from backend.multitask.hnet.pretrainer_one_task import PreTrainerOneTask
 from backend.multitask.pipeline.pipeline import Pipeline
@@ -92,7 +92,7 @@ def run_with_conf(conf, group=None):
             stages.append(TrainerCatchup(conf, "train_catchup", verbose=verbose))
             stages.append(ExportStage("export - train_catchup", path=f"{os.path.join(run_dir, 'train_catchup', 'best.pth')}", verbose=verbose))
         if "train" in conf.keys():
-            stages.append(Trainer(conf, "train", verbose=verbose))
+            stages.append(MainTrainer(conf, "train", verbose=verbose))
             stages.append(ExportStage("export - train", path=f"{os.path.join(run_dir, 'train', 'best.pth')}", verbose=verbose))
         if "test" in conf.keys():
             stages.append(Tester(conf, "test", verbose=verbose))
