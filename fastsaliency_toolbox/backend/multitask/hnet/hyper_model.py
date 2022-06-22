@@ -25,8 +25,11 @@ class HyperModel():
         self.mnet : nn.Module = None
         self._task_id_map = {t:i for i,t in enumerate(tasks)}
 
-    def build(self):
+    def build(self, force_rebuild=False):
         """ Actually creates the hypernetwork and mainnetwork in memory """
+        # only create model if not created before
+        if not force_rebuild and self.hnet is not None and self.mnet is not None: return
+
         hnet,mnet = self._hnet_mnet_fn()
         self.hnet = hnet
         self.mnet = mnet
