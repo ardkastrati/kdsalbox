@@ -18,7 +18,7 @@ class HNET(AHNET):
         for n in self._target_numels:
             total_weights += n
 
-        self._l1 = nn.Linear(self._task_cnt, total_weights)
+        self._l1 = nn.Linear(self._task_cnt, total_weights, bias=False)
 
     def forward(self, task_id : int):
         device = list(self.parameters())[0].device

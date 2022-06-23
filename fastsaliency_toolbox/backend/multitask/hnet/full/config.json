@@ -2,8 +2,8 @@
     "type": "full",
     "gpu": 0,
 
-    "tasks": ["AIM", "SUN", "IKN", "GBVS", "BMS", "IMSIG", "RARE2012"], 
-    "skip": ["pretrain_weights"],
+    "tasks": ["AIM", "SUN"], 
+    "skip": ["pretrain_weights", "pretrain_one_task"],
 
     "name": "Full - One hot to full",
     "description": "Goal: Learn all 7 networks in one",
@@ -12,7 +12,7 @@
 
     "model": {
         "hnet": {
-            "task_cnt": 7
+            "task_cnt": 2
         },
         "mnet": {
             "decoder_non_linearity": "ReLU6",
