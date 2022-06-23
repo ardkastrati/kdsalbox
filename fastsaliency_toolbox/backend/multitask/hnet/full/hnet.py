@@ -1,4 +1,4 @@
-from typing import List
+from typing import Dict, List
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -39,3 +39,15 @@ class HNET(AHNET):
     def unfreeze_hnet_from_catchup(self):
         # no catchup parameters
         pass
+
+    def get_gradients_on_outputs(self) -> Dict[int, List[torch.Tensor]]:
+        weight_param = self.get_parameter("_l1.weight")
+        grads = weight_param.grad.detach() # has shape (total_weights, task_cnt)
+
+        grads_per_task = {}
+        for task_id in range(self._task_cnt):
+            grad = grads[:,task_id] # has shape (total_weights)
+            grad_per_target = list(grad.split(self._target_numels))
+            grads_per_task[task_id] = grad_per_target
+
+        return grads_per_task

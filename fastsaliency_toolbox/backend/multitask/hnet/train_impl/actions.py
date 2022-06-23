@@ -1,5 +1,7 @@
+from math import ceil
 from typing import List
 import numpy as np
+import torch
 
 from backend.multitask.hnet.train_api.actions import EpochAction
 from backend.multitask.hnet.train_api.training import ATrainer
@@ -91,3 +93,36 @@ class BatchLogger(BatchAction):
         should_log = (batch_index % self._log_freq == 0)
         if should_log:
             print(f"[{mode}] Batch {batch_index}/{total_batches}: current accumulated loss {np.mean(batch_losses)}", flush=True)
+
+
+class WeightWatcher(BatchAction):
+    """ Prints the average absolute gradient on all weights of the last layer of the HNET per task """
+    def __init__(self, log_freq : int, groups : int = None):
+        super().__init__()
+
+        self._log_freq = log_freq
+        self._groups = groups
+
+    def invoke(self, trainer: ATrainer, mode: str, batch_losses: List[float], total_batches : int):
+        batch_index = len(batch_losses) - 1
+        
+        should_log = (batch_index % self._log_freq == 0)
+        if not should_log: return
+
+        grads_per_task = trainer.model.hnet.get_gradients_on_outputs()
+
+        for task_id in grads_per_task.keys():
+            grads_per_target : List[torch.Tensor] = grads_per_task[task_id]
+
+            grad_means = [grads.abs().mean().item() for grads in grads_per_target]
+
+            # if groups then aggregate into n almost same sized groups
+            if self._groups:
+                split_size = ceil(len(grad_means) / self._groups)
+                means_per_group : List[torch.Tensor] = list(torch.tensor(np.array(grad_means)).split(split_size))
+                mean_per_group = [means.mean() for means in means_per_group]
+                
+                grad_means = mean_per_group
+            
+            print(f"Task {task_id} : {', '.join([f'{mean:.3f}' for mean in grad_means])}")
+        

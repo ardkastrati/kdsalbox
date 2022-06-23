@@ -1,3 +1,15 @@
+""" 
+API that facilitates the use of layers with external weights in models. 
+A CustomWeightsLayer is basically a model that can have
+    - normal nn.Module layers with their own parameters
+    - a leaf cwl that requires a given amount of external weights fed into the forward call
+    - child cwls (will be handled recursively)
+
+The layers are called in sequential order of registration.
+
+"""
+
+from typing import List, Tuple
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -13,7 +25,8 @@ class CustomWeightsLayer(nn.Module):
     def __init__(self):
         super(CustomWeightsLayer, self).__init__()
         self._cw_layers = nn.ModuleDict()
-        self._cw_param_shapes = []
+        self._cw_param_shapes : List[torch.Size] = []
+        self._named_cw_param_shapes : List[Tuple[str, torch.Size]] = []
 
     def forward(self, x, weights):
         index = 0
@@ -41,14 +54,24 @@ class CustomWeightsLayer(nn.Module):
     def get_layer(self, name:str):
         return self._cw_layers[name]
 
-    def compute_cw_param_shapes(self):
+    def compute_cw_param_shapes(self, name_prefix : str = ""):
         self._cw_param_shapes = []
-        for cwl in self._cw_layers.values():
-            cwl.compute_cw_param_shapes() # just to make sure all the child layers have been properly initialized
+        self._named_cw_param_shapes = []
+
+        for cwl_name in self._cw_layers.keys():
+            cwl = self._cw_layers[cwl_name]
+
+            # compute the cw param shapes recursively
+            cwl.compute_cw_param_shapes(f"{name_prefix}.{cwl_name}") 
+
             self._cw_param_shapes.extend(cwl.get_cw_param_shapes())
+            self._named_cw_param_shapes.extend(cwl.get_named_cw_param_shapes())
 
     def get_cw_param_shapes(self):
         return self._cw_param_shapes
+    
+    def get_named_cw_param_shapes(self):
+        return self._named_cw_param_shapes
 
 class _LeafModule(CustomWeightsLayer):
     """
@@ -63,7 +86,8 @@ class _LeafModule(CustomWeightsLayer):
         
         self.layer = layer
 
-        self.compute_cw_param_shapes()
+        self._cw_param_shapes = []
+        self._named_cw_param_shapes = []
 
     def register_layer(self, layer): 
         raise RuntimeError("Should not call register_layer on a _ModuleWrapper")
@@ -71,8 +95,9 @@ class _LeafModule(CustomWeightsLayer):
     def forward(self, x, weights):
         return self.layer(x)
 
-    def compute_cw_param_shapes(self):
-        self._cw_param_shapes = []
+    def compute_cw_param_shapes(self, name_prefix : str = ""):
+        # computed once in c'tor
+        pass        
 
 class ModuleWrapper(CustomWeightsLayer):
     """
@@ -90,7 +115,13 @@ class ModuleWrapper(CustomWeightsLayer):
         super().__init__()
 
         self.fwd = forward
-        self._cw_param_shapes = [p.size() for p in blueprint.parameters()]
+        self._non_prefixed_named_cw_param_shapes = [(name, p.size()) for name,p in blueprint.named_parameters()]
+        self._cw_param_shapes = [size for _,size in self._non_prefixed_named_cw_param_shapes]
+
+        # initially we dont have a prefix on the parameter names
+        self._named_cw_prefix = ""
+        self._named_cw_param_shapes = self._non_prefixed_named_cw_param_shapes
+
 
     def register_layer(self, layer): 
         raise RuntimeError("Should not call register_layer on a CWLWrapper")
@@ -98,8 +129,12 @@ class ModuleWrapper(CustomWeightsLayer):
     def forward(self, x, weights):
         return self.fwd(x, weights)
 
-    def compute_cw_param_shapes(self): 
-        pass # initialized once in c'tor
+    def compute_cw_param_shapes(self, name_prefix : str = ""):
+        # update param name prefix
+        self._named_cw_prefix = name_prefix
+        self._named_cw_param_shapes = [(f"{name_prefix}.{name}", shape) for name,shape in self._non_prefixed_named_cw_param_shapes]
+
+        
 
 
 #########################
@@ -115,7 +150,6 @@ def conv2d(in_channels, out_channels, kernel_size, stride=1, padding=0, dilation
         with_bias if bias else without_bias
     )
 
-    cwl.compute_cw_param_shapes()
     return cwl
 
 def batchnorm2d(num_features):
@@ -135,7 +169,6 @@ def block(in_channels, out_channels, non_lin, interpolate):
     if interpolate:
         cwl.register_layer(nn.Upsample(scale_factor=2, mode="bilinear", align_corners=False)) # Upsample has no learnable parameters
 
-    cwl.compute_cw_param_shapes()
     return cwl
 
 
@@ -181,13 +214,20 @@ class BatchNorm2d(CustomWeightsLayer):
         self._bn = _BN2dCW(num_features, affine=False)
 
         blueprint = nn.BatchNorm2d(num_features, affine=True)
-        self._cw_param_shapes = [p.size() for p in blueprint.parameters()]
+        self._non_prefixed_named_cw_param_shapes = [(name, p.size()) for name,p in blueprint.named_parameters()]
+        self._cw_param_shapes = [size for _,size in self._non_prefixed_named_cw_param_shapes]
+
+        # initially we dont have a prefix on the parameter names
+        self._named_cw_prefix = ""
+        self._named_cw_param_shapes = self._non_prefixed_named_cw_param_shapes
     
     def forward(self, x, weights):
         return self._bn(x, weights)
 
-    def compute_cw_param_shapes(self):
-        pass
+    def compute_cw_param_shapes(self, name_prefix : str = ""):
+        # update param name prefix
+        self._named_cw_prefix = name_prefix
+        self._named_cw_param_shapes = [(f"{name_prefix}.{name}", shape) for name,shape in self._non_prefixed_named_cw_param_shapes]
 
     def register_layer(self, layer, name=None):
         raise RuntimeError("Should not call register_layer on a BatchNorm2d")

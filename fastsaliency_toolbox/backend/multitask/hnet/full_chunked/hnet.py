@@ -26,3 +26,7 @@ class HNET(AHNET):
         
     def unfreeze_hnet_from_catchup(self):
         pass
+
+    def get_gradients_on_outputs(self) -> List[torch.Tensor]:
+        print("Warning: observing gradients of ChunkedHLMP is currently not yet supported!")
+        return []

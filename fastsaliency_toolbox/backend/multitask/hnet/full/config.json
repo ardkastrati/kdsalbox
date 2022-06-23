@@ -22,6 +22,7 @@
 
     "pretrain_weights": {
         "target_model_weights": "./models/",
+        "input_images_run": "./dataset/dummy_images/run/",
 
         "loss": "MSELoss",
         "batch_size": 4,
@@ -71,9 +72,9 @@
     "train": {
         "input_saliencies": "./dataset/dummy_saliency/",
         "input_images_train": "./dataset/dummy_images/train/",
-        "imgs_per_task_train": 1500,
+        "imgs_per_task_train": 10000,
         "input_images_val": "./dataset/dummy_images/val/",
-        "imgs_per_task_val": 750,
+        "imgs_per_task_val": 5000,
         "input_images_run": "./dataset/dummy_images/run/",
         
         "loss": "BCELoss",

@@ -8,7 +8,7 @@ that can be used by trainers for example.
 """
 
 from abc import ABC, abstractmethod
-from typing import List
+from typing import Dict, List
 import torch
 import torch.nn as nn
 
@@ -29,4 +29,9 @@ class AHNET(nn.Module, ABC):
 
     @abstractmethod
     def unfreeze_hnet_from_catchup(self):
+        pass
+
+    @abstractmethod
+    def get_gradients_on_outputs(self) -> Dict[int, List[torch.Tensor]]:
+        """ Returns a dictionary that for each task_id contains a list of gradients (representing the different targets = MNET parameters) """
         pass

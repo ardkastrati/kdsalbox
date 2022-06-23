@@ -23,9 +23,6 @@ class Decoder(cwl.CustomWeightsLayer):
         self.register_layer(cwl.block(64, 64, non_lin, interpolate=False))
         self.register_layer(cwl.conv2d(64, 1, kernel_size=1, padding=0))
 
-        # generate the shapes of the params that are learned by the hypernetwork
-        self.compute_cw_param_shapes()
-
 
 class MNET(cwl.CustomWeightsLayer):
     def __init__(self, mnet_conf):

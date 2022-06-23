@@ -29,7 +29,7 @@ from backend.multitask.hnet.trainer_catchup import TrainerCatchup
 @click.group()
 def cli():
     pass
-    
+
 @cli.command()
 def version():
     """Displays version information."""
@@ -60,23 +60,23 @@ def run_with_conf(conf, group=None):
         
     # construct and run the experiment pipeline
     try:
-        from backend.multitask.hnet.contextmod.model import hnet_mnet_from_config as hmfc_contextmod
         from backend.multitask.hnet.full_chunked.mnet import MNET as MFC
         from backend.multitask.hnet.full_chunked.hnet import HNET as HFC
         from backend.multitask.hnet.full.mnet import MNET as MF
         from backend.multitask.hnet.full.hnet import HNET as HF
-        def hnet_mnet_from_ctors(hnet_ctor, mnet_ctor, conf):
-            model_conf = conf["model"]
-            mnet = mnet_ctor(model_conf["mnet"])
-            hnet = hnet_ctor(mnet.get_cw_param_shapes(), model_conf["hnet"])
-            return hnet, mnet
 
-        net_factory = {
-            "contextmod": hmfc_contextmod,
-            "full_chunked": lambda conf : hnet_mnet_from_ctors(HFC, MFC, conf), 
-            "full": lambda conf : hnet_mnet_from_ctors(HF, MF, conf),
+        mnet_conf = conf["model"]["mnet"]
+        hnet_conf = conf["model"]["hnet"]
+
+        mnet_factory = {
+            "full_chunked": lambda : MFC(mnet_conf), 
+            "full": lambda : MF(mnet_conf),
         }
-        hnet_mnet_from_config = net_factory[conf["type"]]
+
+        hnet_factory = {
+            "full_chunked": lambda mnet : HFC(mnet.get_cw_param_shapes(), hnet_conf),
+            "full": lambda mnet : HF(mnet.get_cw_param_shapes(), hnet_conf)
+        }
 
         verbose = conf["verbose"]
         print(f"Running {conf['type']}")
@@ -100,7 +100,7 @@ def run_with_conf(conf, group=None):
             stages.append(Runner(conf, "run", verbose=verbose))
 
         pipeline = Pipeline(
-            input = HyperModel(lambda: hnet_mnet_from_config(conf), conf["tasks"]).build(),
+            input = HyperModel(mnet_factory[conf["type"]], hnet_factory[conf["type"]], conf["tasks"]).build(),
             work_dir_path=run_dir,
             stages = stages
         )

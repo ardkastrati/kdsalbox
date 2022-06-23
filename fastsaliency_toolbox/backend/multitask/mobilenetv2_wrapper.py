@@ -1,10 +1,14 @@
+""" Wraps the feature layers of the mobilenetv2 
+    and allows for the last n layers of the mobilenet to be learned externally.
+    Also uses the pretrained weights for the first x layers that are learned internally. """
+
 from typing import Callable, List, Optional
 import torch
 import torch.nn as nn
 from torchvision.models import mobilenet_v2
 import backend.multitask.custom_weight_layers as cwl
 
-def mobilenet_v2_pretrained(cutoff=0):
+def mobilenet_v2_pretrained(cutoff : int = 0):
     mv2 = mobilenet_v2(pretrained=True, progress=False)
     mv2f = MobileNetV2Features(cutoff)
 

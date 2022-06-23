@@ -6,27 +6,30 @@ Abstracts a hypernetwork and mainnetwork such that it can be treated as one mode
 
 """
 
-from typing import Callable, Dict, List, Tuple
+from typing import Callable, List
 import torch
-import torch.nn as nn
 
 from backend.multitask.hnet.hnet_interface import AHNET
+from backend.multitask.custom_weight_layers import CustomWeightsLayer
 
 class HyperModel():
     def __init__(self, 
-        hnet_mnet_fn : Callable[[Dict], Tuple[nn.Module, nn.Module]], 
+        mnet_fn : Callable[[], CustomWeightsLayer],
+        hnet_fn : Callable[[CustomWeightsLayer], AHNET], 
         tasks : List[str]):
         """
         Args:
-            hnet_mnet_fn (Function -> (hnet, mnet)): Factory function that creates the hypernetwork and the main-network when invoked.
+            mnet_fn (Function -> mnet): function that returns the mnet when invoked
+            hnet_fn (Fuction(mnet) -> hnet): function that builds the hnet from the mnet
             tasks (List[str]): The names of the tasks the network will be learning. Used to create a internal mapping of task-name
                 to task-id such that when the model is loaded with a different ordering of tasks it will still work.
         """
         self._tasks = tasks
         self._device = None
-        self._hnet_mnet_fn = hnet_mnet_fn
+        self._mnet_fn = mnet_fn
+        self._hnet_fn = hnet_fn
         self.hnet : AHNET = None
-        self.mnet : nn.Module = None
+        self.mnet : CustomWeightsLayer = None
         self._task_id_map = {t:i for i,t in enumerate(tasks)}
 
     def build(self, force_rebuild=False):
@@ -34,9 +37,17 @@ class HyperModel():
         # only create model if not created before
         if not force_rebuild and self.hnet is not None and self.mnet is not None: return
 
-        hnet,mnet = self._hnet_mnet_fn()
-        self.hnet = hnet
-        self.mnet = mnet
+        self.mnet = self._mnet_fn()
+        self.mnet.compute_cw_param_shapes()
+
+        self.hnet = self._hnet_fn(self.mnet)
+
+        print("Successfully built HNET")
+        print("The named parameters that are learned are:")
+        for (n,s) in self.mnet.get_named_cw_param_shapes():
+            print(f"\t-{n} ({s})")
+
+
         return self
 
     def to(self, device):

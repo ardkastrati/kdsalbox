@@ -24,6 +24,7 @@ from backend.multitask.hnet.train_impl_wandb.checkpointing import CheckpointerWa
 from backend.multitask.hnet.train_impl_wandb.progress_tracking import RunProgressTrackerWandb
 from backend.multitask.hnet.train_api.training import TrainStep
 from backend.multitask.hnet.train_impl.training import MultitaskTrainStep
+from backend.multitask.hnet.train_impl.actions import WeightWatcher
 
 # try to get a parameter value, if it doesnt exist then return default
 def _get(conf : Dict, key, default = None):
@@ -109,7 +110,9 @@ class ATrainer(AStage, ABC):
             .add_epoch_end_action(ReportLiveMetricsWandb(self._name, self._logging_dir, self._log_freq))
         
         if self._batch_log_freq:
-            self._trainer.add_batch_action(BatchLogger(self._batch_log_freq))
+            self._trainer\
+            .add_batch_action(BatchLogger(self._batch_log_freq))\
+            .add_batch_action(WeightWatcher(self._batch_log_freq, groups=30))
 
         # sanity checks
         assert self._task_cnt == len(self._tasks)
