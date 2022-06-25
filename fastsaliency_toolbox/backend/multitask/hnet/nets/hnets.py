@@ -58,7 +58,9 @@ class SimpleHNET(AHNET):
     SimpleHNET
     ----------
 
-    HNET that outputs all the weights at once
+    HNET that outputs all the weights at once.
+    Note that the the network will use the conditional task_embedding as an input
+    (which will be learned too).
 
     """
     def __init__(self, target_shapes : List[torch.Size], hnet_conf : dict):

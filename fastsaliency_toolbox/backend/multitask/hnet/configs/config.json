@@ -1,5 +1,4 @@
 {
-    "type": "full",
     "gpu": 0,
 
     "tasks": ["AIM", "SUN", "IKN", "GBVS"], 
@@ -15,7 +14,7 @@
             "type": "simple",
             "task_cnt": 4,
             "hidden_layers": [],
-            "embedding_size": 2
+            "embedding_size": 8
         },
         "mnet": {
             "encoder_type": "cwl",
@@ -43,7 +42,7 @@
         "freeze_encoder_steps": 0,
         "decay_epochs": [],
         
-        "auto_checkpoint_steps": 15,
+        "auto_checkpoint_steps": 7,
 
         "batch_log_freq": 100,
         "wandb": {

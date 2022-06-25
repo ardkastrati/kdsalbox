@@ -60,7 +60,7 @@ class PreTrainerWeights(ATrainer):
 
     # produces images using the target/label model weights (to see if mapping is correct)
     def _run_with_target_weights(self):
-        from backend.multitask.hnet.full.mnet import MNET
+        from backend.multitask.hnet.nets.mnet import MNET
         import numpy as np
         from backend.image_processing import process
         from backend.utils import save_image
