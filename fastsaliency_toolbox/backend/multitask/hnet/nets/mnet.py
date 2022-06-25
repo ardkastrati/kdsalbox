@@ -22,7 +22,7 @@ class MNET(cwl.CustomWeightsLayer):
             mobilenet_cutoff = mnet_conf["mobilenet_cutoff"]
             self.register_layer(self.get_cwl_mobilenet(mobilenet_cutoff), "encoder")
         elif enc_type == "mv2":
-            self.register_layer(self.get_mobilenet())
+            self.register_layer(self.get_mobilenet(), "encoder")
         else:
             raise ValueError(f"Main network configuration: Does not support encoder_type {enc_type}")
             
