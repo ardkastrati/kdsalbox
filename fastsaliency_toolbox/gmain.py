@@ -60,26 +60,11 @@ def run_with_conf(conf, group=None):
         
     # construct and run the experiment pipeline
     try:
-        from backend.multitask.hnet.full_chunked.mnet import MNET as MFC
-        from backend.multitask.hnet.full_chunked.hnet import HNET as HFC
-        from backend.multitask.hnet.full.mnet import MNET as MF
-        from backend.multitask.hnet.full.hnet import HNET as HF
-
-        mnet_conf = conf["model"]["mnet"]
-        hnet_conf = conf["model"]["hnet"]
-
-        mnet_factory = {
-            "full_chunked": lambda : MFC(mnet_conf), 
-            "full": lambda : MF(mnet_conf),
-        }
-
-        hnet_factory = {
-            "full_chunked": lambda mnet : HFC(mnet.get_cw_param_shapes(), hnet_conf),
-            "full": lambda mnet : HF(mnet.get_cw_param_shapes(), hnet_conf)
-        }
+        from backend.multitask.hnet.nets.mnet import MNET
+        from backend.multitask.hnet.nets.hnet import HNET
 
         verbose = conf["verbose"]
-        print(f"Running {conf['type']}")
+        print(f"Running {run_name}")
 
         stages = []
         if "pretrain_weights" in conf.keys():
@@ -99,8 +84,11 @@ def run_with_conf(conf, group=None):
         if "run" in conf.keys():
             stages.append(Runner(conf, "run", verbose=verbose))
 
+        mnet_fn = lambda : MNET(conf["model"]["mnet"])
+        hnet_fn = lambda mnet : HNET(mnet.get_cw_param_shapes(), conf["model"]["hnet"])
+
         pipeline = Pipeline(
-            input = HyperModel(mnet_factory[conf["type"]], hnet_factory[conf["type"]], conf["tasks"]).build(),
+            input = HyperModel(mnet_fn, hnet_fn, conf["tasks"]).build(),
             work_dir_path=run_dir,
             stages = stages
         )

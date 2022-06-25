@@ -186,7 +186,7 @@ class WeightsTrainStep(TrainStep):
 
         task_ids = task_ids.tolist()
         weights = hnet(task_id=task_ids) 
-        weights = torch.stack([torch.cat([w.flatten() for w in batch]) for batch in weights])
+        weights = torch.stack([torch.cat([w.flatten() for w in datapoint]) for datapoint in weights])
         loss = loss_fn(weights, y)
 
         # training

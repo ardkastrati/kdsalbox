@@ -1,0 +1,14 @@
+{
+    "model": {
+        "hnet": {
+            "type": "singlelayer",
+            "task_cnt": 4
+        },
+        "mnet": {
+            "encoder_type": "mv2",
+    
+            "decoder_type": "full",
+            "decoder_non_linearity": "ReLU6"
+        }
+    }
+}

@@ -1,106 +1,28 @@
 {
-    "type": "full_chunked",
+    "type": "full",
     "gpu": 0,
 
     "tasks": ["AIM", "SUN", "IKN", "GBVS"], 
-    "skip": ["pretrain_weights"],
+    "skip": [],
 
-    "name": "Full Chunked - Only one",
-    "description": "Goal: Figure out the best embedding size for the smaller hnet_chunk_size=65536. This will let us use a larger second last layer of the HNET without it exploding.",
+    "name": "Full - One hot to full",
+    "description": "Goal: Learn all 7 networks in one",
 
     "verbose": true,
 
     "model": {
         "hnet": {
+            "type": "simple",
             "task_cnt": 4,
-            "hidden_layers": [512, 512, 512, 512],
-            "embedding_size": 256,
-            "chunk_size": 65536,
-            "chunk_emb_per_task": false,
-            "chunk_emb_size": 16
+            "hidden_layers": [],
+            "embedding_size": 2
         },
         "mnet": {
-            "decoder_non_linearity": "ReLU6",
-            "mobilenet_cutoff": 0
-        }
-    },
-
-    "pretrain_weights": {
-        "target_model_weights": "./models/",
-
-        "input_images_run": "./dataset/dummy_images/run/",
-
-        "loss": "MSELoss",
-        "batch_size": 4,
-        "epochs": 1000,
-        "lr": 0.001,
-        "lr_decay": 0.1,
-        "decay_epochs": [],
-        
-        "auto_checkpoint_steps": 250,
-
-        "log_freq": 100,
-        "wandb": {
-            "save_checkpoints_to_wandb": false,
-            "watch": {
-                "log": null,
-                "log_freq": 100
-            }
-        }
-    },
-
-    "pretrain_one_task": {
-        "input_saliencies": "./dataset/dummy_saliency/",
-        "input_images_train": "./dataset/dummy_images/train/",
-        "input_images_val": "./dataset/dummy_images/val/",
-        "input_images_run": "./dataset/dummy_images/run/",
-        
-        "loss": "BCELoss",
-        "batch_size": 4,
-        "epochs": 1,
-        "lr": 0.001,
-        "lr_decay": 0.1,
-        "freeze_encoder_steps": 0,
-        "decay_epochs": [],
-        
-        "auto_checkpoint_steps": 7,
-
-        "batch_log_freq": 100,
-        "wandb": {
-            "save_checkpoints_to_wandb": false,
-            "watch": {
-                "log": null,
-                "log_freq": 100
-            }
-        }
-    },
-
-    "train_catchup": {
-        "input_saliencies": "./dataset/dummy_saliency/",
-        "input_images_train": "./dataset/dummy_images/train/",
-        "imgs_per_task_train": 2500,
-        "input_images_val": "./dataset/dummy_images/val/",
-        "imgs_per_task_val": 1250,
-        "input_images_run": "./dataset/dummy_images/run/",
-        
-        "loss": "BCELoss",
-        "batch_size": 4,
-        "consecutive_batches_per_task": 1,
-        "epochs": 5,
-        "lr": 0.001,
-        "lr_decay": 0.1,
-        "freeze_encoder_steps": 3,
-        "decay_epochs": [],
-        
-        "auto_checkpoint_steps": 7,
-
-        "batch_log_freq": 100,
-        "wandb": {
-            "save_checkpoints_to_wandb": false,
-            "watch": {
-                "log": null,
-                "log_freq": 100
-            }
+            "encoder_type": "cwl",
+            "mobilenet_cutoff": 0,
+    
+            "decoder_type": "full",
+            "decoder_non_linearity": "ReLU6"
         }
     },
 
@@ -114,14 +36,14 @@
         
         "loss": "BCELoss",
         "batch_size": 4,
-        "consecutive_batches_per_task": 1,
-        "epochs": 15,
+        "consecutive_batches_per_task": 4,
+        "epochs": 60,
         "lr": 0.001,
         "lr_decay": 0.1,
-        "freeze_encoder_steps": 3,
+        "freeze_encoder_steps": 0,
         "decay_epochs": [],
         
-        "auto_checkpoint_steps": 7,
+        "auto_checkpoint_steps": 15,
 
         "batch_log_freq": 100,
         "wandb": {

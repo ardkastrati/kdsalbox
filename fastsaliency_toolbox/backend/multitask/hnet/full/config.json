@@ -3,30 +3,22 @@
     "gpu": 0,
 
     "tasks": ["AIM", "SUN"], 
-    "skip": ["pretrain_weights", "pretrain_one_task"],
+    "skip": [],
 
     "name": "Full - One hot to full",
     "description": "Goal: Learn all 7 networks in one",
 
     "verbose": true,
 
-    "model": {
-        "hnet": {
-            "task_cnt": 2
-        },
-        "mnet": {
-            "decoder_non_linearity": "ReLU6",
-            "mobilenet_cutoff": 0
-        }
-    },
+    
 
     "pretrain_weights": {
         "target_model_weights": "./models/",
         "input_images_run": "./dataset/dummy_images/run/",
 
-        "loss": "MSELoss",
-        "batch_size": 4,
-        "epochs": 1,
+        "loss": "L1Loss",
+        "batch_size": 1,
+        "epochs": 3000,
         "lr": 0.001,
         "lr_decay": 0.1,
         "decay_epochs": [],

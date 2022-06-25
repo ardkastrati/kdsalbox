@@ -1,0 +1,9 @@
+{
+    "test": {
+        "input_images_test": "./dataset/dummy_images/train/",
+        "imgs_per_task_test": 1,
+        "input_saliencies": "./dataset/dummy_saliency/",
+        
+        "per_image_statistics": true        
+    }
+}

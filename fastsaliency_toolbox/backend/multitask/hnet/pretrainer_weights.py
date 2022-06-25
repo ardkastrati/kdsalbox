@@ -18,6 +18,7 @@ from backend.multitask.hnet.train_api.data import DataProvider
 from backend.multitask.hnet.train_api.training import TrainStep
 from backend.multitask.hnet.train_impl.data import BatchProvider
 from backend.multitask.hnet.train_impl.training import WeightsTrainStep
+from backend.multitask.hnet.train_impl.actions import WeightWatcher
 
 
 class PreTrainerWeights(ATrainer):
@@ -26,6 +27,8 @@ class PreTrainerWeights(ATrainer):
 
         train_conf = conf[self._name]
         self._target_model_weights = train_conf["target_model_weights"]
+
+        self._mnet_conf = conf["model"]["mnet"]
 
     def get_data_providers(self) -> Dict[str, DataProvider]:
         target_model_weights = self._target_model_weights
@@ -45,6 +48,8 @@ class PreTrainerWeights(ATrainer):
     def setup(self, work_dir_path: str = None, input=None):
         super().setup(work_dir_path, input)
 
+        self._trainer.add_batch_action(WeightWatcher(1))
+
         # check if the extpected output format of the HNET matches the labels/weights loaded from the original models
         new_shapes = self._model.mnet.get_cw_param_shapes()
         old_stud = stud.Student()
@@ -52,6 +57,39 @@ class PreTrainerWeights(ATrainer):
         assert len(new_shapes) == len(old_shapes), f"HNET output generates {len(new_shapes)} weight tensors whereas we only loaded {len(old_shapes)} into the label from the original models!"
         for new,old in zip(new_shapes, old_shapes):
             assert new == old, "Mismatch between HNET output format and loaded model weight format. Make sure the order of parameters is the same!"
+
+    # produces images using the target/label model weights (to see if mapping is correct)
+    def _run_with_target_weights(self):
+        from backend.multitask.hnet.full.mnet import MNET
+        import numpy as np
+        from backend.image_processing import process
+        from backend.utils import save_image
+
+        mnet = MNET(self._mnet_conf)
+        mnet.compute_cw_param_shapes()
+
+        image = None
+        for (image, _, _) in self._run_dataloader:
+            image = image.to(self._device)
+            break
+
+        weights = None
+        for (task_ids, y) in self._dataproviders["train"].batches:
+            weights : torch.Tensor = y.squeeze()
+            print(weights)
+            target_shapes = mnet.get_cw_param_shapes()
+            numels = [s.numel() for s in target_shapes]
+            weights = weights.split(numels)
+            weights = [w.view(s) for w,s in zip(weights, target_shapes)]
+
+            sal_img = mnet.forward(image, weights)
+            post_processed_image = np.clip((process(sal_img.cpu().detach().numpy()[0, 0], self._postprocess_parameter_map)*255).astype(np.uint8), 0, 255)
+            save_image(f"{self._logging_dir}/image_{task_ids[0]}.jpg", post_processed_image)
+
+    def execute(self):
+        self._run_with_target_weights()
+
+        return super().execute()
 
     def get_stepper(self) -> TrainStep:
         return WeightsTrainStep()
@@ -109,6 +147,7 @@ class PreTrainerWeights(ATrainer):
                 #     print(f"\t{n}: {d:.3}")
 
     def map_old_to_new_weights(self, named_weights, model, verbose=False):
+        # model is the old model
         decoder_selection = [
             "conv7_3.weight",   "conv7_3.bias",     "bn7_3.weight",     "bn7_3.bias",
             "conv8_1.weight",   "conv8_1.bias",     "bn8_1.weight",     "bn8_1.bias",

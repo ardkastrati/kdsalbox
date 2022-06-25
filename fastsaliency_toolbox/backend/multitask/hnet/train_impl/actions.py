@@ -106,7 +106,7 @@ class WeightWatcher(BatchAction):
     def invoke(self, trainer: ATrainer, mode: str, batch_losses: List[float], total_batches : int):
         batch_index = len(batch_losses) - 1
         
-        should_log = (batch_index % self._log_freq == 0)
+        should_log = (batch_index % self._log_freq == 0) and mode == "train" # grads will be 0 during val
         if not should_log: return
 
         grads_per_task = trainer.model.hnet.get_gradients_on_outputs()
@@ -124,5 +124,9 @@ class WeightWatcher(BatchAction):
                 
                 grad_means = mean_per_group
             
-            print(f"Task {task_id} : {', '.join([f'{mean:.3f}' for mean in grad_means])}")
+            sum = np.sum(np.array([grads.abs().sum().item() for grads in grads_per_target]))
+
+            print(trainer.optimizer.param_groups)
+
+            print(f"Task {task_id} (abs sum = {sum}) : {', '.join([f'{mean:.3f}' for mean in grad_means])}")
         
