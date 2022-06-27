@@ -7,7 +7,7 @@ Trains a hypernetwork to output some specific weights (e.g. to learn pretrained 
 """
 
 import os
-from typing import Dict
+from typing import Dict, List, Tuple
 import torch
 from torch.utils.data import DataLoader
 
@@ -31,9 +31,8 @@ class PreTrainerWeights(ATrainer):
         self._mnet_conf = conf["model"]["mnet"]
 
     def get_data_providers(self) -> Dict[str, DataProvider]:
-        target_model_weights = self._target_model_weights
-        model_paths = [(self._model.task_to_id(task), os.path.join(target_model_weights, task.upper(), "exported", f"{task.lower()}.pth")) for task in self._tasks] # paths to all trained models
-        train_dataset = WeightDataset(model_paths, self.map_old_to_new_weights)
+        model_paths = [(self._model.task_to_id(task), os.path.join(self._target_model_weights, task.upper(), "exported", f"{task.lower()}.pth")) for task in self._tasks] # paths to all trained models
+        train_dataset = WeightDataset(model_paths, self.map_old_to_new_weights, flatten=True)
         train_dataloader = DataLoader(train_dataset, batch_size=self._batch_size, shuffle=True, num_workers=4)
         val_dataloader = DataLoader(train_dataset, batch_size=self._batch_size, shuffle=False, num_workers=4) # TODO: custom validation dataset
 
@@ -48,8 +47,6 @@ class PreTrainerWeights(ATrainer):
     def setup(self, work_dir_path: str = None, input=None):
         super().setup(work_dir_path, input)
 
-        self._trainer.add_batch_action(WeightWatcher(1))
-
         # check if the extpected output format of the HNET matches the labels/weights loaded from the original models
         new_shapes = self._model.mnet.get_cw_param_shapes()
         old_stud = stud.Student()
@@ -58,96 +55,13 @@ class PreTrainerWeights(ATrainer):
         for new,old in zip(new_shapes, old_shapes):
             assert new == old, "Mismatch between HNET output format and loaded model weight format. Make sure the order of parameters is the same!"
 
-    # produces images using the target/label model weights (to see if mapping is correct)
-    def _run_with_target_weights(self):
-        from backend.multitask.hnet.nets.mnet import MNET
-        import numpy as np
-        from backend.image_processing import process
-        from backend.utils import save_image
-
-        mnet = MNET(self._mnet_conf)
-        mnet.compute_cw_param_shapes()
-
-        image = None
-        for (image, _, _) in self._run_dataloader:
-            image = image.to(self._device)
-            break
-
-        weights = None
-        for (task_ids, y) in self._dataproviders["train"].batches:
-            weights : torch.Tensor = y.squeeze()
-            print(weights)
-            target_shapes = mnet.get_cw_param_shapes()
-            numels = [s.numel() for s in target_shapes]
-            weights = weights.split(numels)
-            weights = [w.view(s) for w,s in zip(weights, target_shapes)]
-
-            sal_img = mnet.forward(image, weights)
-            post_processed_image = np.clip((process(sal_img.cpu().detach().numpy()[0, 0], self._postprocess_parameter_map)*255).astype(np.uint8), 0, 255)
-            save_image(f"{self._logging_dir}/image_{task_ids[0]}.jpg", post_processed_image)
-
     def execute(self):
-        self._run_with_target_weights()
-
         return super().execute()
 
     def get_stepper(self) -> TrainStep:
         return WeightsTrainStep()
 
-    # evaluate how different the layers of the models are
-    def _evaluate_model_differences(self, target_model_weights):
-        model_p = [(task, os.path.join(target_model_weights, task.upper(), "exported", f"{task.lower()}.pth")) for task in self._tasks] # paths to all trained models
-        model_weights = []
-        for t,p in model_p:
-            model = stud.Student()
-            state_dict = torch.load(p, map_location=torch.device('cpu'))
-            model.load_state_dict(state_dict['student_model'])
-            
-            model_weights.append((t,{n:p.data.flatten() for n,p in model.named_parameters()}))
-            
-
-        for i in range(len(model_weights)):
-            for j in range(i+1, len(model_weights)):
-                t1,ws1 = model_weights[i]
-                t2,ws2 = model_weights[j]
-
-                # compare the two different models
-                print(f"{t1} vs {t2}")
-
-                total_dist = 0.0
-                total_dist_enc = 0.0
-                total_enc = 0
-                total_dist_dec = 0.0
-                total_dec = 0
-
-                all_dist = []
-                for n in ws1.keys():
-                    w1 = ws1[n]
-                    w2 = ws2[n]
-                    dist = torch.sum(torch.abs(w1 - w2)) / len(w1)
-                    total_dist += dist
-
-                    if "encoder" in n:
-                        total_dist_enc += dist
-                        total_enc += 1
-                    elif "decoder" in n:
-                        total_dist_dec += dist
-                        total_dec += 1
-                    
-                    all_dist.append((n, dist))
-                
-
-                print(f"Average {total_dist / len(ws1.keys())}")
-                print(f"Average Encoder {total_dist_enc / total_enc}")
-                print(f"Average Decoder {total_dist_dec / total_dec}")
-
-                # all_dist = sorted(all_dist, key=(lambda t : t[1]), reverse=True)
-                # for n,d in all_dist:
-                #     if d < 0.5: continue
-                #     print(f"\t{n}: {d:.3}")
-
-    def map_old_to_new_weights(self, named_weights, model, verbose=False):
-        # model is the old model
+    def map_old_to_new_weights(self, named_weights : List[Tuple[str,torch.Size]], legacy_model, verbose=False):
         decoder_selection = [
             "conv7_3.weight",   "conv7_3.bias",     "bn7_3.weight",     "bn7_3.bias",
             "conv8_1.weight",   "conv8_1.bias",     "bn8_1.weight",     "bn8_1.bias",
@@ -162,16 +76,26 @@ class PreTrainerWeights(ATrainer):
         new_weights = []
         new_encoder_param_cnt = len(list(self._model.mnet.get_layer("encoder").parameters()))
         # select the first few params, assuming that 
-        encoder_selection = [n for n,p in model.encoder.named_parameters()][new_encoder_param_cnt:] 
+        encoder_selection = [n for n,p in legacy_model.encoder.named_parameters()][new_encoder_param_cnt:] 
 
-        if verbose: print("selecting encoder.")
         for s in encoder_selection:
-            if verbose: print(f"\t{s}")
             new_weights.append(named_weights[f"encoder.{s}"])    
 
-        if verbose: print("selecting decoder.")
         for s in decoder_selection:
-            if verbose: print(f"\t{s}")
             new_weights.append(named_weights[f"decoder.{s}"])
 
         return new_weights
+
+    def map_old_to_new_buffers(self, named_buffers : List[Tuple[str,torch.Size]], legacy_model, verbose=False):
+        
+        encoder_selection = [n for n,p in legacy_model.encoder.named_buffers()]
+        decoder_selection = [n for n,p in legacy_model.decoder.named_buffers()] # bn layers are already in correct order in stud 
+
+        new_buffers = []
+        for s in encoder_selection:
+            new_buffers.append(named_buffers[f"encoder.{s}"])    
+
+        for s in decoder_selection:
+            new_buffers.append(named_buffers[f"decoder.{s}"])
+
+        return new_buffers

@@ -90,6 +90,8 @@ class ATrainer(AStage, ABC):
         assert work_dir_path is not None, "Working directory path cannot be None."
 
         self._model = input
+        self._model.build()
+
         self._logging_dir = work_dir_path
 
         # prepare trainer
@@ -120,13 +122,10 @@ class ATrainer(AStage, ABC):
     def execute(self):
         super().execute()
 
-        model = self._model
-        model.build()
-        model.to(self._device)
-
+        self._model.to(self._device)
         self._trainer.train()
 
-        return model
+        return self._model
     
     def cleanup(self):
         super().cleanup()

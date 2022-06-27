@@ -11,17 +11,39 @@
 
     "model": {
         "hnet": {
-            "type": "simple",
-            "task_cnt": 4,
-            "hidden_layers": [],
-            "embedding_size": 8
+            "type": "single_layer",
+            "task_cnt": 4
         },
         "mnet": {
             "encoder_type": "cwl",
             "mobilenet_cutoff": 0,
     
             "decoder_type": "full",
-            "decoder_non_linearity": "ReLU6"
+            "decoder_non_linearity": "ReLU"
+        }
+    },
+
+    "pretrain_weights": {
+        "target_model_weights": "./models/",
+
+        "input_images_run": "./dataset/dummy_images/run/",
+
+        "loss": "MSELoss",
+        "batch_size": 1,
+        "epochs": 1000,
+        "lr": 0.001,
+        "lr_decay": 0.1,
+        "decay_epochs": [],
+        
+        "auto_checkpoint_steps": 250,
+
+        "log_freq": 100,
+        "wandb": {
+            "save_checkpoints_to_wandb": false,
+            "watch": {
+                "log": "all",
+                "log_freq": 100
+            }
         }
     },
 

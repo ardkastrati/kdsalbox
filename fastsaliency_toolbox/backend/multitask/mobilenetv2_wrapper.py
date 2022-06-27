@@ -9,18 +9,24 @@ from torchvision.models import mobilenet_v2
 import backend.multitask.custom_weight_layers as cwl
 
 def mobilenet_v2_pretrained(cutoff : int = 0):
-    mv2 = mobilenet_v2(pretrained=True, progress=False)
-    mv2f = MobileNetV2Features(cutoff)
+    originial_mv2 = mobilenet_v2(pretrained=True, progress=False)
+    cwl_mv2 = MobileNetV2Features(cutoff)
 
     # copy all the weights of all parameters that are not learned externally
     # CAUTION: this requires MobileNetV2Features to have the same structure as MobilenetV2 
     # and the layers that aren't learned by the HNET should be the last n consecutive layers of the mobilenet
     with torch.no_grad():
-        mv2_parameters = list(mv2.parameters())
-        for i,p in enumerate(mv2f.parameters()):
+        # copy all the pretrained parameter weights to the custom model
+        mv2_parameters = list(originial_mv2.parameters())
+        for i,p in enumerate(cwl_mv2.parameters()):
             p.copy_(mv2_parameters[i])
 
-    return mv2f
+        # copy all the pretrained buffers to the custom model
+        mv2_buffers = list(originial_mv2.buffers())
+        for i,b in enumerate(cwl_mv2.buffers()):
+            b.copy_(mv2_buffers[i])
+
+    return cwl_mv2
 
 class InvertedResidual(nn.Module):
     def __init__(
@@ -98,7 +104,7 @@ class ConvNormActivationCWL(cwl.CustomWeightsLayer):
         stride: int = 1,
         padding: Optional[int] = None,
         groups: int = 1,
-        norm_layer: Optional[Callable[..., nn.Module]] = cwl.BatchNorm2d,
+        norm_layer: Optional[Callable[..., nn.Module]] = cwl.AffineBatchNorm2d,
         activation_layer: Optional[Callable[..., nn.Module]] = nn.ReLU,
         dilation: int = 1,
         inplace: bool = True,
@@ -107,11 +113,11 @@ class ConvNormActivationCWL(cwl.CustomWeightsLayer):
 
         if padding is None:
             padding = (kernel_size - 1) // 2 * dilation
-        self.register_layer(cwl.conv2d(in_channels, out_channels, kernel_size, stride, padding, dilation, groups, bias=norm_layer is None))
+        self.add_cwl(cwl.conv2d(in_channels, out_channels, kernel_size, stride, padding, dilation, groups, bias=norm_layer is None))
         if norm_layer is not None:
-            self.register_layer(norm_layer(out_channels))
+            self.add_cwl(norm_layer(out_channels))
         if activation_layer is not None:
-            self.register_layer(activation_layer(inplace=inplace))
+            self.add_cwl(activation_layer(inplace=inplace))
         self.out_channels = out_channels
 
 class InvertedResidualCWL(cwl.CustomWeightsLayer):
@@ -128,20 +134,20 @@ class InvertedResidualCWL(cwl.CustomWeightsLayer):
         assert stride in [1, 2]
 
         if norm_layer is None:
-            norm_layer = cwl.BatchNorm2d
+            norm_layer = cwl.AffineBatchNorm2d
 
         hidden_dim = int(round(inp * expand_ratio))
         self.use_res_connect = self.stride == 1 and inp == oup
 
         if expand_ratio != 1:
             # pw
-            self.register_layer(ConvNormActivationCWL(inp, hidden_dim, kernel_size=1, norm_layer=norm_layer, activation_layer=nn.ReLU6))
+            self.add_cwl(ConvNormActivationCWL(inp, hidden_dim, kernel_size=1, norm_layer=norm_layer, activation_layer=nn.ReLU6))
         
         # dw
-        self.register_layer(ConvNormActivationCWL(hidden_dim, hidden_dim, stride=stride, groups=hidden_dim, norm_layer=norm_layer, activation_layer=nn.ReLU6))
+        self.add_cwl(ConvNormActivationCWL(hidden_dim, hidden_dim, stride=stride, groups=hidden_dim, norm_layer=norm_layer, activation_layer=nn.ReLU6))
         # pw-linear
-        self.register_layer(cwl.conv2d(hidden_dim, oup, 1, 1, 0, bias=False))
-        self.register_layer(norm_layer(oup))
+        self.add_cwl(cwl.conv2d(hidden_dim, oup, 1, 1, 0, bias=False))
+        self.add_cwl(norm_layer(oup))
         
         self.out_channels = oup
         self._is_cn = stride > 1
@@ -178,9 +184,9 @@ class MobileNetV2Features(cwl.CustomWeightsLayer):
         self.last_channel = _make_divisible(last_channel * max(1.0, width_mult), round_nearest)
         index = 0
         if index >= cutoff:
-            self.register_layer(ConvNormActivationCWL(3, input_channel, stride=2, norm_layer=cwl.BatchNorm2d, activation_layer=nn.ReLU6))
+            self.add_cwl(ConvNormActivationCWL(3, input_channel, stride=2, norm_layer=cwl.AffineBatchNorm2d, activation_layer=nn.ReLU6))
         else:
-            self.register_layer(ConvNormActivation(3, input_channel, stride=2, norm_layer=nn.BatchNorm2d, activation_layer=nn.ReLU6))
+            self.add_cwl(ConvNormActivation(3, input_channel, stride=2, norm_layer=nn.BatchNorm2d, activation_layer=nn.ReLU6))
         
         # building inverted residual blocks
         index = 1
@@ -190,17 +196,17 @@ class MobileNetV2Features(cwl.CustomWeightsLayer):
                 stride = s if i == 0 else 1
 
                 if index >= cutoff:
-                    self.register_layer(InvertedResidualCWL(input_channel, output_channel, stride, expand_ratio=t, norm_layer=cwl.BatchNorm2d))
+                    self.add_cwl(InvertedResidualCWL(input_channel, output_channel, stride, expand_ratio=t, norm_layer=cwl.AffineBatchNorm2d))
                 else: 
-                    self.register_layer(InvertedResidual(input_channel, output_channel, stride, expand_ratio=t, norm_layer=nn.BatchNorm2d))
+                    self.add_cwl(InvertedResidual(input_channel, output_channel, stride, expand_ratio=t, norm_layer=nn.BatchNorm2d))
                 input_channel = output_channel
                 index += 1
             
         # building last several layers
         if index >= cutoff:
-            self.register_layer(ConvNormActivationCWL(input_channel, self.last_channel, kernel_size=1, norm_layer=cwl.BatchNorm2d, activation_layer=nn.ReLU6))
+            self.add_cwl(ConvNormActivationCWL(input_channel, self.last_channel, kernel_size=1, norm_layer=cwl.AffineBatchNorm2d, activation_layer=nn.ReLU6))
         else:
-            self.register_layer(ConvNormActivation(input_channel, self.last_channel, kernel_size=1, norm_layer=nn.BatchNorm2d, activation_layer=nn.ReLU6))
+            self.add_cwl(ConvNormActivation(input_channel, self.last_channel, kernel_size=1, norm_layer=nn.BatchNorm2d, activation_layer=nn.ReLU6))
         index += 1
 
         # weight initialization

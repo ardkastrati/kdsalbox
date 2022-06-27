@@ -20,21 +20,21 @@ class MNET(cwl.CustomWeightsLayer):
         enc_type = mnet_conf["encoder_type"]
         if enc_type == "cwl":
             mobilenet_cutoff = mnet_conf["mobilenet_cutoff"]
-            self.register_layer(self.get_cwl_mobilenet(mobilenet_cutoff), "encoder")
+            self.add_cwl(self.get_cwl_mobilenet(mobilenet_cutoff), "encoder")
         elif enc_type == "mv2":
-            self.register_layer(self.get_mobilenet(), "encoder")
+            self.add_cwl(self.get_mobilenet(), "encoder")
         else:
             raise ValueError(f"Main network configuration: Does not support encoder_type {enc_type}")
             
         # decoder
         dec_type = mnet_conf["decoder_type"]
         if dec_type == "full":
-            self.register_layer(FullDecoder(mnet_conf), "decoder")
+            self.add_cwl(FullDecoder(mnet_conf), "decoder")
         else:
             raise ValueError(f"Main network configuration: Does not support decoder_type {dec_type}")
 
         # activation function
-        self.register_layer(nn.Sigmoid(), "sigmoid")
+        self.add_cwl(nn.Sigmoid(), "sigmoid")
 
         self.compute_cw_param_shapes()
     

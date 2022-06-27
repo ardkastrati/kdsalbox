@@ -23,7 +23,7 @@ class RunProgressTrackerWandb(ProgressTracker):
     def track_progress(self, trainer: ATrainer):
         epoch = trainer.epoch
 
-        should_invoke = (epoch % self._log_freq == 0)
+        should_invoke = (epoch < 0) or (epoch % self._log_freq == 0)
         if not should_invoke: return
 
         model = trainer.model

@@ -5,7 +5,7 @@
         "input_images_run": "./dataset/dummy_images/run/",
 
         "loss": "MSELoss",
-        "batch_size": 4,
+        "batch_size": 1,
         "epochs": 1000,
         "lr": 0.001,
         "lr_decay": 0.1,

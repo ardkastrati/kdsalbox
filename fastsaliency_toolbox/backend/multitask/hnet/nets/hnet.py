@@ -22,7 +22,7 @@ class HNET(AHNET):
         elif hnet_type == "chunked":
             self.hnet = ChunkedHNET(target_shapes, hnet_conf)
         elif hnet_type == "single_layer":
-            self.hnet == SingleLayerHNET(target_shapes, hnet_conf)
+            self.hnet = SingleLayerHNET(target_shapes, hnet_conf)
         else:
             raise ValueError(f"Hypernetwork Configuration: Does not support type {hnet_type}")
 

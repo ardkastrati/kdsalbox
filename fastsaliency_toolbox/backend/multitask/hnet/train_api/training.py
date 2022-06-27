@@ -17,7 +17,7 @@ class ATrainer(ABC):
         self.reset()
     
     def reset(self):
-        self._epoch : int = 0
+        self._epoch : int = -1
         self._val_losses : List[float] = []
         self._train_losses : List[float] = []
     
