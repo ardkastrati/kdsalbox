@@ -28,30 +28,6 @@
         }
     },
 
-    "pretrain_weights": {
-        "target_model_weights": "./models/",
-
-        "input_images_run": "./dataset/dummy_images/run/",
-
-        "loss": "MSELoss",
-        "batch_size": 1,
-        "epochs": 1000,
-        "lr": 0.001,
-        "lr_decay": 0.1,
-        "decay_epochs": [],
-        
-        "auto_checkpoint_steps": 250,
-
-        "log_freq": 100,
-        "wandb": {
-            "save_checkpoints_to_wandb": false,
-            "watch": {
-                "log": "all",
-                "log_freq": 100
-            }
-        }
-    },
-
     "train": {
         "input_saliencies": "./dataset/dummy_saliency/",
         "input_images_train": "./dataset/dummy_images/train/",
@@ -62,11 +38,11 @@
         
         "loss": "BCELoss",
         "batch_size": 4,
-        "consecutive_batches_per_task": 4,
+        "consecutive_batches_per_task": 8,
         "epochs": 60,
         "lr": 0.001,
         "lr_decay": 0.1,
-        "freeze_encoder_steps": 0,
+        "freeze_encoder_steps": 3,
         "decay_epochs": [],
         
         "auto_checkpoint_steps": 7,

@@ -9,14 +9,14 @@
         
         "loss": "BCELoss",
         "batch_size": 4,
-        "consecutive_batches_per_task": 4,
+        "consecutive_batches_per_task": 8,
         "epochs": 15,
         "lr": 0.001,
         "lr_decay": 0.1,
         "freeze_encoder_steps": 3,
         "decay_epochs": [],
         
-        "auto_checkpoint_steps": 7,
+        "auto_checkpoint_steps": 5,
 
         "batch_log_freq": 100,
         "wandb": {
