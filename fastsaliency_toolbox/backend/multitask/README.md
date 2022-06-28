@@ -40,6 +40,11 @@ Optional arguments are:
  - --wdb: to report to wandb
  - --skip: comma separated list of pipeline stage names that should be skipped
 
+### config.json
+Take a look at config.json in the hnet subfolder. Also take a look at all the *.part.json to get an idea of how to configure the individual parts.
+
+### gridsearch.json
+Take a look at gridsearch.json. You can overwrite all parameters of the config.json. E.g. if the config is {"y":{"z":14}} then you can overwrite it via "y/z".
 
 
 # Hypernetworks
