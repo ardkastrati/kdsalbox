@@ -34,7 +34,7 @@ The framework is intended to be used with [Weights & Biases](https://wandb.ai/ho
 
 Now you can run via
 ```console
-    run gmain.py --name="name of your experiment" --description="description of your experiment" --conf_file="path to your config.json" --param_grid_file="path to your gridsearch.json" --input_images="path to folder containing input images" --input_saliencies="path to folder containing subfolder for each task containing saliency maps" 
+    run gmain.py gridsearch --name="name of your experiment" --description="description of your experiment" --conf_file="path to your config.json" --param_grid_file="path to your gridsearch.json" --input_images="path to folder containing input images" --input_saliencies="path to folder containing subfolder for each task containing saliency maps" 
   ```
 Optional arguments are:
  - --wdb: to report to wandb
