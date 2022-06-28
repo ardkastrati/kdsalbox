@@ -114,7 +114,7 @@ class ATrainer(AStage, ABC):
         if self._batch_log_freq:
             self._trainer\
             .add_batch_action(BatchLogger(self._batch_log_freq))\
-            .add_batch_action(WeightWatcher(self._batch_log_freq, groups=30))
+            #.add_batch_action(WeightWatcher(self._batch_log_freq, groups=30))
 
         # sanity checks
         assert self._task_cnt == len(self._tasks)

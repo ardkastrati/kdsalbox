@@ -2,7 +2,7 @@
     "model": {
         "use_eval_mode": true,
         "hnet": {
-            "type": "singlelayer",
+            "type": "single_layer",
             "task_cnt": 4
         },
         "mnet": {
