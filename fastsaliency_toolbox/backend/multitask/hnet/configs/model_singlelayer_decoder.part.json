@@ -1,5 +1,6 @@
 {
     "model": {
+        "use_eval_mode": true,
         "hnet": {
             "type": "singlelayer",
             "task_cnt": 4

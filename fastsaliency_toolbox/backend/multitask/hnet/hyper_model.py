@@ -16,18 +16,21 @@ class HyperModel():
     def __init__(self, 
         mnet_fn : Callable[[], CustomWeightsLayer],
         hnet_fn : Callable[[CustomWeightsLayer], AHNET], 
-        tasks : List[str]):
+        tasks : List[str],
+        use_eval_mode : bool = True):
         """
         Args:
             mnet_fn (Function -> mnet): function that returns the mnet when invoked
             hnet_fn (Fuction(mnet) -> hnet): function that builds the hnet from the mnet
             tasks (List[str]): The names of the tasks the network will be learning. Used to create a internal mapping of task-name
                 to task-id such that when the model is loaded with a different ordering of tasks it will still work.
+            allow_eval_mode (bool): Whether or not the model will go into eval mode when .eval() is called
         """
         self._tasks = tasks
         self._device = None
         self._mnet_fn = mnet_fn
         self._hnet_fn = hnet_fn
+        self._use_eval_mode = use_eval_mode
         self.hnet : AHNET = None
         self.mnet : CustomWeightsLayer = None
         self._task_id_map = {t:i for i,t in enumerate(tasks)}
@@ -81,8 +84,9 @@ class HyperModel():
     
     def eval(self):
         """ Put the hypernetwork and mainnetwork into eval mode. """
-        self.hnet.eval()
-        self.mnet.eval()
+        if self._use_eval_mode:
+            self.hnet.eval()
+            self.mnet.eval()
 
     def compute_saliency(self, img : torch.Tensor, task_id : int) -> torch.Tensor:
         """ Runs and returns the hypernetwork and mainnetwork on an image for a given task and returns the computed saliency map.

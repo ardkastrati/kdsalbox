@@ -88,7 +88,7 @@ def run_with_conf(conf, group=None):
         hnet_fn = lambda mnet : HNET(mnet.get_cw_param_shapes(), conf["model"]["hnet"])
 
         pipeline = Pipeline(
-            input = HyperModel(mnet_fn, hnet_fn, conf["tasks"]).build(),
+            input = HyperModel(mnet_fn, hnet_fn, conf["tasks"], conf["model"]["use_eval_mode"]).build(),
             work_dir_path=run_dir,
             stages = stages
         )

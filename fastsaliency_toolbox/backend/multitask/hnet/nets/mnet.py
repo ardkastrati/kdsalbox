@@ -39,7 +39,7 @@ class MNET(cwl.CustomWeightsLayer):
         self.compute_cw_param_shapes()
     
     def get_mobilenet(self):
-        return nn.Sequential(*mobilenet_v2(pretrained=True).features)
+        return nn.Sequential(*list(mobilenet_v2(pretrained=True).features))
 
     def get_cwl_mobilenet(self, cutoff : int):
         return mobilenet_v2_pretrained(cutoff)
