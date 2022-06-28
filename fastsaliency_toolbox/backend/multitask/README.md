@@ -26,6 +26,22 @@ The framework is intended to be used with [Weights & Biases](https://wandb.ai/ho
 - cwl: Custom Weights Layer
 - mv2: MobilenetV2
 
+## Running an experiment
+1. Follow the instructions on the main readme of this repo to setup the environment ect.
+2. Create custom config.json specifying all the details about the model architecture and trainings
+3. Create custom gridearch.json specifying all the configurations you want to run
+4. Navigate to fastsaliency_toolbox
+
+Now you can run via
+```console
+    run gmain.py --name="name of your experiment" --description="description of your experiment" --conf_file="path to your config.json" --param_grid_file="path to your gridsearch.json" --input_images="path to folder containing input images" --input_saliencies="path to folder containing subfolder for each task containing saliency maps" 
+  ```
+Optional arguments are:
+ - --wdb: to report to wandb
+ - --skip: comma separated list of pipeline stage names that should be skipped
+
+
+
 # Hypernetworks
 Hypernetworks in a nutshell: A hnet is a network that produces the weights of other networks as outputs.
 To train a hnet we feed a task_id to the network and it will generate a list of weights. We then use this weights as our parameters in the forward pass of the mnet and can backpropagate through the weights to optimize the hnet. Note that we can also have parameters that are shared between tasks and are learned by the mnet directly. The mnet typically consists of a encoder and a decoder.
