@@ -19,7 +19,7 @@ from backend.metrics import NSS, CC, SIM, KL as KL_c
 from backend.image_processing import process
 from backend.parameters import ParameterMap
 from backend.multitask.pipeline.pipeline import AStage
-from backend.multitask.hnet.hyper_model import HyperModel
+from backend.multitask.hnet.models.hyper_model import HyperModel
 
 
 class Tester(AStage):

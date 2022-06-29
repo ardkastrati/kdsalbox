@@ -3,7 +3,7 @@ import os
 import wandb
 
 from backend.multitask.hnet.train_api.checkpointing import Checkpointer
-from backend.multitask.hnet.hyper_model import HyperModel
+from backend.multitask.hnet.models.hyper_model import HyperModel
 from backend.multitask.hnet.train_api.training import ATrainer
 
 class CheckpointerWandb(Checkpointer):

@@ -15,7 +15,7 @@ from torch.utils.data import DataLoader
 from backend.datasets import RunDataManager
 from backend.parameters import ParameterMap
 from backend.multitask.pipeline.pipeline import AStage
-from backend.multitask.hnet.hyper_model import HyperModel
+from backend.multitask.hnet.models.hyper_model import HyperModel
 from backend.multitask.hnet.train_api.data import DataProvider
 from backend.multitask.hnet.train_impl.actions import LogEpochLosses, BatchLogger, FreezeEncoder, LrDecay
 from backend.multitask.hnet.train_impl.training import Trainer

@@ -13,7 +13,7 @@ from torch.utils.data import DataLoader
 
 import backend.student as stud
 from backend.multitask.hnet.datasets import WeightDataset
-from backend.multitask.hnet.trainer import ATrainer
+from backend.multitask.hnet.stages.trainer import ATrainer
 from backend.multitask.hnet.train_api.data import DataProvider
 from backend.multitask.hnet.train_api.training import TrainStep
 from backend.multitask.hnet.train_impl.data import BatchProvider

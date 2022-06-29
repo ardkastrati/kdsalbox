@@ -3,7 +3,7 @@ from typing import List
 import torch
 import torch.nn as nn
 
-from backend.multitask.hnet.hyper_model import HyperModel
+from backend.multitask.hnet.models.hyper_model import HyperModel
 
 class ATrainer(ABC):
     def __init__(self, epochs : int, model : HyperModel, optimizer : torch.optim.Optimizer, loss_fn : nn.Module):

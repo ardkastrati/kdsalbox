@@ -11,7 +11,7 @@ from typing import Dict, List, Union
 from hypnettorch.hnets.chunked_mlp_hnet import ChunkedHMLP
 from hypnettorch.hnets.mlp_hnet import HMLP
 
-from backend.multitask.hnet.hnet_interface import AHNET
+from backend.multitask.hnet.models.hnet_interface import AHNET
 
 
 class ChunkedHNET(AHNET):

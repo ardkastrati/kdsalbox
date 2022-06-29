@@ -8,9 +8,9 @@ The main network. Check out the config for all the available parameters.
 import torch.nn as nn
 from torchvision.models import mobilenet_v2
 
-import backend.multitask.custom_weight_layers as cwl
-from backend.multitask.hnet.nets.decoders import FullDecoder
-from backend.multitask.mobilenetv2_wrapper import mobilenet_v2_pretrained
+import backend.multitask.hnet.cwl.custom_weight_layers as cwl
+from backend.multitask.hnet.models.decoders import FullDecoder
+from backend.multitask.hnet.cwl.mobilenetv2_wrapper import mobilenet_v2_pretrained
 
 class MNET(cwl.CustomWeightsLayer):
     def __init__(self, mnet_conf):

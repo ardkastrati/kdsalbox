@@ -9,8 +9,8 @@ General HNET that can take different forms depending on the specified type
 from typing import List, Union
 import torch
 
-from backend.multitask.hnet.hnet_interface import AHNET
-from backend.multitask.hnet.nets.hnets import ChunkedHNET, SimpleHNET, SingleLayerHNET
+from backend.multitask.hnet.models.hnet_interface import AHNET
+from backend.multitask.hnet.models.hnets import ChunkedHNET, SimpleHNET, SingleLayerHNET
 
 class HNET(AHNET):
     def __init__(self, target_shapes : List[torch.Size], hnet_conf : dict):

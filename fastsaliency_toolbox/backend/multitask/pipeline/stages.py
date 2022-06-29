@@ -11,7 +11,7 @@ import wandb
 import os
 
 from backend.multitask.pipeline.pipeline import AStage
-from backend.multitask.hnet.hyper_model import HyperModel
+from backend.multitask.hnet.models.hyper_model import HyperModel
 
 
 class ExportStage(AStage):

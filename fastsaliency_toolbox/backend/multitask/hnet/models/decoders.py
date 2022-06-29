@@ -10,7 +10,7 @@ FullDecoder: all the weights of the decoder have to be provided externally
 
 import torch.nn as nn
 
-import backend.multitask.custom_weight_layers as cwl
+import backend.multitask.hnet.cwl.custom_weight_layers as cwl
 
 non_lins = {
     "LeakyReLU": nn.LeakyReLU,

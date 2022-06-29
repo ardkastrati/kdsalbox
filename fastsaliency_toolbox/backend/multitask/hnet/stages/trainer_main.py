@@ -14,7 +14,7 @@ from typing import Dict
 from torch.utils.data import DataLoader
 
 from backend.datasets import TrainDataManager
-from backend.multitask.hnet.trainer import ASaliencyTrainer
+from backend.multitask.hnet.stages.trainer import ASaliencyTrainer
 from backend.multitask.hnet.train_impl.data import MultitaskBatchProvider
 from backend.multitask.hnet.train_api.data import DataProvider
 

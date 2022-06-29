@@ -3,7 +3,7 @@ import torch
 from torch.utils.data import Dataset
 
 import backend.student as stud
-from backend.multitask.hnet.hyper_model import HyperModel
+from backend.multitask.hnet.models.hyper_model import HyperModel
 
 ListOfNamedWeights = List[Tuple[str,torch.Tensor]]
 ListOfWeights = List[torch.Tensor]

@@ -8,7 +8,7 @@ from backend.multitask.hnet.train_api.actions import EpochAction, BatchAction, S
 from backend.multitask.hnet.train_api.checkpointing import Checkpointer
 from backend.multitask.hnet.train_api.data import DataProvider
 from backend.multitask.hnet.train_api.training import ATrainer, TrainStep
-from backend.multitask.hnet.hyper_model import HyperModel
+from backend.multitask.hnet.models.hyper_model import HyperModel
 
 class Trainer(ATrainer):
     """ A trainer with the option to track the progress, do checkpointing and also support actions such as lr-decay """
