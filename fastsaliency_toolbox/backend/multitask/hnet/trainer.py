@@ -45,6 +45,7 @@ class ATrainer(AStage, ABC):
 
         self._device = f"cuda:{conf['gpu']}" if torch.cuda.is_available() else "cpu"
         self._auto_checkpoint_steps = train_conf["auto_checkpoint_steps"]
+        self._max_checkpoint_freq = train_conf["max_checkpoint_freq"]
         self._input_images_run = train_conf["input_images_run"]
 
         self._tasks = conf["tasks"]
@@ -104,7 +105,7 @@ class ATrainer(AStage, ABC):
         stepper = self.get_stepper()
 
         self._trainer = Trainer(self._epochs, self._model, optimizer, loss_fn, stepper, self._dataproviders)\
-            .set_checkpointer(CheckpointerWandb(self._auto_checkpoint_steps, self._logging_dir, self._save_checkpoints_to_wandb, max_freq=self._log_freq))\
+            .set_checkpointer(CheckpointerWandb(self._auto_checkpoint_steps, self._logging_dir, self._save_checkpoints_to_wandb, max_freq=self._max_checkpoint_freq))\
             .add_progress_tracker(RunProgressTrackerWandb(self._run_dataloader, self._postprocess_parameter_map, report_prefix=self._name, log_freq=self._log_freq))\
             .add_start_action(WatchWandb(self._wandb_watch_log, self._wandb_watch_log_freq))\
             .add_epoch_start_action(LrDecay(self._lr_decay, self._decay_epochs))\

@@ -8,12 +8,15 @@ class Checkpointer(ABC):
         super().__init__()
 
     def should_make_checkpoint(self, trainer : ATrainer) -> bool:
+        """ Given the state of the trainer, should a checkpoint be made? """
         pass
 
     def make_checkpoint(self, trainer : ATrainer):
+        """ Actually make a checkpoint """
         pass
 
     def restore_best(self, trainer : ATrainer) -> HyperModel:
+        """ Restores the best checkpoint """
         pass
 
 

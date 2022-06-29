@@ -31,21 +31,22 @@
     "train": {
         "input_saliencies": "./dataset/dummy_saliency/",
         "input_images_train": "./dataset/dummy_images/train/",
-        "imgs_per_task_train": 2500,
+        "imgs_per_task_train": 8,
         "input_images_val": "./dataset/dummy_images/val/",
-        "imgs_per_task_val": 1250,
+        "imgs_per_task_val": 8,
         "input_images_run": "./dataset/dummy_images/run/",
         
         "loss": "BCELoss",
         "batch_size": 4,
         "consecutive_batches_per_task": 8,
-        "epochs": 60,
+        "epochs": 2,
         "lr": 0.001,
         "lr_decay": 0.1,
         "freeze_encoder_steps": 3,
         "decay_epochs": [],
         
         "auto_checkpoint_steps": 7,
+        "max_checkpoint_freq": 3,
 
         "batch_log_freq": 100,
         "wandb": {

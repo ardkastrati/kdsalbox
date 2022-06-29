@@ -68,7 +68,11 @@ class CheckpointerWandb(Checkpointer):
         self._last_checkpoint = epoch
 
     def restore_best(self, trainer: ATrainer) -> HyperModel:
-        raise NotImplementedError()
+        model = trainer.model
+        
+        best_path = os.path.join(self._base_checkpoint_dir, "best.pth")
+        model.load(best_path)
+        
 
     def save(self, path : str, model : HyperModel, save_to_wandb : bool = True):
         os.makedirs(os.path.dirname(path), exist_ok=True)

@@ -15,6 +15,7 @@
         "decay_epochs": [],
         
         "auto_checkpoint_steps": 7,
+        "max_checkpoint_freq": 3,
 
         "batch_log_freq": 100,
         "wandb": {
