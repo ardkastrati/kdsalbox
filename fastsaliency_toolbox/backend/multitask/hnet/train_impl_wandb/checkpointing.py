@@ -71,7 +71,7 @@ class CheckpointerWandb(Checkpointer):
         model = trainer.model
         
         best_path = os.path.join(self._base_checkpoint_dir, "best.pth")
-        model.load(best_path)
+        model.load(best_path, model.device)
         
 
     def save(self, path : str, model : HyperModel, save_to_wandb : bool = True):
