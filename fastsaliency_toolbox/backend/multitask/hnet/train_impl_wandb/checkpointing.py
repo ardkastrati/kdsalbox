@@ -46,6 +46,8 @@ class CheckpointerWandb(Checkpointer):
 
         is_smallest_loss = self._is_best_model(trainer)
         if is_smallest_loss: return True
+
+        return False
         
 
     def make_checkpoint(self, trainer: ATrainer):
