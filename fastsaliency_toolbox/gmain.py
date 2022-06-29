@@ -39,9 +39,12 @@ def run_with_conf(conf, group=None):
     run_name = conf["name"]
     run_description = conf["description"]
 
+    wandb_entity = conf["wandb_entity"]
+    wandb_project = conf["wandb_project"]
+
     wandb.login()
     start_method = "spawn" if os.name == "nt" else "fork" # check if windows or linux
-    run = wandb.init(project="kdsalbox-generalization", entity="ba-yanickz", 
+    run = wandb.init(project=wandb_project, entity=wandb_entity, 
         name=run_name, notes=run_description, group=group, reinit=True, 
         config=conf, settings=wandb.Settings(start_method=start_method))
 

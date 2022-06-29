@@ -1,4 +1,6 @@
 {
+    "wandb_entity": "ba-yanickz",
+    "wandb_project": "kdsalbox-generalization",
     "gpu": 0,
 
     "tasks": ["AIM", "SUN", "IKN", "GBVS"], 
