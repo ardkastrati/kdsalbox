@@ -32,7 +32,10 @@ class MultitaskBatchProvider(DataProvider):
 
         # create a data iterator for each task
         # Note: DataLoader shuffles when iterator is created
-        data_iters = [iter(d) for d in self._dataloaders.values()] 
+        data_iters = {
+            task_id: iter(self._dataloaders[task_id]) 
+            for task_id in self._dataloaders.keys()
+        }
 
         # for each batch in all_batches
         for task_id in all_batches:

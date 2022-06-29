@@ -4,20 +4,19 @@
 
         "input_saliencies": "./dataset/dummy_saliency/",
         "input_images_train": "./dataset/dummy_images/train/",
-        "imgs_per_task_train": 10,
+        "imgs_per_task_train": 100,
         "input_images_val": "./dataset/dummy_images/val/",
         "imgs_per_task_val": 1250,
         "input_images_run": "./dataset/dummy_images/run/",
         
         "loss": "BCELoss",
         "batch_size": 4,
-        "consecutive_batches_per_task": 8,
         "epochs": 15,
         "lr": 0.001,
         "lr_decay": 0.1,
-        "freeze_encoder_steps": 3,
         "decay_epochs": [],
-
+        
+        "freeze_encoder_steps": 3,
         "freeze_hnet_shared_steps": 5,
         
         "auto_checkpoint_steps": 5,
