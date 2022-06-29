@@ -1,5 +1,7 @@
 {
     "pretrain_weights": {
+        "tasks": ["UniSal", "SAM", "IKN", "GBVS", "BMS", "IMSIG", "RARE2012"],
+        
         "target_model_weights": "./models/",
 
         "input_images_run": "./dataset/dummy_images/run/",

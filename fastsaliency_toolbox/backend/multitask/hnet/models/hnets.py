@@ -37,17 +37,17 @@ class ChunkedHNET(AHNET):
             chunk_emb_size=hnet_conf["chunk_emb_size"] # size of the chunk embeddings
         )
 
+        self._did_log = False
+
     def forward(self, task_id : Union[int, List[int]]):
         return self.hnet.forward(cond_id = task_id)
 
-    def freeze_hnet_for_catchup(self):
-        print([n for n,p in self.hnet.named_parameters()])
-        
-    def unfreeze_hnet_from_catchup(self):
-        pass
-
     def get_gradients_on_outputs(self) -> Dict[int, List[torch.Tensor]]:
+        if self._did_log: return
+
         print("Warning: observing gradients of ChunkedHLMP is currently not yet supported!")
+        self._did_log = True
+        
         return {}
 
 
@@ -75,12 +75,6 @@ class SimpleHNET(AHNET):
 
     def forward(self, task_id : Union[int, List[int]]):
         return self.hnet.forward(cond_id = task_id)
-
-    def freeze_hnet_for_catchup(self):
-        print([n for n,p in self.hnet.named_parameters()])
-        
-    def unfreeze_hnet_from_catchup(self):
-        pass
 
     def get_gradients_on_outputs(self) -> Dict[int, List[torch.Tensor]]:
         print("Warning: observing gradients of SimpleHNET is currently not yet supported!")
@@ -133,14 +127,6 @@ class SingleLayerHNET(AHNET):
             weights[i] = weights[i].view(s)
 
         return weights
-
-    def freeze_hnet_for_catchup(self):
-        # no catchup parameters
-        pass
-
-    def unfreeze_hnet_from_catchup(self):
-        # no catchup parameters
-        pass
 
     def get_gradients_on_outputs(self) -> Dict[int, List[torch.Tensor]]:
         weight_param = self.get_parameter("_l1.weight")

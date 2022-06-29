@@ -29,11 +29,5 @@ class HNET(AHNET):
     def forward(self, task_id : Union[int, List[int]]):
         return self.hnet.forward(task_id)
 
-    def freeze_hnet_for_catchup(self):
-        self.hnet.freeze_hnet_for_catchup()
-        
-    def unfreeze_hnet_from_catchup(self):
-        self.hnet.unfreeze_hnet_from_catchup()
-
     def get_gradients_on_outputs(self) -> List[torch.Tensor]:
         return self.hnet.get_gradients_on_outputs()

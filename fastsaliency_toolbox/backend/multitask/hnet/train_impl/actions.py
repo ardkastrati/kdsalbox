@@ -41,7 +41,7 @@ class FreezeEncoder(EpochAction):
         if should_unfreeze:
             trainer.model.mnet.unfreeze_encoder()
 
-class FreezeHNETForCatchup(EpochAction):
+class FreezeHNETShared(EpochAction):
     """ Freezes all but the task specific weights of the HNET at epoch 0 and unfreezes them again at a specified epoch """
     def __init__(self, unfreeze_at_epoch : int):
         super().__init__()
@@ -52,11 +52,24 @@ class FreezeHNETForCatchup(EpochAction):
 
         should_freeze = (epoch == 0)
         if should_freeze:
-            trainer.model.hnet.freeze_hnet_for_catchup()
+            # TODO: set lr of all shared params to 0
+            print("should_freeze")
         
         should_unfreeze = (epoch == self._unfreeze_at_epoch)
         if should_unfreeze:
-            trainer.model.hnet.freeze_hnet_for_catchup()
+            # TODO: set lr of all shared params to <lr>
+            print("should_unfreeze")
+
+class LoadModel(EpochAction):
+    """ Loads a model from a specific path """
+    def __init__(self, path : str):
+        super().__init__()
+
+        self._path = path
+    
+    def invoke(self, trainer: ATrainer):
+        model = trainer.model
+        model.load(self._path)
 
 class LogEpochLosses(EpochAction):
     """ Logs the training loss and validation loss at the end of an epoch """

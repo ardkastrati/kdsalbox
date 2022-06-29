@@ -2,7 +2,7 @@
 Runner
 ------
 
-For each task in conf["run"]["tasks"], 
+For each task in conf["tasks"], 
 this runner will go over all images in conf["run"]["input_images_run"]
 and compute & store the saliency map for each of them.
 
@@ -23,7 +23,7 @@ class Runner(AStage):
         self._model : HyperModel = None
 
         run_conf = conf[name]
-        self._tasks = conf["tasks"]
+        self._tasks = conf["all_tasks"]
         self._device = f"cuda:{conf['gpu']}" if torch.cuda.is_available() else "cpu"
         self._input_dir = run_conf["input_images_run"]
         self._overwrite = run_conf["overwrite"]
@@ -43,7 +43,7 @@ class Runner(AStage):
         # prepare dataloader
         self._dataloader = DataLoader(RunDataManager(self._input_dir, "", self._verbose, recursive=False), batch_size=1)
 
-        self._runner = RunProgressTrackerWandb(self._dataloader, self._postprocess_parameter_map, self._name)
+        self._runner = RunProgressTrackerWandb(self._dataloader, self._tasks, self._postprocess_parameter_map, self._name)
 
 
     def execute(self):

@@ -48,7 +48,7 @@ class ATrainer(AStage, ABC):
         self._max_checkpoint_freq = train_conf["max_checkpoint_freq"]
         self._input_images_run = train_conf["input_images_run"]
 
-        self._tasks = conf["tasks"]
+        self._tasks = train_conf["tasks"]
         self._task_cnt = conf["model"]["hnet"]["task_cnt"]
 
         self._loss_fn = train_conf["loss"]
@@ -68,6 +68,11 @@ class ATrainer(AStage, ABC):
         # convert parameter dicts to parametermap such that it can be used in process()
         self._preprocess_parameter_map = ParameterMap().set_from_dict(conf["preprocess"])
         self._postprocess_parameter_map = ParameterMap().set_from_dict(conf["postprocess"])
+
+        # sanity checks
+        all_tasks = conf["all_tasks"]
+        assert len(self._tasks) <= self._task_cnt
+        assert set(self._tasks).issubset(set(all_tasks))
 
     @abstractmethod
     def get_data_providers(self) -> Dict[str, DataProvider]:
@@ -98,27 +103,27 @@ class ATrainer(AStage, ABC):
         # prepare trainer
         self._dataproviders = self.get_data_providers()
         self._run_dataloader = DataLoader(RunDataManager(self._input_images_run, "", verbose=False, recursive=False), batch_size=1)
+        self._trainer = self.build_trainer()
 
+    def build_trainer(self) -> Trainer:
         optimizer = torch.optim.Adam(self._model.parameters(), lr=self._lr)
         losses = self.get_losses()
         loss_fn = losses[self._loss_fn]
         stepper = self.get_stepper()
 
-        self._trainer = Trainer(self._epochs, self._model, optimizer, loss_fn, stepper, self._dataproviders)\
+        trainer = Trainer(self._epochs, self._model, optimizer, loss_fn, stepper, self._dataproviders)\
             .set_checkpointer(CheckpointerWandb(self._auto_checkpoint_steps, self._logging_dir, self._save_checkpoints_to_wandb, max_freq=self._max_checkpoint_freq))\
-            .add_progress_tracker(RunProgressTrackerWandb(self._run_dataloader, self._postprocess_parameter_map, report_prefix=self._name, log_freq=self._log_freq))\
+            .add_progress_tracker(RunProgressTrackerWandb(self._run_dataloader, self._tasks, self._postprocess_parameter_map, report_prefix=self._name, log_freq=self._log_freq))\
             .add_start_action(WatchWandb(self._wandb_watch_log, self._wandb_watch_log_freq))\
             .add_epoch_start_action(LrDecay(self._lr_decay, self._decay_epochs))\
             .add_epoch_end_action(LogEpochLosses(self._log_freq))\
             .add_epoch_end_action(ReportLiveMetricsWandb(self._name, self._logging_dir, self._log_freq))
         
         if self._batch_log_freq:
-            self._trainer\
-            .add_batch_action(BatchLogger(self._batch_log_freq))\
+            trainer.add_batch_action(BatchLogger(self._batch_log_freq))\
             #.add_batch_action(WeightWatcher(self._batch_log_freq, groups=30))
-
-        # sanity checks
-        assert self._task_cnt == len(self._tasks)
+        
+        return trainer
 
     def execute(self):
         super().execute()
@@ -145,10 +150,8 @@ class ASaliencyTrainer(ATrainer):
 
         self._freeze_encoder_steps = train_conf["freeze_encoder_steps"]
 
-    def setup(self, work_dir_path: str = None, input=None):
-        super().setup(work_dir_path, input)
-        
-        self._trainer.add_epoch_start_action(FreezeEncoder(self._freeze_encoder_steps))
+    def build_trainer(self) -> Trainer:
+        return super().build_trainer().add_epoch_start_action(FreezeEncoder(self._freeze_encoder_steps))
 
     def get_stepper(self) -> TrainStep:
         return MultitaskTrainStep()

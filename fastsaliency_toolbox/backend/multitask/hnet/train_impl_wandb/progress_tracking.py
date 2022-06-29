@@ -6,7 +6,7 @@ from torch.utils.data import DataLoader
 import wandb
 
 from backend.image_processing import process
-from backend.metrics import NSS, CC, SIM, KL as KL
+from backend.metrics import NSS, CC, SIM, KL
 from backend.parameters import ParameterMap
 from backend.multitask.hnet.train_api.progress_tracking import ProgressTracker
 from backend.multitask.hnet.train_api.training import ATrainer
@@ -15,10 +15,11 @@ from backend.multitask.hnet.models.hyper_model import HyperModel
 class RunProgressTrackerWandb(ProgressTracker):
     """ Runs a model for all images provided by the dataloader and for all tasks
         and uploads the resulting saliency maps to wandb """
-    def __init__(self, run_dataloader : DataLoader, postprocess_parameter_map : ParameterMap, report_prefix : str = "", log_freq : int = 1):
+    def __init__(self, run_dataloader : DataLoader, tasks : List[str], postprocess_parameter_map : ParameterMap, report_prefix : str = "", log_freq : int = 1):
         super().__init__()
 
         self._run_dataloader = run_dataloader
+        self._tasks = tasks
         self._postprocess_parameter_map = postprocess_parameter_map
         self._report_prefix = report_prefix
         self._log_freq = log_freq
@@ -34,13 +35,12 @@ class RunProgressTrackerWandb(ProgressTracker):
     def track_progress_core(self, model : HyperModel, report_name : str):
         with torch.no_grad():
             device = model.device
-            tasks = model.tasks
 
             cols = ["Model"]
             cols.extend([os.path.basename(output_path[0]) for (_, _, output_path) in self._run_dataloader])
 
             data = []
-            for task in tasks:
+            for task in self._tasks:
                 row = [task]
                 task_id = model.task_to_id(task)
 

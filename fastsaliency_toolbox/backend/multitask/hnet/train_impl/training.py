@@ -55,6 +55,21 @@ class Trainer(ATrainer):
         self._checkpointer = checkpointer
         return self
 
+    def set_dataproviders(self, dataproviders : Dict[str, DataProvider]):
+        self._data_providers = dataproviders
+        return self
+
+    def clear(self):
+        """ Clears progress tracking, checkpointer and all actions """
+        self._progress_trackers.clear()
+        self._checkpointer = None
+        self._start_actions.clear()
+        self._epoch_start_actions.clear()
+        self._batch_actions.clear()
+        self._epoch_end_actions.clear()
+        self._end_actions.clear()
+
+        return self
     
     def train(self):
         # invoke all start actions
@@ -85,9 +100,9 @@ class Trainer(ATrainer):
             if self._checkpointer is not None and self._checkpointer.should_make_checkpoint(self):
                 self._checkpointer.make_checkpoint(self)
 
-                # track the progress on every checkpoint
-                for progress_tracker in self._progress_trackers:
-                    progress_tracker.track_progress(self)
+            # track the progress on every epoch
+            for progress_tracker in self._progress_trackers:
+                progress_tracker.track_progress(self)
 
             # invoke all epoch end actions
             for action in self._epoch_end_actions:

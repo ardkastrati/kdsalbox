@@ -23,6 +23,7 @@ from backend.multitask.hnet.stages.trainer_main import MainTrainer
 from backend.multitask.hnet.stages.pretrainer_weights import PreTrainerWeights
 from backend.multitask.hnet.stages.pretrainer_one_task import PreTrainerOneTask
 from backend.multitask.hnet.stages.trainer_catchup import TrainerCatchup
+from backend.multitask.hnet.stages.trainer_generalization_task import TrainerGeneralizationTask
 from backend.multitask.pipeline.pipeline import Pipeline
 from backend.multitask.pipeline.stages import ExportStage
 
@@ -82,6 +83,8 @@ def run_with_conf(conf, group=None):
         if "train" in conf.keys():
             stages.append(MainTrainer(conf, "train", verbose=verbose))
             stages.append(ExportStage("export - train", path=f"{os.path.join(run_dir, 'train', 'best.pth')}", verbose=verbose))
+        if "train_generalization_task" in conf.keys():
+            stages.append(TrainerGeneralizationTask(conf, "train_generalization_task", verbose=verbose))
         if "test" in conf.keys():
             stages.append(Tester(conf, "test", verbose=verbose))
         if "run" in conf.keys():
@@ -91,7 +94,7 @@ def run_with_conf(conf, group=None):
         hnet_fn = lambda mnet : HNET(mnet.get_cw_param_shapes(), conf["model"]["hnet"])
 
         pipeline = Pipeline(
-            input = HyperModel(mnet_fn, hnet_fn, conf["tasks"], conf["model"]["use_eval_mode"]).build(),
+            input = HyperModel(mnet_fn, hnet_fn, conf["all_tasks"], conf["model"]["use_eval_mode"]).build(),
             work_dir_path=run_dir,
             stages = stages
         )

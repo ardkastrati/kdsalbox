@@ -44,6 +44,10 @@ class ATrainer(ABC):
     @property
     def optimizer(self):
         return self._optimizer
+
+    def set_optimizer(self, optimizer : torch.optim.Optimizer):
+        self._optimizer = optimizer
+        return self
     
     @property
     def loss_fn(self):

@@ -1,5 +1,7 @@
 {
     "train_catchup": {
+        "tasks": ["UniSal", "SAM", "IKN", "GBVS", "BMS", "IMSIG", "RARE2012"],
+
         "input_saliencies": "./dataset/dummy_saliency/",
         "input_images_train": "./dataset/dummy_images/train/",
         "imgs_per_task_train": 2500,

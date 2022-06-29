@@ -27,7 +27,7 @@ class Tester(AStage):
 
         self._batch_size = 1 # TODO: add support for batch_size > 1 (make sure per_image_statistics still works!)
         self._imgs_per_task_test = test_conf["imgs_per_task_test"]
-        self._tasks = conf["tasks"]
+        self._tasks = conf["all_tasks"]
         self._input_saliencies = test_conf["input_saliencies"]
         self._input_images_test = test_conf["input_images_test"]
 

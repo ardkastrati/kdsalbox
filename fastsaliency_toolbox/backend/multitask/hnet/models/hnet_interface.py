@@ -24,14 +24,6 @@ class AHNET(nn.Module, ABC):
         return self._target_shapes
 
     @abstractmethod
-    def freeze_hnet_for_catchup(self):
-        pass
-
-    @abstractmethod
-    def unfreeze_hnet_from_catchup(self):
-        pass
-
-    @abstractmethod
     def get_gradients_on_outputs(self) -> Dict[int, List[torch.Tensor]]:
         """ Returns a dictionary that for each task_id contains a list of gradients (representing the different targets = MNET parameters) """
         pass

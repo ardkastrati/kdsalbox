@@ -17,7 +17,8 @@ from backend.datasets import TrainDataManager
 from backend.multitask.hnet.train_impl.data import MultitaskBatchProvider
 from backend.multitask.hnet.stages.trainer import ASaliencyTrainer
 from backend.multitask.hnet.train_api.data import DataProvider
-from backend.multitask.hnet.train_impl.actions import FreezeHNETForCatchup
+from backend.multitask.hnet.train_impl.actions import FreezeHNETShared
+from backend.multitask.hnet.train_impl.training import Trainer
 
 class TrainerCatchup(ASaliencyTrainer):
     def __init__(self, conf, name, verbose):
@@ -56,5 +57,6 @@ class TrainerCatchup(ASaliencyTrainer):
 
     def setup(self, work_dir_path: str = None, input=None):
         super().setup(work_dir_path, input)
-        
-        self._trainer.add_epoch_start_action(FreezeHNETForCatchup(self._epochs - 1))
+    
+    def build_trainer(self) -> Trainer:
+        return super().build_trainer().add_epoch_start_action(FreezeHNETShared(self._epochs - 1))

@@ -1,6 +1,8 @@
 
 {
     "pretrain_one_task": {
+        "tasks": ["UniSal", "SAM", "IKN", "GBVS", "BMS", "IMSIG", "RARE2012"],
+        
         "input_saliencies": "./dataset/dummy_saliency/",
         "input_images_train": "./dataset/dummy_images/train/",
         "input_images_val": "./dataset/dummy_images/val/",
