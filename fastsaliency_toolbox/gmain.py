@@ -27,6 +27,7 @@ from backend.multitask.hnet.stages.trainer_generalization_task import TrainerGen
 from backend.multitask.pipeline.pipeline import Pipeline
 from backend.multitask.pipeline.stages import ExportStage
 from backend.multitask.hnet.stages.load_model import ModelLoader
+from backend.multitask.hnet.stages.table_1 import Table1
 
 @click.group()
 def cli():
@@ -92,6 +93,27 @@ def run_with_conf(conf, group=None):
             stages.append(Tester(conf, "test", verbose=verbose))
         if "run" in conf.keys():
             stages.append(Runner(conf, "run", verbose=verbose))
+        
+        # generate tables for each category
+        CAT = ['Action', 'Affective', 'Art', 'BlackWhite', 'Cartoon', 'Fractal', 'Indoor', 'Inverted', 'Jumbled', 'LineDrawing', 'LowResolution', 'Noisy', 'Object', 'OutdoorManMade', 'OutdoorNatural', 'Pattern', 'Random', 'Satelite', 'Sketch', 'Social']
+        UMSI = ['ads', 'infographics', 'mobile_uis', 'movie_posters', 'webpages']
+        
+        base_path = "E:/data/ethz/ba/dataset"
+
+        for cat in CAT:
+            base_path_sal = os.path.join(base_path, "saliency/CAT")
+            base_path_img = os.path.join(base_path, "DATASET/CAT")
+            stages.append(Table1(conf, os.path.join(base_path_sal, cat), os.path.join(base_path_img, cat), f"table_cat_{cat}", verbose=verbose))
+        
+        for umsi in UMSI:
+            base_path_sal = os.path.join(base_path, "saliency/UMSI")
+            base_path_img = os.path.join(base_path, "DATASET/UMSI")
+            stages.append(Table1(conf, os.path.join(base_path_sal, umsi), os.path.join(base_path_img, umsi), f"table_umsi_{cat}", verbose=verbose))
+
+        base_path_sal = os.path.join(base_path, "SALICON")
+        base_path_img = os.path.join(base_path, "SALICON/Images/val")
+        stages.append(Table1(conf, base_path_sal, base_path_img, f"table_salicon", verbose=verbose))
+
 
         mnet_fn = lambda : MNET(conf["model"]["mnet"])
         hnet_fn = lambda mnet : HNET(mnet.get_cw_param_shapes(), conf["model"]["hnet"])
