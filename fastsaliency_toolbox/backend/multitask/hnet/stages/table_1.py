@@ -78,8 +78,6 @@ class Table1(AStage):
         loss_fn = torch.nn.BCELoss()
 
         for i,(X, y, names) in enumerate(dataloader):
-            if i >= 2: break # TODO: remove
-
             X = X.to(device)
             y = y.to(device)
 
