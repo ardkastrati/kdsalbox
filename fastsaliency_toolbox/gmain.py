@@ -26,6 +26,7 @@ from backend.multitask.hnet.stages.trainer_catchup import TrainerCatchup
 from backend.multitask.hnet.stages.trainer_generalization_task import TrainerGeneralizationTask
 from backend.multitask.pipeline.pipeline import Pipeline
 from backend.multitask.pipeline.stages import ExportStage
+from backend.multitask.hnet.stages.load_model import ModelLoader
 
 @click.group()
 def cli():
@@ -71,6 +72,8 @@ def run_with_conf(conf, group=None):
         print(f"Running {run_name}")
 
         stages = []
+        if "load_model" in conf.keys():
+            stages.append(ModelLoader(conf, "load_model", verbose=verbose))
         if "pretrain_weights" in conf.keys():
             stages.append(PreTrainerWeights(conf, "pretrain_weights", verbose=verbose))
             stages.append(ExportStage("export - pretrain_weights", path=f"{os.path.join(run_dir, 'pretrain_weights', 'best.pth')}", verbose=verbose))

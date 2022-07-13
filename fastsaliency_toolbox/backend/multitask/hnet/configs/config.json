@@ -4,7 +4,7 @@
     "gpu": 0,
 
     "all_tasks": ["UniSal", "SAM", "DGII", "AIM", "SUN", "IKN", "GBVS", "BMS", "IMSIG", "RARE2012"], 
-    "skip": [],
+    "skip": ["train", "test", "train_generalization_task"],
 
     "name": "Full - One hot to full",
     "description": "Goal: Learn all 7 networks in one",
@@ -30,20 +30,25 @@
         }
     },
 
+    "load_model": {
+        "run_path": "ba-yanickz/kdsalbox-generalization/b0pwqfcz",
+        "file_name": "Generalization - decoder - chunked - evaluation - 0/train/25_0.354321.pth"
+    },
+
     "train": {
-        "tasks": ["UniSal", "SAM", "IKN", "GBVS", "BMS", "IMSIG", "RARE2012"],
+        "tasks": ["UniSal", "SAM", "DGII", "AIM", "SUN", "IKN", "GBVS", "BMS", "IMSIG", "RARE2012"], 
 
         "input_saliencies": "./dataset/dummy_saliency/",
         "input_images_train": "./dataset/dummy_images/train/",
-        "imgs_per_task_train": 1500,
+        "imgs_per_task_train": 1000,
         "input_images_val": "./dataset/dummy_images/val/",
-        "imgs_per_task_val": 750,
+        "imgs_per_task_val": 500,
         "input_images_run": "./dataset/dummy_images/run/",
         
         "loss": "BCELoss",
         "batch_size": 4,
         "consecutive_batches_per_task": 8,
-        "epochs": 15,
+        "epochs": 30,
         "lr": 0.001,
         "lr_decay": 0.1,
         "freeze_encoder_steps": 3,
@@ -60,47 +65,6 @@
                 "log_freq": 100
             }
         }
-    },
-
-    "train_generalization_task": {
-        "tasks": ["DGII", "AIM", "SUN"],
-
-        "input_saliencies": "./dataset/dummy_saliency/",
-        "input_images_train": "./dataset/dummy_images/train/",
-        "imgs_per_task_train": 100,
-        "input_images_val": "./dataset/dummy_images/val/",
-        "imgs_per_task_val": 1250,
-        "input_images_run": "./dataset/dummy_images/run/",
-        
-        "loss": "BCELoss",
-        "batch_size": 4,
-        "epochs": 15,
-        "lr": 0.001,
-        "lr_decay": 0.1,
-        "decay_epochs": [],
-        
-        "freeze_encoder_steps": 3,
-        "freeze_hnet_shared_steps": 5,
-        
-        "auto_checkpoint_steps": 5,
-        "max_checkpoint_freq": 3,
-
-        "batch_log_freq": 100,
-        "wandb": {
-            "save_checkpoints_to_wandb": false,
-            "watch": {
-                "log": null,
-                "log_freq": 100
-            }
-        }
-    },
-
-    "test": {
-        "input_images_test": "./dataset/dummy_images/train/",
-        "imgs_per_task_test": 1,
-        "input_saliencies": "./dataset/dummy_saliency/",
-        
-        "per_image_statistics": true        
     },
 
     "run": {

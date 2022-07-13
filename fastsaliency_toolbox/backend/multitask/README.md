@@ -10,6 +10,7 @@ The framework currently supports meta-learning via Hypernetworks but should be e
 The frameworks core is a fully configurable experiment pipeline that currently supports the following stages:
 | Name              | Description                                                                                             | Data                 | Status    |
 |-------------------|---------------------------------------------------------------------------------------------------------|----------------------|-----------|
+| load_model        | Restores and loads a model from a wandb save                                                            | .pth                 | [x]       |
 | pretrain_weights  | Pretrains the Hypernetwork to output the weights of the models in fastsaliency_toolbox/models           | Weights              | [x]       |
 | pretrain_one_task | Primes the Hypernetwork on one task (e.g. AIM)                                                          | Image/Saliency Pairs | [x]       |
 | train_catchup     | Freezes all shared Hypernetwork parameters and lets the individual parameters adjust to the shared ones | Image/Saliency Pairs | partially |
