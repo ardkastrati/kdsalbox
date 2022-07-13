@@ -41,9 +41,9 @@ class ModelLoader(AStage):
         model_file = wandb.restore(self._file_name, run_path=self._run_path)
 
         print("Load model")
-        self._model.load(model_file.name, self._device)
-        
-        self._model.to(self._device)
         self._model.build()
+        self._model.load(model_file.name, self._device)
+
+        self._model.to(self._device)
 
         return self._model
