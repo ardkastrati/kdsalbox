@@ -98,7 +98,7 @@ def run_with_conf(conf, group=None):
         CAT = ['Action', 'Affective', 'Art', 'BlackWhite', 'Cartoon', 'Fractal', 'Indoor', 'Inverted', 'Jumbled', 'LineDrawing', 'LowResolution', 'Noisy', 'Object', 'OutdoorManMade', 'OutdoorNatural', 'Pattern', 'Random', 'Satelite', 'Sketch', 'Social']
         UMSI = ['ads', 'infographics', 'mobile_uis', 'movie_posters', 'webpages']
         
-        base_path = "E:/data/ethz/ba/dataset"
+        base_path = "/itet-stor/yanickz/net_scratch/data/dataset"
 
         for cat in CAT:
             base_path_sal = os.path.join(base_path, "saliency/CAT")
