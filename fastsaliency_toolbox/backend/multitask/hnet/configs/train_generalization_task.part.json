@@ -1,25 +1,24 @@
 {
     "train_generalization_task": {
-        "tasks": ["DGII", "AIM", "SUN"],
+        "tasks": ["IKN"],
 
         "input_saliencies": "./dataset/dummy_saliency/",
         "input_images_train": "./dataset/dummy_images/train/",
-        "imgs_per_task_train": 100,
+        "train_img_cnt": 10,
         "input_images_val": "./dataset/dummy_images/val/",
-        "imgs_per_task_val": 1250,
+        "val_img_cnt": 1500,
         "input_images_run": "./dataset/dummy_images/run/",
         
         "loss": "BCELoss",
         "batch_size": 4,
-        "epochs": 15,
+        "epochs": 1000,
         "lr": 0.001,
         "lr_decay": 0.1,
         "decay_epochs": [],
         
-        "freeze_encoder_steps": 3,
         "freeze_hnet_shared_steps": 5,
         
-        "auto_checkpoint_steps": 5,
+        "auto_checkpoint_steps": 100,
         "max_checkpoint_freq": 3,
 
         "batch_log_freq": 100,

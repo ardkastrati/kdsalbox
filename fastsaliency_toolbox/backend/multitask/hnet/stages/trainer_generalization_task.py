@@ -25,8 +25,8 @@ class TrainerGeneralizationTask(ASaliencyTrainer):
 
         train_conf = conf[name]
 
-        self._imgs_per_task_train = train_conf["imgs_per_task_train"]
-        self._imgs_per_task_val = train_conf["imgs_per_task_val"]
+        self._train_img_cnt = train_conf["train_img_cnt"]
+        self._val_img_cnt = train_conf["val_img_cnt"]
 
         self._freeze_hnet_shared_steps = train_conf["freeze_hnet_shared_steps"]
 
@@ -49,8 +49,8 @@ class TrainerGeneralizationTask(ASaliencyTrainer):
     def get_data_providers(self) -> Dict[str, DataProvider]:
         sal_folders = [os.path.join(self._input_saliencies, task) for task in self._tasks] # path to saliency folder for all models
 
-        train_datasets = [TrainDataManager(self._train_img_path, sal_path, self._verbose, self._preprocess_parameter_map) for sal_path in sal_folders]
-        val_datasets = [TrainDataManager(self._val_img_path, sal_path, self._verbose, self._preprocess_parameter_map) for sal_path in sal_folders]
+        train_datasets = [TrainDataManager(self._train_img_path, sal_path, self._verbose, self._preprocess_parameter_map, self._train_img_cnt) for sal_path in sal_folders]
+        val_datasets = [TrainDataManager(self._val_img_path, sal_path, self._verbose, self._preprocess_parameter_map, self._val_img_cnt) for sal_path in sal_folders]
 
         train_dataloaders = { 
             task: DataLoader(ds, batch_size=self._batch_size, shuffle=True, num_workers=4) 
