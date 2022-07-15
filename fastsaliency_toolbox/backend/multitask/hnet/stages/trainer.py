@@ -105,8 +105,11 @@ class ATrainer(AStage, ABC):
         self._run_dataloader = DataLoader(RunDataManager(self._input_images_run, "", verbose=False, recursive=False), batch_size=1)
         self._trainer = self.build_trainer()
 
+    def get_optimizer(self) -> torch.optim.Optimizer:
+        return torch.optim.Adam(self._model.parameters(), lr=self._lr)
+
     def build_trainer(self) -> Trainer:
-        optimizer = torch.optim.Adam(self._model.parameters(), lr=self._lr)
+        optimizer = self.get_optimizer()
         losses = self.get_losses()
         loss_fn = losses[self._loss_fn]
         stepper = self.get_stepper()

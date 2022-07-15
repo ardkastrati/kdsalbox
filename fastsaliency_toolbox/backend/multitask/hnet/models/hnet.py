@@ -31,3 +31,6 @@ class HNET(AHNET):
 
     def get_gradients_on_outputs(self) -> List[torch.Tensor]:
         return self.hnet.get_gradients_on_outputs()
+    
+    def task_parameters(self, task_ids : List[int]) -> List[torch.nn.parameter.Parameter]:
+        return self.hnet.task_parameters(task_ids)

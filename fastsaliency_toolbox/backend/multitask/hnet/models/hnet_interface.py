@@ -27,3 +27,10 @@ class AHNET(nn.Module, ABC):
     def get_gradients_on_outputs(self) -> Dict[int, List[torch.Tensor]]:
         """ Returns a dictionary that for each task_id contains a list of gradients (representing the different targets = MNET parameters) """
         pass
+
+    @abstractmethod
+    def task_parameters(self, task_ids : List[int]) -> List[torch.nn.parameter.Parameter]:
+        """ Gets all the parameters that are unique to a list of tasks
+            (e.g. the embedding vectors)
+        """
+        pass

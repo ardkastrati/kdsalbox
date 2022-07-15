@@ -60,11 +60,17 @@ class HyperModel():
 
         self._device = device
 
-    def parameters(self):
+    def parameters(self) -> List[torch.nn.parameter.Parameter]:
         """ Gets all the parameters of the model
             (all the parameters of the hypernetwork as well as all trainable parameters of the mainnetwork).
         """
         return list(self.hnet.parameters()) + list(self.mnet.parameters())
+    
+    def task_parameters(self, task_ids : List[int]) -> List[torch.nn.parameter.Parameter]:
+        """ Gets all the parameters that are unique to a list of tasks
+            (e.g. the embedding vectors)
+        """
+        return self.hnet.task_parameters(task_ids)
 
     def __call__(self, task_id, X):
         """ Invokes a forward pass on the hypernetwork and uses the produced weights to invoke a forward pass on the mainnetwork. """

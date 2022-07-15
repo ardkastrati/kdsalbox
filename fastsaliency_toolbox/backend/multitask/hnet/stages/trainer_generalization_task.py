@@ -8,13 +8,14 @@ Incrementally trains a model on a new task and reports how good the model perfor
 
 from typing import Dict
 import os
+import torch
 from torch.utils.data import DataLoader
 
 from backend.datasets import TrainDataManager
 from backend.multitask.hnet.train_api.data import DataProvider
 from backend.multitask.hnet.stages.trainer import ASaliencyTrainer
 from backend.multitask.hnet.train_impl.data import BatchAndTaskProvider
-from backend.multitask.hnet.train_impl.actions import FreezeHNETShared, LoadModel
+from backend.multitask.hnet.train_impl.actions import LoadModel
 from backend.multitask.pipeline.pipeline import AStage
 from backend.multitask.hnet.train_impl.training import Trainer
 
@@ -37,9 +38,12 @@ class TrainerGeneralizationTask(ASaliencyTrainer):
         self._initial_model_path = os.path.join(self._logging_dir, "original.pth")
         self._model.save(self._initial_model_path)
 
+    def get_optimizer(self) -> torch.optim.Optimizer:
+        params = self._model.task_parameters(task_ids=[self._model.task_to_id(t_id) for t_id in self._tasks])
+        return torch.optim.Adam(params, lr=self._lr)
+
     def build_trainer(self) -> Trainer:
-        return super().build_trainer().add_epoch_start_action(FreezeHNETShared(self._freeze_hnet_shared_steps))\
-            .add_end_action(LoadModel(self._initial_model_path)) # reset to the original model at the end of training
+        return super().build_trainer().add_end_action(LoadModel(self._initial_model_path)) # reset to the original model at the end of training
 
 
     def get_data_providers(self) -> Dict[str, DataProvider]:

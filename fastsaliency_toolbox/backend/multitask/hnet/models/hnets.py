@@ -49,8 +49,11 @@ class ChunkedHNET(AHNET):
         self._did_log = True
         
         return {}
-
-
+    
+    def task_parameters(self, task_ids : List[int]) -> List[torch.nn.parameter.Parameter]:
+        selection = [f"_hnet._internal_params.{i}" for i in task_ids]
+        params = [p for n,p in self.hnet.named_parameters() if n in selection]
+        return params
 
 
 class SimpleHNET(AHNET):
@@ -79,6 +82,9 @@ class SimpleHNET(AHNET):
     def get_gradients_on_outputs(self) -> Dict[int, List[torch.Tensor]]:
         print("Warning: observing gradients of SimpleHNET is currently not yet supported!")
         return {}
+
+    def task_parameters(self, task_ids : List[int]) -> List[torch.nn.parameter.Parameter]:
+        raise NotImplementedError("SimpleHNET.task_parameters() not implemented!")
 
 
 
@@ -139,3 +145,6 @@ class SingleLayerHNET(AHNET):
             grads_per_task[task_id] = grad_per_target
 
         return grads_per_task
+    
+    def task_parameters(self, task_ids : List[int]) -> List[torch.nn.parameter.Parameter]:
+        raise NotImplementedError("SingleLayerHNET.task_parameters() not implemented!")
