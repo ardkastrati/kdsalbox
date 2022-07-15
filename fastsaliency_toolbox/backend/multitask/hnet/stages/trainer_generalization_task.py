@@ -72,8 +72,8 @@ class TrainerGeneralizationTask(ASaliencyTrainer):
         }
 
         # sanity checks
-        assert self._imgs_per_task_train <= min([len(ds) for ds in train_datasets])
-        assert self._imgs_per_task_val <= min([len(ds) for ds in val_datasets])
+        assert self._train_img_cnt <= min([len(ds) for ds in train_datasets])
+        assert self._val_img_cnt <= min([len(ds) for ds in val_datasets])
 
         return dataproviders
 

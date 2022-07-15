@@ -6,16 +6,17 @@
         "input_images_train": "./dataset/dummy_images/train/",
         "train_img_cnt": 10,
         "input_images_val": "./dataset/dummy_images/val/",
-        "val_img_cnt": 1500,
+        "val_img_cnt": 250,
         "input_images_run": "./dataset/dummy_images/run/",
         
         "loss": "BCELoss",
         "batch_size": 4,
-        "epochs": 1000,
+        "epochs": 2000,
         "lr": 0.001,
         "lr_decay": 0.1,
         "decay_epochs": [],
         
+        "freeze_encoder_steps": 100,
         "freeze_hnet_shared_steps": 5,
         
         "auto_checkpoint_steps": 100,
