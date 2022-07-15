@@ -108,7 +108,7 @@ def run_with_conf(conf, group=None):
         for umsi in UMSI:
             base_path_sal = os.path.join(base_path, "saliency/UMSI")
             base_path_img = os.path.join(base_path, "DATASET/UMSI")
-            stages.append(Table1(conf, os.path.join(base_path_sal, umsi), os.path.join(base_path_img, umsi), f"table_umsi_{cat}", verbose=verbose))
+            stages.append(Table1(conf, os.path.join(base_path_sal, umsi), os.path.join(base_path_img, umsi), f"table_umsi_{umsi}", verbose=verbose))
 
         base_path_sal = os.path.join(base_path, "SALICON")
         base_path_img = os.path.join(base_path, "SALICON/Images/val")
