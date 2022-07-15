@@ -71,13 +71,13 @@ class Tables(AStage):
         self._input = input
         self._work_dir_path = work_dir_path
 
-        self._base_path = "E:/data/ethz/ba/runs/Hypernetwork/Chunked_Decoder/test"
+        self._data_path = os.path.split(work_dir_path)[0]
     
     def _table_1(self):
         print("TABLE 1")
 
-        data_salicon = pd.read_csv(os.path.join(self._base_path, "table_salicon", "test_results.csv"))
-        data_pattern = pd.read_csv(os.path.join(self._base_path, "table_cat_Pattern", "test_results.csv"))
+        data_salicon = pd.read_csv(os.path.join(self._data_path, "table_salicon", "test_results.csv"))
+        data_pattern = pd.read_csv(os.path.join(self._data_path, "table_cat_Pattern", "test_results.csv"))
 
         table_file = os.path.join(self._work_dir_path, "table1.tex")
         with open(table_file, "x") as f:
@@ -130,7 +130,7 @@ class Tables(AStage):
             for i in range(len(self.CAT)):
                 myString1 = "      "
                 myString1 += "\\multirow{2}{*}{" + self.CAT[i] + "} & CC  $\\uparrow$"
-                myTable = pd.read_csv(os.path.join(self._base_path, "table_cat_" + self.CAT[i], "test_results.csv"))
+                myTable = pd.read_csv(os.path.join(self._data_path, "table_cat_" + self.CAT[i], "test_results.csv"))
                 for task in tasks:
                     row = myTable.loc[myTable["Model"] == task]
                     myString1 += " & \makebox{" +  "%.2f" % row["CC_mean"].item() + " $\\pm$ " + "%.2f" % row["CC_std"].item()  + "}"
@@ -157,7 +157,7 @@ class Tables(AStage):
             for i in range(len(self.UMSI)):
                 myString1 = "      "
                 myString1 += "\\multirow{2}{*}{" + self.UMSI_table[i] + "} & CC  $\\uparrow$"
-                myTable = pd.read_csv(os.path.join(self._base_path, "table_umsi_" + self.UMSI[i], "test_results.csv"))
+                myTable = pd.read_csv(os.path.join(self._data_path, "table_umsi_" + self.UMSI[i], "test_results.csv"))
                 for task in tasks:
                     row = myTable.loc[myTable["Model"] == task]
                     myString1 += " & \makebox{" +  "%.2f" % row["CC_mean"].item() + " $\\pm$ " + "%.2f" % row["CC_std"].item()  + "}"
