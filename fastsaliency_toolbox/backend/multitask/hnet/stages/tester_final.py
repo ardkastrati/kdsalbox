@@ -12,7 +12,7 @@ from backend.multitask.pipeline.pipeline import AStage
 from backend.multitask.hnet.models.hyper_model import HyperModel
 
 
-class Table1(AStage):
+class TesterFinal(AStage):
     def __init__(self, conf, input_saliencies, input_images, name, verbose):
         super().__init__(name=name, verbose=verbose)
         self._model : HyperModel = None
