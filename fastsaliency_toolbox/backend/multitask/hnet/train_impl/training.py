@@ -97,8 +97,8 @@ class Trainer(ATrainer):
             self.val_losses.append(val_loss)
 
             # check if a checkpoint should be created
-            if self._checkpointer is not None and self._checkpointer.should_make_checkpoint(self):
-                self._checkpointer.make_checkpoint(self)
+            if self._checkpointer is not None:
+                self._checkpointer.try_make_checkpoint(self)
 
             # track the progress on every epoch
             for progress_tracker in self._progress_trackers:
@@ -108,7 +108,7 @@ class Trainer(ATrainer):
             for action in self._epoch_end_actions:
                 action.invoke(self)
 
-        # restore the best checkpoint
+        # restore the best model at the end of training
         if self._checkpointer:
             self._checkpointer.restore_best(self)
         
