@@ -11,7 +11,7 @@
         
         "loss": "BCELoss",
         "batch_size": 4,
-        "epochs": 2000,
+        "epochs": 200,
         "lr": 0.001,
         "lr_decay": 0.1,
         "decay_epochs": [],
@@ -22,6 +22,7 @@
         "auto_checkpoint_steps": 100,
         "max_checkpoint_freq": 3,
 
+        "log_freq": 20,
         "batch_log_freq": 100,
         "wandb": {
             "save_checkpoints_to_wandb": false,
