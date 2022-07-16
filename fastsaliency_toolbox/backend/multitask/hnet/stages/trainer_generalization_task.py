@@ -43,7 +43,7 @@ class TrainerGeneralizationTask(ASaliencyTrainer):
         return torch.optim.Adam(params, lr=self._lr)
 
     def build_trainer(self) -> Trainer:
-        return super().build_trainer().add_end_action(LoadModel(self._initial_model_path)) # reset to the original model at the end of training
+        return super().build_trainer()#.add_end_action(LoadModel(self._initial_model_path)) # reset to the original model at the end of training
 
 
     def get_data_providers(self) -> Dict[str, DataProvider]:

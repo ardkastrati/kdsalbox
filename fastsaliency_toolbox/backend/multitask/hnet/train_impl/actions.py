@@ -69,7 +69,7 @@ class LoadModel(EpochAction):
     
     def invoke(self, trainer: ATrainer):
         model = trainer.model
-        model.load(self._path)
+        model.load(self._path, trainer.model._device)
 
 class LogEpochLosses(EpochAction):
     """ Logs the training loss and validation loss at the end of an epoch """
