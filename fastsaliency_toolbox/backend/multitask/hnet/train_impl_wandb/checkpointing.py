@@ -36,19 +36,6 @@ class CheckpointerWandb(Checkpointer):
         
         return is_smallest_loss
 
-
-    def should_make_checkpoint(self, trainer: ATrainer) -> bool:
-        epoch = trainer.epoch
-        is_checkpoint_epoch = epoch % self._auto_checkpoint_freq == 0
-        if is_checkpoint_epoch: return True
-        
-        if epoch - self._last_checkpoint < self._max_freq: return False
-
-        is_smallest_loss = self._is_best_model(trainer)
-        if is_smallest_loss: return True
-
-        return False
-
     def _should_do_checkpoint(self, trainer: ATrainer) -> bool:
         epoch = trainer.epoch
         is_checkpoint_epoch = epoch % self._auto_checkpoint_freq == 0
