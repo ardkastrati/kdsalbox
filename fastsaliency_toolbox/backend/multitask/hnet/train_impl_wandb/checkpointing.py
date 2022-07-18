@@ -64,6 +64,9 @@ class CheckpointerWandb(Checkpointer):
             path = os.path.join(self._base_checkpoint_dir, 
                 f"{epoch}_{loss_val:f}.pth")
 
+            if not self._save_to_wandb:
+                path = os.path.join(path, "ignore_wandb")
+
             self.save(path, model, self._save_to_wandb)
         
             self._last_checkpoint = epoch

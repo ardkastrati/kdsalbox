@@ -158,6 +158,7 @@ def gridsearch(skip, name, conf_file, param_grid_file, input_images, input_salie
             set_value_if_exists(stage_conf, "input_saliencies", input_saliencies)
     
     os.environ["WANDB_MODE"] = "online" if wdb else "offline"
+    os.environ["WANDB_IGNORE_GLOBS"] = "*.ignore_wandb"
 
     base_name = conf["name"]
 
