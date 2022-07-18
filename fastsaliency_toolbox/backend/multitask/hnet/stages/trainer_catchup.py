@@ -59,4 +59,4 @@ class TrainerCatchup(ASaliencyTrainer):
         super().setup(work_dir_path, input)
     
     def build_trainer(self) -> Trainer:
-        return super().build_trainer().add_epoch_start_action(FreezeHNETShared(self._epochs - 1))
+        return super().build_trainer().add_epoch_start_action(FreezeHNETShared(self._epochs - 1, self._lr))

@@ -1,5 +1,5 @@
 from math import ceil
-from typing import List
+from typing import Callable, List
 import numpy as np
 import torch
 
@@ -42,23 +42,26 @@ class FreezeEncoder(EpochAction):
             trainer.model.mnet.unfreeze_encoder()
 
 class FreezeHNETShared(EpochAction):
+    # TODO: support for dynamic lr
     """ Freezes all but the task specific weights of the HNET at epoch 0 and unfreezes them again at a specified epoch """
-    def __init__(self, unfreeze_at_epoch : int):
+    def __init__(self, unfreeze_at_epoch : int, lr : int):
         super().__init__()
         self._unfreeze_at_epoch = unfreeze_at_epoch
+        self._lr = lr
     
     def invoke(self, trainer: ATrainer):
         epoch = trainer.epoch
+        model = trainer.model
 
         should_freeze = (epoch == 0)
         if should_freeze:
-            # TODO: set lr of all shared params to 0
-            print("should_freeze")
+            trainer.set_optimizer(torch.optim.Adam(params=trainer.model.task_parameters(model.task_ids), lr=self._lr))
+            print("Only training task specific parameters")
         
         should_unfreeze = (epoch == self._unfreeze_at_epoch)
         if should_unfreeze:
-            # TODO: set lr of all shared params to <lr>
-            print("should_unfreeze")
+            trainer.set_optimizer(torch.optim.Adam(params=trainer.model.parameters(), lr=self._lr))
+            print("Training all parameters")
 
 class LoadModel(EpochAction):
     """ Loads a model from a specific path """

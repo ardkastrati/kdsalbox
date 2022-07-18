@@ -108,6 +108,11 @@ class HyperModel():
         """ All the tasks that this model supports """
         return self._tasks
 
+    @property
+    def task_ids(self):
+        """ All the task ids this model supports """
+        return [self.task_to_id(t) for t in self.tasks]
+
     def task_to_id(self, task):
         """ Maps a task name to a task id. """
         return self._task_id_map[task]

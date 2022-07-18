@@ -2,7 +2,8 @@
 Trainer Generalization Task
 ------------------------
 
-Incrementally trains a model on a new task and reports how good the model performs on the new task
+Trains a model on a new task and reports how good the model performs on the new task.
+Only trains the embedding first and then trains the entire network ('freeze_hnet_shared_steps' config parameter)
 
 """
 
@@ -15,9 +16,9 @@ from backend.datasets import TrainDataManager
 from backend.multitask.hnet.train_api.data import DataProvider
 from backend.multitask.hnet.stages.trainer import ASaliencyTrainer
 from backend.multitask.hnet.train_impl.data import BatchAndTaskProvider
-from backend.multitask.hnet.train_impl.actions import LoadModel
 from backend.multitask.pipeline.pipeline import AStage
 from backend.multitask.hnet.train_impl.training import Trainer
+from backend.multitask.hnet.train_impl.actions import FreezeHNETShared
 
 class TrainerGeneralizationTask(ASaliencyTrainer):
     def __init__(self, conf, name, verbose):
@@ -43,7 +44,8 @@ class TrainerGeneralizationTask(ASaliencyTrainer):
         return torch.optim.Adam(params, lr=self._lr)
 
     def build_trainer(self) -> Trainer:
-        return super().build_trainer()#.add_end_action(LoadModel(self._initial_model_path)) # reset to the original model at the end of training
+        return super().build_trainer()\
+            .add_epoch_start_action(FreezeHNETShared(self._freeze_hnet_shared_steps, self._lr))
 
 
     def get_data_providers(self) -> Dict[str, DataProvider]:
