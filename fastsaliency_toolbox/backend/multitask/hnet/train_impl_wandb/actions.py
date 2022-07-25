@@ -38,8 +38,8 @@ class ReportLiveMetricsWandb(EpochAction):
         lr = trainer.optimizer.param_groups[0]["lr"]
 
         wandb.log({
-                f"{self._report_prefix} - pretrain - epoch": epoch,
-                f"{self._report_prefix} - pretrain - loss train": train_loss,
-                f"{self._report_prefix} - pretrain - loss val": val_loss,
-                f"{self._report_prefix} - pretrain - learning rate": lr
+                f"{self._report_prefix} - epoch": epoch,
+                f"{self._report_prefix} - loss train": train_loss,
+                f"{self._report_prefix} - loss val": val_loss,
+                f"{self._report_prefix} - learning rate": lr
             })
