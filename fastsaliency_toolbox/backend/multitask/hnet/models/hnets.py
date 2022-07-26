@@ -84,7 +84,9 @@ class SimpleHNET(AHNET):
         return {}
 
     def task_parameters(self, task_ids : List[int]) -> List[torch.nn.parameter.Parameter]:
-        raise NotImplementedError("SimpleHNET.task_parameters() not implemented!")
+        selection = [f"_internal_params.{i}" for i in task_ids]
+        params = [p for n,p in self.hnet.named_parameters() if n in selection]
+        return params
 
 
 
