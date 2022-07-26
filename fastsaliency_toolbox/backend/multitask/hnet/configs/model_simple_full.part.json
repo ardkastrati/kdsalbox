@@ -2,9 +2,9 @@
     "model": {
         "use_eval_mode": true,
         "hnet": {
-            "type": "chunked",
+            "type": "simple",
             "task_cnt": 4,
-            "hidden_layers": [512, 512, 512, 512],
+            "hidden_layers": [512, 512, 512, 10],
             "embedding_size": 256
         },
         "mnet": {
