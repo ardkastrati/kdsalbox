@@ -1,5 +1,7 @@
 {
     "test": {
+        "tasks": ["UniSal", "SAM", "DGII", "AIM", "SUN", "IKN", "GBVS", "BMS", "IMSIG", "RARE2012"],
+        
         "input_images_test": "./dataset/dummy_images/train/",
         "imgs_per_task_test": 1,
         "input_saliencies": "./dataset/dummy_saliency/",

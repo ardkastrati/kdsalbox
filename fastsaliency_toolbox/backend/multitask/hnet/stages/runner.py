@@ -23,7 +23,7 @@ class Runner(AStage):
         self._model : HyperModel = None
 
         run_conf = conf[name]
-        self._tasks = conf["all_tasks"]
+        self._tasks = run_conf["tasks"]
         self._device = f"cuda:{conf['gpu']}" if torch.cuda.is_available() else "cpu"
         self._input_dir = run_conf["input_images_run"]
         self._overwrite = run_conf["overwrite"]
