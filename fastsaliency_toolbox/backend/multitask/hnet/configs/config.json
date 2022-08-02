@@ -115,6 +115,10 @@
         "save_to_disk": true
     },
 
+    "eval": {
+        "tasks": ["UniSal", "SAM", "DGII", "AIM", "SUN", "IKN", "GBVS", "BMS", "IMSIG", "RARE2012"]
+    },
+
     "preprocess": {
         "histogram_matching": {
             "default": "none",

@@ -61,7 +61,8 @@ class Tables(AStage):
 
     def __init__(self, conf, name, verbose):
         super().__init__(name=name, verbose=verbose)
-        self._tasks = conf["all_tasks"]
+        eval_conf = conf["eval"]
+        self._tasks = eval_conf["tasks"]
         self._input = None
         
     def setup(self, work_dir_path: str = None, input=None):

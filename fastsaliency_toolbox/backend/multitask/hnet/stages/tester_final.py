@@ -1,3 +1,8 @@
+"""
+Computes the final metrics [KL, KL std, CC, CC std] for a model, that can then be used to generate the final scores as in Ards paper.
+
+"""
+
 import os
 import numpy as np
 import torch
@@ -17,8 +22,10 @@ class TesterFinal(AStage):
         super().__init__(name=name, verbose=verbose)
         self._model : HyperModel = None
 
+        eval_conf = conf["eval"]
+
         self._batch_size = 1 # TODO: add support for batch_size > 1 (make sure per_image_statistics still works!)
-        self._tasks = conf["all_tasks"]
+        self._tasks = eval_conf["tasks"]
         self._input_saliencies = input_saliencies
         self._input_images_test = input_images
 
