@@ -6,6 +6,7 @@ The main network. Check out the config for all the available parameters.
 """
 
 import torch.nn as nn
+import torch.nn.functional as F
 from torchvision.models import mobilenet_v2
 
 import backend.multitask.hnet.cwl.custom_weight_layers as cwl
@@ -38,6 +39,11 @@ class MNET(cwl.CustomWeightsLayer):
 
         self.compute_cw_param_shapes()
     
+    def forward(self, x, weights):
+        _,_,h,w = x.shape
+        x = super(MNET, self).forward(x, weights)
+        return F.upsample_bilinear(x, (h,w)) # rescale to original size
+
     def get_mobilenet(self):
         return nn.Sequential(*list(mobilenet_v2(pretrained=True).features))
 
