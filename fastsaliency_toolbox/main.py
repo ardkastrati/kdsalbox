@@ -22,7 +22,6 @@ Available Commands:
 import os
 import click
 
-
 @click.group()
 def cli():
     pass
@@ -229,7 +228,7 @@ def train(model, histogram_matching, scale, blur, center_prior, logging_dir, inp
     help="More detailed testing (Such as per image statistics).")
 @click.option('-b', '--batch_size', help="The size of the batches used for testing.")
 def test(model, student_path, train_histogram_matching, train_scale, train_blur, train_center_prior, post_histogram_matching, post_scale, post_blur, post_center_prior, logging_dir, input_images, input_saliencies, recursive, verbose, detailed, batch_size):
-    """Trains model on images in a directory."""
+    """Tests model on images in a directory."""
 
     from backend.config import Config
     c = Config('config.json')

@@ -1,0 +1,6 @@
+{
+    "load_model": {
+        "run_path": "name/project/run_id",
+        "file_name": "path/file.pth"
+    }
+}

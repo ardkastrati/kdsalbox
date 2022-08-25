@@ -1,0 +1,5 @@
+{
+    "eval": {
+        "tasks": ["UniSal", "SAM", "DGII", "AIM", "SUN", "IKN", "GBVS", "BMS", "IMSIG", "RARE2012"]
+    }
+}
