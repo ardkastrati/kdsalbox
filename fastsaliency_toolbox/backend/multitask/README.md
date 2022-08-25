@@ -4,7 +4,7 @@ This is a research framework under development.
 It aims to provide tools to investigate how we can make saliency models generalize to new tasks and new image domains.
 In essence we are trying to find a model takes a few image-saliency pairs as input and then outputs a model that best fits the task "described" by those pairs.
 
-The framework currently supports meta-learning via Hypernetworks but should be easy to extend to new approaches.
+The framework currently supports a combined model of all 10 models using hypernetworks and can generalize to a new 11th task using a fraction of the images that are usually required.
 
 # Framework
 The frameworks core is a fully configurable experiment pipeline that currently supports the following stages:
@@ -15,8 +15,12 @@ The frameworks core is a fully configurable experiment pipeline that currently s
 | pretrain_one_task | Primes the Hypernetwork on one task (e.g. AIM)                                                          | Image/Saliency Pairs | [x]       |
 | train_catchup     | Freezes all shared Hypernetwork parameters and lets the individual parameters adjust to the shared ones | Image/Saliency Pairs | partially |
 | train             | Main training stage                                                                                     | Image/Saliency Pairs | [x]       |
+| generalize        | Generalizes to a new task                                                                               | Image/Saliency Pairs | [x]       |
 | test              | Generates a variety of metrics for a model                                                              | Image/Saliency Pairs | [x]       |
 | run               | For a list of images it produces the saliency maps and stores them                                      | Images               | [x]       |
+| tester_final      | Generates the metrics required for the tables                                                           | Images               | [x]       |
+| tables            | Generates the tables as in the paper (do this to benchmark your approach)                               | Metrics              | [x]       |
+| export            | Exports the model                                                                                       | .pth                 | [x]       |
 
 Also after each stage that modifies the model there is an ExportStage that simply saves the model.
 The framework is intended to be used with [Weights & Biases](https://wandb.ai/home)
