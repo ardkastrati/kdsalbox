@@ -2,9 +2,22 @@
 Runner
 ------
 
-For each task in conf["tasks"], 
-this runner will go over all images in conf["run"]["input_images_run"]
-and compute & store the saliency map for each of them.
+DESCRIPTION:
+    For each task in conf["tasks"], 
+    this runner will go over all images in conf["run"]["input_images_run"]
+    and compute & store the saliency map for each of them.
+
+RETURN VALUE:
+    Same as input
+
+CONFIG:
+run
+    tasks                   (List[str]) : all the tasks that will be trained
+    input_images_run        (str)       : path to images for running (folder/img.jpg)
+    overwrite               (bool)      : overwrite output?
+
+    save_to_wandb           (bool)      : save output to wandb
+    save_to_disk            (bool)      : save output to disk
 
 """
 

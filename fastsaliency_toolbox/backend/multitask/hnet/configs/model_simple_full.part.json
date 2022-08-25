@@ -8,6 +8,7 @@
             "embedding_size": 256
         },
         "mnet": {
+            "type": "original",
             "encoder_type": "cwl",
             "mobilenet_cutoff": 0,
     

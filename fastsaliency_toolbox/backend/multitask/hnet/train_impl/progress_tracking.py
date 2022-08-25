@@ -1,3 +1,8 @@
+"""
+Collection of ProgressTrackers
+
+"""
+
 from typing import List
 import os
 import numpy as np

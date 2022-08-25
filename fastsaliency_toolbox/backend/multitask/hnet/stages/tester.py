@@ -2,8 +2,24 @@
 Tester
 ------
 
-Computes a few metrics for all images in a folder and their corresponding saliency maps and reports them.
-By setting conf["test"]["per_image_statistics"], the stats will be produced per image additionally.
+DESCRIPTION:
+    Computes a few metrics [loss, NSS, CC, SIM, KL]
+    for all images in a folder and their corresponding saliency maps and reports them.
+    By setting conf["test"]["per_image_statistics"], the stats will be produced per image additionally.
+
+RETURN VALUE:
+    Same as input
+
+CONFIG:
+test:
+    tasks                   (List[str]) : all tasks that should be tested
+
+    input_saliencies        (str)       : path to saliency map base folder (base_folder/task/img.jpg)
+    input_images_test       (str)       : path to images for testing (folder/img.jpg), img in saliencies
+
+    imgs_per_task_test      (int)       : how many of the available images should be used for testing
+
+    per_image_statistics    (bool)      : generate the stats per image?
 
 """
 

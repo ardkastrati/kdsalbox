@@ -1,3 +1,12 @@
+"""
+Collection of DataProviders.
+
+Return Formats:
+    - MultitaskBatchProvider (task_id, X, y) where task_id varies
+    - BatchAndTaskProvider (task_id, X, y) where task_id is constant
+    - BatchProvider (X, y), simply wraps a DataLoader
+"""
+
 from typing import Dict
 import numpy as np
 from torch.utils.data import DataLoader

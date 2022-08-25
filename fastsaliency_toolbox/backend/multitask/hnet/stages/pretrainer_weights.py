@@ -1,8 +1,36 @@
 """
-PreTrainer
-----------
+PreTrainerWeights
+-----------------
 
-Trains a hypernetwork to output some specific weights (e.g. to learn pretrained weights before the actual training begins)
+DESCRIPTION:
+    Trains a hypernetwork to output some specific weights (e.g. to learn pretrained weights before the actual training begins)
+
+RETURN VALUE:
+    The best (according to validation loss) pretrained model
+
+CONFIG:
+pretrain_weights:
+    tasks                   (List[str]) : all the tasks that will be trained
+
+    target_model_weights    (str)       : base path to folder (folder/task/task.pth)
+    input_images_run        (str)       : path to images for running (folder/img.jpg)
+
+    loss                    (str)       : One of BCELoss, L1Loss, MSELoss, HuberLoss
+    batch_size              (int)       : batch size
+    epochs                  (int)       : amount of training epochs
+    lr                      (float)     : learning rate
+    lr_decay                (float)     : by how much should the lr decay in decay_epochs
+    decay_epochs            (int)       : which epoch should the lr decay
+
+    auto_checkpoint_steps   (int)       : automatically make checkpoint every x epochs
+    max_checkpoint_freq     (int)       : limits the amount of checkpoints that can be made (e.g. if improves every epoch)
+
+    batch_log_freq          (int)       : how often should loss be logged in console
+    wandb:
+        save_checkpoints_to_wandb (bool): should models be saved to wandb (false to reduce storage, export will happen anyway)
+        watch:
+            log           (Optional str): see wandb.watch documentation
+            log_freq      (int)         : see wandb.watch documentation
 
 """
 
@@ -13,7 +41,7 @@ from torch.utils.data import DataLoader
 
 import backend.student as stud
 from backend.multitask.hnet.datasets import WeightDataset
-from backend.multitask.hnet.stages.trainer import ATrainer
+from backend.multitask.hnet.stages.trainer_stage import ATrainer
 from backend.multitask.hnet.train_api.data import DataProvider
 from backend.multitask.hnet.train_api.training import TrainStep
 from backend.multitask.hnet.train_impl.data import BatchProvider

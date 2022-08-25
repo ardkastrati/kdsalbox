@@ -17,6 +17,7 @@ import click
 import wandb
 
 from backend.multitask.hnet.models.hyper_model import HyperModel
+from backend.multitask.pipeline.pipeline import Pipeline
 from backend.multitask.hnet.stages.runner import Runner
 from backend.multitask.hnet.stages.tester import Tester
 from backend.multitask.hnet.stages.trainer_main import MainTrainer
@@ -24,8 +25,7 @@ from backend.multitask.hnet.stages.pretrainer_weights import PreTrainerWeights
 from backend.multitask.hnet.stages.pretrainer_one_task import PreTrainerOneTask
 from backend.multitask.hnet.stages.trainer_catchup import TrainerCatchup
 from backend.multitask.hnet.stages.trainer_generalization_task import TrainerGeneralizationTask
-from backend.multitask.pipeline.pipeline import Pipeline
-from backend.multitask.pipeline.stages import ExportStage
+from backend.multitask.hnet.stages.export import ExportStage
 from backend.multitask.hnet.stages.load_model import ModelLoader
 from backend.multitask.hnet.stages.tester_final import TesterFinal
 from backend.multitask.hnet.stages.tables import Tables
@@ -67,8 +67,8 @@ def run_with_conf(conf, group=None):
         
     # construct and run the experiment pipeline
     try:
-        from backend.multitask.hnet.models.mnet import MNET
-        from backend.multitask.hnet.models.hnet import HNET
+        from backend.multitask.hnet.models.mnets import MNET
+        from backend.multitask.hnet.models.hnets import HNET
 
         verbose = conf["verbose"]
         print(f"Running {run_name}")

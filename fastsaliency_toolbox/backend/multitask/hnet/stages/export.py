@@ -1,18 +1,24 @@
 """
-Stages
-------
+Export Stage
+------------
 
-A collection of useful pipeline stages such as
-    - ExportStage: Exports a model to a specified path
+DESCRIPTION:
+    Save the current model to disk or wandb
+
+RETURN VALUE:
+    Same as input
+
+CONFIG:
+    None
 
 """
 
-import wandb
+
 import os
+import wandb
 
 from backend.multitask.pipeline.pipeline import AStage
 from backend.multitask.hnet.models.hyper_model import HyperModel
-
 
 class ExportStage(AStage):
     def __init__(self, name: str, path : str, verbose: bool = True):
@@ -26,7 +32,6 @@ class ExportStage(AStage):
         self._model = input
 
     def execute(self):
-        print()
         os.makedirs(os.path.dirname(self._path), exist_ok=True)
         self._model.save(self._path)
         wandb.save(self._path, base_path=wandb.run.dir)
@@ -37,4 +42,3 @@ class ExportStage(AStage):
 
     def cleanup(self):
         pass
-

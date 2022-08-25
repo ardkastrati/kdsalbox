@@ -6,6 +6,7 @@
             "task_cnt": 4
         },
         "mnet": {
+            "type": "original",
             "encoder_type": "mv2",
     
             "decoder_type": "full",

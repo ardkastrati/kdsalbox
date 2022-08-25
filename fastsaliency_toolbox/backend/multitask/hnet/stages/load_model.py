@@ -2,7 +2,16 @@
 ModelLoader
 ------
 
-Loads a model from a wandb save
+DESCRIPTION:
+    Loads a model from a wandb save
+
+RETURN VALUE:
+    The loaded model
+
+CONFIG:
+    load_model:
+        run_path: specifies the path of the wandb run
+        file_name: specifies the path to the pth
 
 """
 
@@ -11,7 +20,6 @@ import wandb
 
 from backend.multitask.pipeline.pipeline import AStage
 from backend.multitask.hnet.models.hyper_model import HyperModel
-from backend.multitask.hnet.train_impl_wandb.progress_tracking import TesterProgressTrackerWandb
 
 
 class ModelLoader(AStage):

@@ -1,5 +1,9 @@
-import os
+""" 
+Collection of checkpointers that are specific to wandb
 
+"""
+
+import os
 import wandb
 
 from backend.multitask.hnet.train_api.checkpointing import Checkpointer

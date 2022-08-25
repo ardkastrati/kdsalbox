@@ -1,3 +1,7 @@
+""" 
+Collection of progresstrackers that are specific to wandb
+"""
+
 import os
 from typing import Dict, List
 import numpy as np

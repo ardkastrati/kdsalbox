@@ -1,3 +1,8 @@
+"""
+Collection of Datasets
+
+"""
+
 from typing import Callable, List, Tuple
 import torch
 from torch.utils.data import Dataset

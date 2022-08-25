@@ -1,5 +1,19 @@
 """
-Computes the final metrics [KL, KL std, CC, CC std] for a model, that can then be used to generate the final scores as in Ards paper.
+TesterFinal
+-----------
+
+DESCRIPTION:
+    Computes the final metrics [KL, KL std, CC, CC std] for a model, 
+    that can then be used to generate the final scores as in the KDSalBox paper.
+
+RETURN VALUE:
+    Same as input
+
+CONFIG:
+eval:
+    tasks   (List[str]) : all the tasks that will be tested
+
+TODO: combine with tester.py and specify metrics that should be computed via config
 
 """
 

@@ -8,7 +8,6 @@ Allows for stages to be dynamically excluded by name.
 
 """
 
-
 from abc import ABC, abstractmethod
 import os
 from typing import List

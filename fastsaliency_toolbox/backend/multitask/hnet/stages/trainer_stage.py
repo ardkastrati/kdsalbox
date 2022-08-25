@@ -1,8 +1,8 @@
 """
 ATrainer
------------------
+--------
 
-Abstract baseclass that provides the framework for any trainer
+Abstract baseclass that provides the framework for any trainer stage
 
 """
 

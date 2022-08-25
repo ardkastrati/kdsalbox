@@ -15,7 +15,7 @@
         "use_eval_mode": false,
         "hnet": {
             "type": "chunked",
-            "task_cnt": 10,
+            "task_cnt": 11,
             "hidden_layers": [512, 512, 512, 512],
             "embedding_size": 256,
             "chunk_size": 65536,
@@ -23,11 +23,17 @@
             "chunk_emb_size": 16
         },
         "mnet": {
+            "type": "original",
             "encoder_type": "mv2",
-    
+            "mobilenet_cutoff": 0,
             "decoder_type": "full",
             "decoder_non_linearity": "ReLU6"
         }
+    },
+
+    "load_model": {
+        "run_path": "ba-yanickz/kdsalbox-generalization/mivytnuy",
+        "file_name": "11 - 0/train/best.pth"
     },
 
     "train": {

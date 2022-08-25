@@ -1,5 +1,14 @@
 """
-Contains a bunch of hypernetwork architectures
+Provides an interface that exposes a most general hypernetwork
+and a concrete implementation that selects a hypernetwork type 
+specified in the config.
+
+Also provides the actual hypernetwork architectures.
+
+TUTORIAL:
+    To add new hypernetwork architecture:
+    Add a class extending from AHNET and add an if case in HNET.
+    You can now set type=<your new type name> in the config.
 
 """
 
@@ -7,12 +16,68 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
+from abc import ABC, abstractmethod
 from typing import Dict, List, Union
+
 from hypnettorch.hnets.chunked_mlp_hnet import ChunkedHMLP
 from hypnettorch.hnets.mlp_hnet import HMLP
 
-from backend.multitask.hnet.models.hnet_interface import AHNET
+class AHNET(nn.Module, ABC):
+    """ Abstract hypernetwork class that exposes a default interface
+        that can be used by trainers for example. """
+    def __init__(self, target_shapes : List[torch.Size]):
+        nn.Module.__init__(self)
+        ABC.__init__(self)
 
+        self._target_shapes = target_shapes
+
+    @property
+    def target_shapes(self):
+        return self._target_shapes
+
+    @abstractmethod
+    def get_gradients_on_outputs(self) -> Dict[int, List[torch.Tensor]]:
+        """ Returns a dictionary that for each task_id contains a list of gradients (representing the different targets = MNET parameters) """
+        pass
+
+    @abstractmethod
+    def task_parameters(self, task_ids : List[int]) -> List[torch.nn.parameter.Parameter]:
+        """ Gets all the parameters that are unique to a list of tasks
+            (e.g. the embedding vectors)
+        """
+        pass
+
+class HNET(AHNET):
+    """ General HNET that can take different forms 
+        depending on the specified type in the config. """
+    def __init__(self, target_shapes : List[torch.Size], hnet_conf : dict):
+        super().__init__(target_shapes)
+
+        hnet_type = hnet_conf["type"]
+        if hnet_type == "simple":
+            self.hnet = SimpleHNET(target_shapes, hnet_conf)
+        elif hnet_type == "chunked":
+            self.hnet = ChunkedHNET(target_shapes, hnet_conf)
+        elif hnet_type == "single_layer":
+            self.hnet = SingleLayerHNET(target_shapes, hnet_conf)
+        else:
+            raise ValueError(f"Hypernetwork Configuration: Does not support type {hnet_type}")
+
+    def forward(self, task_id : Union[int, List[int]]):
+        return self.hnet.forward(task_id)
+
+    def get_gradients_on_outputs(self) -> List[torch.Tensor]:
+        return self.hnet.get_gradients_on_outputs()
+    
+    def task_parameters(self, task_ids : List[int]) -> List[torch.nn.parameter.Parameter]:
+        return self.hnet.task_parameters(task_ids)
+
+
+
+
+
+
+########## ACTUAL HYPERNETWORK ARCHITECTURES ##########
 
 class ChunkedHNET(AHNET):
     """

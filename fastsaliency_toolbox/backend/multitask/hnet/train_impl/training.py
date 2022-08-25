@@ -1,3 +1,8 @@
+"""
+Collection of Trainers and TrainingSteps
+
+"""
+
 from typing import Dict, List
 import numpy as np
 import torch

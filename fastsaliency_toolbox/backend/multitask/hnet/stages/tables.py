@@ -2,7 +2,16 @@
 Tables
 ------
 
-Generates tables (like in the original paper) that show how well the models perform on a variety of image domains.
+DESCRIPTION:
+    Generates latex tables (like in the original KDSalBox paper) 
+    that show how well the models perform on a variety of image domains.
+
+RETURN VALUE:
+    Same as input
+
+CONFIG:
+eval
+    tasks   (List[str]) : all the tasks that will be included in the table
 
 """
 

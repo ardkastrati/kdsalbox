@@ -1,3 +1,9 @@
+"""
+Actions are just callbacks that are invoked at certain points during the training routine.
+The names suggest the intended point of usage.
+
+"""
+
 from abc import ABC, abstractmethod
 from typing import List
 

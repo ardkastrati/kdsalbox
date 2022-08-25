@@ -1,5 +1,10 @@
+""" 
+Collection of actions for training
+
+"""
+
 from math import ceil
-from typing import Callable, List
+from typing import List
 import numpy as np
 import torch
 

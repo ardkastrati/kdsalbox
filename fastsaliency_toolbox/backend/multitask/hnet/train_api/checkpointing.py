@@ -1,6 +1,11 @@
+"""
+A checkpointer is responsible for making intermediate saves of the model during training.
+It should also provide the option to restore the best save at the end of training.
+
+"""
+
 from abc import ABC, abstractmethod
 
-from backend.multitask.pipeline.pipeline import AStage
 from backend.multitask.hnet.train_api.training import ATrainer
 from backend.multitask.hnet.models.hyper_model import HyperModel
 

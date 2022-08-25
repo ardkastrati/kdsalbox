@@ -1,3 +1,8 @@
+""" 
+Collection of actions that are specific to wandb
+
+"""
+
 import wandb
 from backend.multitask.hnet.train_api.actions import StartAction
 from backend.multitask.hnet.train_api.training import ATrainer

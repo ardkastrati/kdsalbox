@@ -1,9 +1,44 @@
 """
-Trainer Generalization Task
-------------------------
+TrainerGeneralizationTask
+-------------------------
 
-Trains a model on a new task and reports how good the model performs on the new task.
-Only trains the embedding first and then trains the entire network ('freeze_hnet_shared_steps' config parameter)
+DESCRIPTION:
+    Trains a model on a new task and reports how good the model performs on the new task.
+    Only trains the embedding first and then trains the entire network ('freeze_hnet_shared_steps' config parameter)
+
+RETURN VALUE:
+    The best (according to validation loss) generalized model
+
+CONFIG:
+train_generalization_task:
+    tasks                   (List[str]) : all tasks that will be trained
+
+    input_saliencies        (str)       : path to saliency map base folder (base_folder/task/img.jpg)
+    input_images_train      (str)       : path to images for training (folder/img.jpg), img in saliencies
+    train_img_cnt           (int)       : how many images of the available images should be used for training for each task
+    input_images_val        (str)       : path to images for validation (folder/img.jpg), img in saliencies
+    val_img_cnt             (int)       : how many images of the available images should be used for validation for each task
+    input_images_run        (str)       : path to images for running (folder/img.jpg)
+
+    loss                    (str)       : One of BCELoss, L1Loss, MSELoss, HuberLoss
+    batch_size              (int)       : batch size
+    epochs                  (int)       : amount of training epochs
+    lr                      (float)     : learning rate
+    lr_decay                (float)     : by how much should the lr decay in decay_epochs
+    decay_epochs            (int)       : which epoch should the lr decay
+    freeze_encoder_steps    (int)       : for how many epochs should the encoder be frozen at the beginning
+    freeze_hnet_shared_steps(int)       : for how many epochs should the shared hypernetwork parameters be frozen at the beginning (training embedding only)
+
+    auto_checkpoint_steps   (int)       : automatically make checkpoint every x epochs
+    max_checkpoint_freq     (int)       : limits the amount of checkpoints that can be made (e.g. if improves every epoch)
+
+    log_freq                (int)       : how often should epoch summary be logged in console
+    batch_log_freq          (int)       : how often should loss be logged in console (make this very large to turn off)
+    wandb:
+        save_checkpoints_to_wandb (bool): should models be saved to wandb (false to reduce storage, export will happen anyway)
+        watch:
+            log           (Optional str): see wandb.watch documentation
+            log_freq      (int)         : see wandb.watch documentation
 
 """
 
@@ -14,7 +49,7 @@ from torch.utils.data import DataLoader
 
 from backend.datasets import TrainDataManager
 from backend.multitask.hnet.train_api.data import DataProvider
-from backend.multitask.hnet.stages.trainer import ASaliencyTrainer
+from backend.multitask.hnet.stages.trainer_stage import ASaliencyTrainer
 from backend.multitask.hnet.train_impl.data import BatchAndTaskProvider
 from backend.multitask.pipeline.pipeline import AStage
 from backend.multitask.hnet.train_impl.training import Trainer

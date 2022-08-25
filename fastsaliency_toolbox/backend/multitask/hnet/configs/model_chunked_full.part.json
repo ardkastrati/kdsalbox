@@ -11,6 +11,7 @@
             "chunk_emb_size": 16
         },
         "mnet": {
+            "type": "original",
             "encoder_type": "cwl",
             "mobilenet_cutoff": 0,
     

@@ -1,3 +1,5 @@
+""" Responsible for optimizing the model """
+
 from abc import ABC, abstractmethod
 from typing import List
 import torch
@@ -6,6 +8,8 @@ import torch.nn as nn
 from backend.multitask.hnet.models.hyper_model import HyperModel
 
 class ATrainer(ABC):
+    """ Abstracts the training routine and the state of the trainer.
+        The state may be passed to actions (depending on the implementation) """
     def __init__(self, epochs : int, model : HyperModel, optimizer : torch.optim.Optimizer, loss_fn : nn.Module):
         super().__init__()
 
@@ -55,9 +59,11 @@ class ATrainer(ABC):
 
     @abstractmethod
     def train(self):
+        """ Exectues the training routine """
         pass
 
 class TrainStep(ABC):
+    """ A single step of training (usually one batch) """
     def __init__(self):
         super().__init__()
 

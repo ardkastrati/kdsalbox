@@ -9,7 +9,7 @@ Abstracts a hypernetwork and mainnetwork such that it can be treated as one mode
 from typing import Callable, List
 import torch
 
-from backend.multitask.hnet.models.hnet_interface import AHNET
+from backend.multitask.hnet.models.hnets import AHNET
 from backend.multitask.hnet.cwl.custom_weight_layers import CustomWeightsLayer
 
 class HyperModel():
