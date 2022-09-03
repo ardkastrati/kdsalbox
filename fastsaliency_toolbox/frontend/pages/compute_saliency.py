@@ -1,8 +1,8 @@
 import streamlit as st
 import numpy as np
-from PIL import Image
 import matplotlib.pyplot as plt
 import pandas as pd
+from PIL import Image
 
 # Helper functions (Just for developing)!
 def read_image(path, dtype=np.float32):
@@ -37,7 +37,7 @@ def app():
 	#    st.session_state.computed_state = False 
 
     # Code to read a single file 
-    uploaded_image = st.file_uploader("Choose an image", type = ['jpg', 'png'])
+    uploaded_image = st.file_uploader("Choose an image", type = ['jpeg', 'jpg', 'png'])
 
     ''' Compute the Saliency of the Images. '''
     if uploaded_image:
@@ -79,7 +79,7 @@ def app():
         st.markdown("### Please upload the ground truth.") 
         st.write("\n")
         # Code to read a single file 
-        uploaded_ground_truth = st.file_uploader("Choose the ground truth", type = ['jpg', 'png'])
+        uploaded_ground_truth = st.file_uploader("Choose the ground truth", type = ['jpeg', 'jpg', 'png'])
         if uploaded_ground_truth and st.button("Evaluate Model"):
             ground_truth = Image.open(uploaded_ground_truth)
             col0, col1, col2 = st.columns([2, 5, 7])

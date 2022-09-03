@@ -1,14 +1,29 @@
+"""
+Trainer
+-------
+
+Does train a student on all original images in a folder using all saliency images in a different folder. 
+Checkout the TrainDataLoader documentation for further details.
+
+"""
+
 import os
 import numpy as np
 import torch
 from torch.utils.data import DataLoader
+
+from .student import Student
+from parameters import ParameterMap
+from .pseudomodels import ModelManager
 from .datasets import TrainDataManager
 from .utils import print_pretty_header
 
 class Trainer(object):
     def __init__(self,
-                 model_manager,
-                 train_parameter_map, preprocess_parameter_map, gpu=0):
+                 model_manager : ModelManager,
+                 train_parameter_map : ParameterMap, 
+                 preprocess_parameter_map : ParameterMap, 
+                 gpu : int = 0):
 
 
         self._model = model_manager.get_matching(train_parameter_map.get_val('model'))
@@ -34,15 +49,14 @@ class Trainer(object):
             'val': DataLoader(ds_validate, batch_size=self._batch_size, shuffle=False, num_workers=4)
         }
 
-    def save(self, path, model):
+    def save(self, path : str, model : Student):
         d = {}
         d['student_model'] = model.state_dict()
         torch.save(d, path)
-        #if optimizer:
-        #    d['optimizer'] = optimizer.state_dict()
-        #t.save(d, path)
         
-    def save_weight(self, smallest_val, best_epoch, best_model, loss_val, epoch, model, checkpoint_dir):
+    def save_weight(self, smallest_val : float, best_epoch : int, best_model : Student, 
+        loss_val : float, epoch : int, model : Student, checkpoint_dir : str):
+
         path = '{}/{}_{:f}.pth'.format(checkpoint_dir, epoch, loss_val)
         self.save(path, model)
         
@@ -52,23 +66,22 @@ class Trainer(object):
             best_model = model
         return smallest_val, best_epoch, best_model, model
 
-    def pretty_print_epoch(self, epoch, mode, loss, lr):
+    def pretty_print_epoch(self, epoch : int, mode : str, loss : float, lr : float):
         print('--------------------------------------------->>>>>>')
         print('Epoch {}: loss {} {}, lr {}'.format(epoch, mode, loss, lr))
         print('--------------------------------------------->>>>>>')
 
     
-    def memory_check(self, position=None):
+    def memory_check(self, position : str = None):
         print(position)
         for i in range(8):
             print(torch.cuda.memory_reserved(i))
             print(torch.cuda.memory_allocated(i))
             print("")
     
-    def train_one(self, model, dataloader, optimizer, mode):
-        all_loss, all_NSS, all_CC, all_SIM = [], [], [], []
+    def train_one(self, model : Student, dataloader : DataLoader, optimizer, mode : str):
+        all_loss = []
         my_loss = torch.nn.BCELoss()
-        # my_loss = lambda s_map1, s_map2: kldiv(s_map1, s_map2) - nss(s_map1, s_map2) - cc(s_map1, s_map2)
         
         for i, (X, y) in enumerate(dataloader[mode]):   
             optimizer.zero_grad()
@@ -102,11 +115,6 @@ class Trainer(object):
     def start_train(self):
         if self._verbose: print("Encoder frozen...")
         student = self._model.get_student()
-
-        #def count_parameters(model):
-        #    return sum(p.numel() for p in model.parameters() if p.requires_grad)
-        #print(count_parameters(student))
-        #print(count_parameters(student.encoder))
 
         lr = 0.01
         lr_decay = 0.1

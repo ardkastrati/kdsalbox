@@ -1,0 +1,35 @@
+{
+    "train_generalization_task": {
+        "tasks": ["IKN"],
+
+        "input_saliencies": "./dataset/dummy_saliency/",
+        "input_images_train": "./dataset/dummy_images/train/",
+        "train_img_cnt": 10,
+        "input_images_val": "./dataset/dummy_images/val/",
+        "val_img_cnt": 250,
+        "input_images_run": "./dataset/dummy_images/run/",
+        
+        "loss": "BCELoss",
+        "batch_size": 4,
+        "epochs": 2000,
+        "lr": 0.001,
+        "lr_decay": 0.1,
+        "decay_epochs": [],
+        
+        "freeze_encoder_steps": 250,
+        "freeze_hnet_shared_steps": 250,
+        
+        "auto_checkpoint_steps": 200,
+        "max_checkpoint_freq": 50,
+
+        "log_freq": 20,
+        "batch_log_freq": 100,
+        "wandb": {
+            "save_checkpoints_to_wandb": false,
+            "watch": {
+                "log": null,
+                "log_freq": 100
+            }
+        }
+    }
+}

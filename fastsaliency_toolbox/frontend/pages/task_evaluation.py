@@ -1,11 +1,9 @@
 # Import necessary libraries
-import json
 import pandas as pd
-from pandas.core.arrays.sparse import dtype
 import streamlit as st
-from PIL import Image
 import numpy as np
 import matplotlib.pyplot as plt
+from PIL import Image
 
 # Helper functions (Just for developing)!
 def read_image(path, dtype=np.float32):
@@ -42,13 +40,13 @@ def app():
     path = "frontend/Images/"
 
     if 'computed_images' not in st.session_state:
-	    st.session_state.computed_images = [Image.open(path + models[i].lower() + '.jpg') for i in range(10)]
+        st.session_state.computed_images = [Image.open(path + models[i].lower() + '.jpg') for i in range(10)]
+        
+    # Code to read a single file 
+    uploaded_image = st.file_uploader("Choose the image", type = ['jpeg', 'jpg', 'png'])
 
     # Code to read a single file 
-    uploaded_image = st.file_uploader("Choose the image", type = ['jpg', 'png'])
-
-    # Code to read a single file 
-    uploaded_annotation = st.file_uploader("Choose the annotations", type = ['jpg', 'png'])
+    uploaded_annotation = st.file_uploader("Choose the annotations", type = ['jpeg', 'jpg', 'png'])
 
     if uploaded_image and uploaded_annotation:
         original_image = Image.open(uploaded_image)

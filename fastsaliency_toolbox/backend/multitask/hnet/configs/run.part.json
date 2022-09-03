@@ -1,0 +1,10 @@
+{
+    "run": {
+        "tasks": ["UniSal", "SAM", "DGII", "AIM", "SUN", "IKN", "GBVS", "BMS", "IMSIG", "RARE2012"],
+        "input_images_run": "./dataset/dummy_images/train/",
+        "overwrite": false,
+
+        "save_to_wandb": true,
+        "save_to_disk": true
+    }
+}

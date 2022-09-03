@@ -1,10 +1,20 @@
+"""
+ParameterMap
+------------
+
+Represents a collection of named parameters, where each parameter has 
+a value, description and a list of valid values.
+
+"""
+
 import copy
+from typing import Any, List
 
 class ParameterMap(object):
     def __init__(self):
         self._parameters = {}
 
-    def set_from_dict(self, parameter_dict):
+    def set_from_dict(self, parameter_dict : dict):
         for name, properties in parameter_dict.items():
             if not isinstance(properties, dict):
                 raise ValueError(
@@ -15,8 +25,9 @@ class ParameterMap(object):
                 properties['default'],
                 description=properties.get('description'),
                 valid_values=properties.get('valid_values'))
+        return self
 
-    def set(self, name, value, description=None, valid_values=None):
+    def set(self, name : str, value : Any, description : str = None, valid_values : List[Any] = None):
         if name in self._parameters:
             self._parameters[name].update(
                 value, description=description, valid_values=valid_values)
@@ -27,15 +38,15 @@ class ParameterMap(object):
                 description=description,
                 valid_values=valid_values)
 
-    def update(self, other_parameter_map):
+    def update(self, other_parameter_map : 'ParameterMap'):
         for name, parameter in other_parameter_map._parameters.items():
             self.set(name, parameter.value, parameter.description,
                      parameter.valid_values)
 
-    def get_val(self, name):
+    def get_val(self, name : str):
         return self._parameters[name].value
 
-    def exists_val(self, name):
+    def exists_val(self, name : str):
         print([n.name for n in self._parameters.values()])
         return name in [n.name for n in self._parameters.values()]
 
@@ -57,15 +68,21 @@ class ParameterMap(object):
         for name in self._parameters:
             self._parameters[name].pretty_print()
 
+    def __str__(self):
+        res = ""
+        for name in self._parameters:
+            res += str(self._parameters[name]) + " \n "
+        return res
+
 
 class Parameter(object):
-    def __init__(self, name, value, description=None, valid_values=None):
+    def __init__(self, name : str, value : Any, description : str = None, valid_values : List[Any] = None):
         self.name = name
         self.value = value
         self.description = description
         self.valid_values = valid_values
 
-    def update(self, value, description=None, valid_values=None):
+    def update(self, value : Any, description :str = None, valid_values : List[Any] = None):
         if description is not None:
             self.description = description
         if valid_values is not None:
@@ -74,4 +91,7 @@ class Parameter(object):
         self.value = value
 
     def pretty_print(self):
-        print("Parameter: " + str(self.name) + ": " + str(self.value))
+        print(str(self))
+
+    def __str__(self):
+        return "Parameter: " + str(self.name) + ": " + str(self.value)

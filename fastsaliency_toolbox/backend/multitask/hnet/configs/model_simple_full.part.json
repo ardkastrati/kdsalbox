@@ -1,0 +1,19 @@
+{
+    "model": {
+        "use_eval_mode": true,
+        "hnet": {
+            "type": "simple",
+            "task_cnt": 4,
+            "hidden_layers": [512, 512, 512, 10],
+            "embedding_size": 256
+        },
+        "mnet": {
+            "type": "original",
+            "encoder_type": "cwl",
+            "mobilenet_cutoff": 0,
+    
+            "decoder_type": "full",
+            "decoder_non_linearity": "ReLU6"
+        }
+    }
+}

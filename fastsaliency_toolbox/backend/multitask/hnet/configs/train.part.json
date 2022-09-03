@@ -1,0 +1,33 @@
+{
+    "train": {
+        "tasks": ["UniSal", "SAM", "IKN", "GBVS", "BMS", "IMSIG", "RARE2012"],
+
+        "input_saliencies": "./dataset/dummy_saliency/",
+        "input_images_train": "./dataset/dummy_images/train/",
+        "imgs_per_task_train": 1500,
+        "input_images_val": "./dataset/dummy_images/val/",
+        "imgs_per_task_val": 750,
+        "input_images_run": "./dataset/dummy_images/run/",
+        
+        "loss": "BCELoss",
+        "batch_size": 4,
+        "consecutive_batches_per_task": 8,
+        "epochs": 15,
+        "lr": 0.001,
+        "lr_decay": 0.1,
+        "freeze_encoder_steps": 3,
+        "decay_epochs": [],
+        
+        "auto_checkpoint_steps": 5,
+        "max_checkpoint_freq": 3,
+
+        "batch_log_freq": 100,
+        "wandb": {
+            "save_checkpoints_to_wandb": false,
+            "watch": {
+                "log": null,
+                "log_freq": 100
+            }
+        }
+    }
+}
